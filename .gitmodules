@@ -1,0 +1,3 @@
+[submodule "PatchCoreTest/src/main/cpp/gtest"]
+	path = PatchCoreTest/src/main/cpp/gtest
+	url = https://github.com/google/googletest.git

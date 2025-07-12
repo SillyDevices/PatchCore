@@ -1,0 +1,51 @@
+/*
+ * PatchCore — Modular Synthesizer Engine
+ * Copyright (c) 2025 Evgenii Petrov
+ *
+ * This file is part of PatchCore.
+ *
+ * PatchCore is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * PatchCore is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU AGPL License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * Commercial licensing available: contact sillydevices@gmail.com
+ */
+
+#ifndef PATCHCORE_CALLBACKFLOATUSERINPUT_HPP
+#define PATCHCORE_CALLBACKFLOATUSERINPUT_HPP
+
+#include "patchcore/module/input/user/FloatUserInput.hpp"
+#include "patchcore/callback/OnStartBuffer.hpp"
+#include <string>
+
+class CallbackFloatUserInput: public FloatUserInput{
+public:
+    class OnSetCallback {
+    public:
+        virtual ~OnSetCallback() = default;
+        virtual void onSet(float newValue) = 0;
+    };
+public:
+    CallbackFloatUserInput(std::string name, OnSetCallback *callback);
+    //TODO check for memory leak with this destructor
+    virtual ~CallbackFloatUserInput() = default;
+public:
+    inline void setValue(float newValue);
+private:
+    OnSetCallback *callback;
+};
+
+inline void CallbackFloatUserInput::setValue(float newValue) {
+    callback->onSet(newValue);
+}
+
+#endif //PATCHCORE_CALLBACKFLOATUSERINPUT_HPP

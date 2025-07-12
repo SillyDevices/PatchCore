@@ -1,0 +1,33 @@
+language = Objective-C
+
+headers =   modules/KeyboardModuleWrapper.h \
+            CommonAudioInterface.h \
+            WaveTableProviderWrapper.h \
+            DefaultWaveTableProviderWrapper.h \
+            ModuleFactoryWrapper.h \
+            DefaultModuleFactoryWrapper.h \
+            ModularSynthWrapper.h \
+            ModuleParameterWrapper.h \
+            ModuleWrapper.h \
+            PatchModuleWrapper.h \
+            PolyModuleWrapper.h \
+            UserInputWrapper.h \
+            modules/IndicatorModuleWrapper.h
+
+package = com.sillydevices.patchcore.ios.wrappers
+
+#working, but only one target
+#linkerOpts = -framework PatchCoreWrapper
+             #-F/Users/geka/Develop/Projects/android/DigitronSynthesizer/WaveCave/PatchCore/PatchCoreMultiplatform/build/xcode_output/Debug/PatchCoreWrapper.xcframework/ios-arm64_x86_64-simulator
+
+
+#modules = PatchCoreWrapperObj
+#package = PatchCoreWrapperObj
+
+
+#compilerOpts = -framework PatchCoreWrapperObj
+#linkerOpts = -framework PatchCoreWrapperObj
+
+#linkerOpts = -L${projectDir}/src/nativeMain/cpp -lnative
+#compilerOpts = -I/Users/geka/Develop/Projects/android/DigitronSynthesizer/WaveCave/composeApp/src/nativeMain/cpp
+#compilerOpts = -Isrc/nativeMain/cpp

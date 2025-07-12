@@ -1,0 +1,42 @@
+name: Publish CI
+
+on:
+  push:
+    tags:
+      - v*
+
+env:
+  USERNAME: ${{ secrets.DIGITRON_GPR_USERNAME }}
+  TOKEN: ${{ secrets.DIGITRON_GPR_TOKEN }}
+
+jobs:
+  publish:
+    runs-on: macos-15
+    steps:
+      - name: Set tag version to ENV
+        run: echo "TAG_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+      - uses: actions/checkout@v3
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v1
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Build and Publish PatchCore with Gradle
+        env:
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_IN_MEMORY_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: gradle PatchCore:publishAllPublicationsToMavenCentralRepository -PgitTag=${TAG_VERSION}
+      - name: Build and Publish PatchCoreMultiplatform with Gradle
+        env:
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_IN_MEMORY_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_IN_MEMORY_KEY_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+        run: gradle PatchCoreMultiplatform:publishAllPublicationsToMavenCentralRepository -PgitTag=${TAG_VERSION}
