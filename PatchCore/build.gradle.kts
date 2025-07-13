@@ -9,9 +9,6 @@ plugins {
     alias(libs.plugins.vanniktech.maven.publish)
 }
 
-group = "com.sillydevices"      // needs for composite build
-version = "1.0-DEV"             // needs for composite build
-
 android {
 
     namespace = "com.sillydevices.patchcore.andoid"
@@ -107,28 +104,6 @@ mavenPublishing {
             publishJavadocJar = false,
         )
     )
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "DigitronGithub"
-            url = uri("https://maven.pkg.github.com/DigitronSynthesizer/repository")
-            credentials {
-                val propertiesFile = project.rootProject.file("repository.properties")
-                val credentialsPair = if (propertiesFile.exists()) {
-                    val properties: Properties = Properties().apply { load(propertiesFile.inputStream()) }
-                    properties.getProperty("digitron.gpr.push.user") to properties.getProperty("digitron.gpr.push.token")
-                } else {
-                    val user = project.findProperty("digitron.gpr.push.user") as String? ?: (System.getenv("USERNAME"))
-                    val key = project.findProperty("digitron.gpr.push.token") as String? ?: System.getenv("TOKEN")
-                    user to key
-                }
-                username = credentialsPair.first
-                password = credentialsPair.second
-            }
-        }
-    }
 }
 
 task("getArtifactVersion") {

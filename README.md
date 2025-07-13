@@ -131,14 +131,21 @@ cp local.properties PatchCore/local.properties
 Then, include the submodule in your build setup:
 settings.gradle.kts
 ```kotlin
-includeBuild("PatchCore")
+includeBuild("PatchCore") {
+    dependencySubstitution {
+        substitute(module("com.sillydevices.patchcore:native-android")).using(project(":PatchCore"))
+        substitute(module("com.sillydevices.patchcore:patchcore-multiplatform")).using(project(":PatchCoreMultiplatform"))
+    }
+}
 ```
 
-add dependency to app module build.gradle.kts and enable prefab
+add dependency to app module build.gradle.kts
 
 ```kotlin
 //build.gradle.kts
 dependencies {
-    implementation("com.sillydevices:PatchCoreMultiplatform:1.0-DEV")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.0")
 }
 ```
+
+add local swift package dependency to your iOS project from PatchCore folder
