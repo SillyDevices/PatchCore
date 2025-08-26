@@ -102,13 +102,13 @@ Add the dependency to your build.gradle.kts
 ```kotlin
 // for kotlin multiplatform projects
 commonMain.dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.0")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.1")
 }
 // for android projects
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.0")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.1")
     // or
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.1.0")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.1.1")
 }
 
 ```
@@ -135,6 +135,7 @@ includeBuild("PatchCore") {
     dependencySubstitution {
         substitute(module("com.sillydevices.patchcore:native-android")).using(project(":PatchCore"))
         substitute(module("com.sillydevices.patchcore:patchcore-multiplatform")).using(project(":PatchCoreMultiplatform"))
+        substitute(module("com.sillydevices.patchcore:patchcore-multiplatform-android")).using(project(":PatchCoreMultiplatform"))
     }
 }
 ```
@@ -144,7 +145,7 @@ add dependency to app module build.gradle.kts
 ```kotlin
 //build.gradle.kts
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.0")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.1")
 }
 ```
 
