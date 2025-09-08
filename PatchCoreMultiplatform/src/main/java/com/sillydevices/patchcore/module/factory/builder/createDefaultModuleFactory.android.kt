@@ -34,7 +34,7 @@ actual fun ModuleFactoryBuilder.createDefaultModuleFactory(
 ): ModuleFactory {
     val pointer = DefaultModuleFactoryJni.defaultModuleFactoryCreate(
         waveTableProvider.pointer.nativePointer,
-        customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL
+        customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
     )
     return AndroidDefaultModuleFactory(ModuleFactoryPointer(pointer))
 }
