@@ -26,6 +26,6 @@ data class ModuleFactoryPointer(
     override val nativePointer: ULong
 ): NativePointer {
     companion object {
-        const val NULL: ULong = 0uL
+        const val NULL_VALUE: ULong = 0uL
     }
 }

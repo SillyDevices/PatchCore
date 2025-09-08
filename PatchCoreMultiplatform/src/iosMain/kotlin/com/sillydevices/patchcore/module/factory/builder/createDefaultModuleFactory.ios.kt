@@ -36,7 +36,7 @@ actual fun ModuleFactoryBuilder.createDefaultModuleFactory(
 ): ModuleFactory {
     val wrapper = DefaultModuleFactoryWrapper(
         waveTableProvider.pointer.nativePointer,
-        (customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL)
+        (customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE)
     )
     return IosDefaultModuleFactory(wrapper)
 }
