@@ -40,7 +40,9 @@
 }
 
 - (void)dealloc {
-    delete _provider;
+    //TODO return delete, after solving the issue
+    //No one hold link to this wrapper
+    //delete _provider;
 }
 
 - (uintptr_t)getRawPointerToWaveTableProvider { 
