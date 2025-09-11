@@ -36,5 +36,6 @@ actual fun ModuleFactoryBuilder.createDefaultModuleFactory(
         waveTableProvider.pointer.nativePointer,
         customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
     )
-    return AndroidDefaultModuleFactory(ModuleFactoryPointer(pointer))
+    //save WaveTableProvider reference to avoid deallocation
+    return AndroidDefaultModuleFactory(ModuleFactoryPointer(pointer), waveTableProvider)
 }

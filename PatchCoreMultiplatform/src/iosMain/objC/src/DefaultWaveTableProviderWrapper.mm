@@ -27,26 +27,17 @@
 #include <patchcore/dsp/wavetable/DefaultWaveTableProvider.hpp>
 
 
-@implementation DefaultWaveTableProviderWrapper {
-    WaveTableProvider* _provider;
-}
+@implementation DefaultWaveTableProviderWrapper
 
 - (instancetype)initWithSampleRate:(NSInteger)sampleRate {
-    self = [super init];
-    if (self) {
-        _provider = new DefaultWaveTableProvider(sampleRate);
+    DefaultWaveTableProvider* provider = new DefaultWaveTableProvider(sampleRate);
+    void* pointer = reinterpret_cast<void*>(provider);
+    self = [super initWithProvider:pointer];
+    if (!self) {
+        delete provider;
+        return nil;
     }
     return self;
-}
-
-- (void)dealloc {
-    //TODO return delete, after solving the issue
-    //No one hold link to this wrapper
-    //delete _provider;
-}
-
-- (uintptr_t)getRawPointerToWaveTableProvider { 
-    return reinterpret_cast<uintptr_t>(dynamic_cast<WaveTableProvider*>(_provider));
 }
 
 @end

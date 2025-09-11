@@ -24,9 +24,13 @@ package com.sillydevices.patchcore.android.modules.factory
 
 import com.sillydevices.patchcore.android.jni.modules.factory.ModuleFactoryJni
 import com.sillydevices.patchcore.module.factory.ModuleFactory
+import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
 abstract class AndroidModuleFactory: ModuleFactory {
+    protected abstract var waveTableProvider: WaveTableProvider?
+
     override fun release() {
+        waveTableProvider = null
         ModuleFactoryJni.moduleFactoryRelease(pointer.nativePointer)
     }
 }

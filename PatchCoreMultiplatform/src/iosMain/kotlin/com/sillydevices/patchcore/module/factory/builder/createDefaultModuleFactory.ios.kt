@@ -34,10 +34,10 @@ actual fun ModuleFactoryBuilder.createDefaultModuleFactory(
     waveTableProvider: WaveTableProvider,
     customModuleFactory: ModuleFactory?
 ): ModuleFactory {
-    //TODO save wavetable provider
     val wrapper = DefaultModuleFactoryWrapper(
         waveTableProvider.pointer.nativePointer,
         (customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE)
     )
-    return IosDefaultModuleFactory(wrapper)
+    //save WaveTableProvider reference to avoid deallocation
+    return IosDefaultModuleFactory(wrapper, waveTableProvider)
 }

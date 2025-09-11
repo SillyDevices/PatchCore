@@ -20,17 +20,9 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
+package com.sillydevices.patchcore.android.jni.modules.factory
 
-#ifndef DefaultWaveTableProviderWrapper_h
-#define DefaultWaveTableProviderWrapper_h
-
-#import <Foundation/Foundation.h>
-#import "WaveTableProviderWrapper.h"
-
-@interface DefaultWaveTableProviderWrapper : WaveTableProviderWrapper
-
-- (instancetype)initWithSampleRate:(NSInteger)sampleRate;
-
-@end
-
-#endif /* DefaultWaveTableProviderWrapper_h */
+object WaveTableProviderJni {
+    @JvmName("waveTableProviderRelease")
+    external fun waveTableProviderRelease(pointer: ULong)
+}

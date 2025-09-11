@@ -22,10 +22,22 @@
 
 package com.sillydevices.patchcore.android.modules.factory
 
+import android.util.Log
+import com.sillydevices.patchcore.android.jni.modules.factory.WaveTableProviderJni
 import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
 abstract class AndroidWaveTableProvider: WaveTableProvider {
+
+    init {
+        Log.d("AndroidWaveTableProvider", "Creating WaveTableProvider")
+    }
+
     override fun release() {
-        //TODO call jni method to release resources
+        Log.d("AndroidWaveTableProvider", "Releasing WaveTableProvider with pointer: ${pointer.nativePointer}")
+        WaveTableProviderJni.waveTableProviderRelease(pointer.nativePointer)
+    }
+
+    protected fun finalize() {
+        release()
     }
 }

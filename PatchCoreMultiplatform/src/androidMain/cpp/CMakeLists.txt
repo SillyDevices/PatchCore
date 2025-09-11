@@ -19,6 +19,7 @@ add_library( # Sets the name of the library.
         android/AudioInterface/utils/AudioStreamCallbackProxy.cpp
 
         jni/DefaultWaveTableProviderJni.cpp
+        jni/WaveTableProviderJni.cpp
         jni/DefaultModuleFactoryJni.cpp
         jni/ModuleFactoryJni.cpp
         jni/ModuleJni.cpp

@@ -21,16 +21,29 @@
  */
 
 
-#ifndef DefaultWaveTableProviderWrapper_h
-#define DefaultWaveTableProviderWrapper_h
-
 #import <Foundation/Foundation.h>
 #import "WaveTableProviderWrapper.h"
+#include <patchcore/dsp/wavetable/WaveTableProvider.hpp>
 
-@interface DefaultWaveTableProviderWrapper : WaveTableProviderWrapper
 
-- (instancetype)initWithSampleRate:(NSInteger)sampleRate;
+@implementation WaveTableProviderWrapper {
+    WaveTableProvider *_provider;
+}
+
+- (instancetype)initWithProvider:(void*)provider {
+    self = [super init];
+    if (self) {
+        _provider = reinterpret_cast<WaveTableProvider *>(provider);
+    }
+    return self;
+}
+
+- (void)dealloc {
+    delete _provider;
+}
+
+- (uintptr_t)getRawPointerToWaveTableProvider {
+    return reinterpret_cast<uintptr_t>(_provider);
+}
 
 @end
-
-#endif /* DefaultWaveTableProviderWrapper_h */

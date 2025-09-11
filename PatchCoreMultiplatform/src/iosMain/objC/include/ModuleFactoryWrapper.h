@@ -28,7 +28,7 @@
 
 @protocol ModuleFactoryWrapper<NSObject>
 
-- (uintptr_t*)getRawPointerToModuleFactory;
+- (uintptr_t)getRawPointerToModuleFactory;
 
 @end
 

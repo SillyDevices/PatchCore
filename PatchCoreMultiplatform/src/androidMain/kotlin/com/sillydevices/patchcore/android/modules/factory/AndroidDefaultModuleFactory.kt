@@ -24,8 +24,10 @@ package com.sillydevices.patchcore.android.modules.factory
 
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.module.factory.DefaultModuleFactory
+import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
 class AndroidDefaultModuleFactory(
-    override val pointer: ModuleFactoryPointer
+    override val pointer: ModuleFactoryPointer,
+    override var waveTableProvider: WaveTableProvider?
 ): AndroidModuleFactory(), DefaultModuleFactory
 

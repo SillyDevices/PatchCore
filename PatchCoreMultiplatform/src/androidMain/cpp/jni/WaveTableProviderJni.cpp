@@ -20,17 +20,15 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
+#include <jni.h>
 
-#ifndef DefaultWaveTableProviderWrapper_h
-#define DefaultWaveTableProviderWrapper_h
+#include <PatchCore/dsp/wavetable/DefaultWaveTableProvider.hpp>
+#include <stdexcept>
 
-#import <Foundation/Foundation.h>
-#import "WaveTableProviderWrapper.h"
-
-@interface DefaultWaveTableProviderWrapper : WaveTableProviderWrapper
-
-- (instancetype)initWithSampleRate:(NSInteger)sampleRate;
-
-@end
-
-#endif /* DefaultWaveTableProviderWrapper_h */
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_modules_factory_WaveTableProviderJni_waveTableProviderRelease(JNIEnv *env, jobject thiz, jlong pointer) {
+    auto *provider = reinterpret_cast<WaveTableProvider *>(pointer);
+    if (provider == nullptr) return;
+    delete provider;
+}

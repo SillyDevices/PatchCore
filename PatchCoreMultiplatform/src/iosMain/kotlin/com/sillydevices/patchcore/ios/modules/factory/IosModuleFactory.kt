@@ -23,9 +23,15 @@
 package com.sillydevices.patchcore.ios.modules.factory
 
 import com.sillydevices.patchcore.module.factory.ModuleFactory
+import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
 abstract class IosModuleFactory: ModuleFactory {
+
+    protected abstract var waveTableProvider: WaveTableProvider?
     override fun release() {
-        //moduleFactoryRelease(pointer.nativePointer)
+        waveTableProvider = null
+        //TODO release native
+//        moduleFactoryRelease(pointer.nativePointer)
+
     }
 }
