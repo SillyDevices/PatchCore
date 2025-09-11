@@ -26,9 +26,11 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol ModuleFactoryWrapper<NSObject>
+@interface ModuleFactoryWrapper: NSObject
 
-- (uintptr_t*)getRawPointerToModuleFactory;
+- (instancetype)initWithModuleFactory:(void*)moduleFactory;
+
+- (uintptr_t)getRawPointerToModuleFactory;
 
 @end
 

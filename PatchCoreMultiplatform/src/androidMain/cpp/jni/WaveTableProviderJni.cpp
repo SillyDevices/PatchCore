@@ -20,13 +20,15 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.modules.factory
+#include <jni.h>
 
-import com.sillydevices.patchcore.android.jni.modules.factory.ModuleFactoryJni
-import com.sillydevices.patchcore.module.factory.ModuleFactory
+#include <PatchCore/dsp/wavetable/DefaultWaveTableProvider.hpp>
+#include <stdexcept>
 
-abstract class AndroidModuleFactory: ModuleFactory {
-    override fun release() {
-        ModuleFactoryJni.moduleFactoryRelease(pointer.nativePointer)
-    }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_modules_factory_WaveTableProviderJni_waveTableProviderRelease(JNIEnv *env, jobject thiz, jlong pointer) {
+    auto *provider = reinterpret_cast<WaveTableProvider *>(pointer);
+    if (provider == nullptr) return;
+    delete provider;
 }

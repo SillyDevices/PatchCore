@@ -70,9 +70,11 @@ android {
         }
     }
 
+    ndkVersion = libs.versions.ndk.get()
+
     externalNativeBuild {
         cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
+            path = file("src/androidMain/cpp/CMakeLists.txt")
         }
     }
 
@@ -100,7 +102,7 @@ android {
     }
 }
 
-val artifactVersion = "0.1.4"
+val artifactVersion = "0.1.5"
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)

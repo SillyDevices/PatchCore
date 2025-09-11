@@ -42,6 +42,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    ndkVersion = libs.versions.ndk.get()
+
     externalNativeBuild {
         cmake {
             path = File("src/main/cpp/CMakeLists.txt")
@@ -67,7 +69,7 @@ android {
     }
 }
 
-val artifactVersion = "0.1.1"
+val artifactVersion = "0.1.2"
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)

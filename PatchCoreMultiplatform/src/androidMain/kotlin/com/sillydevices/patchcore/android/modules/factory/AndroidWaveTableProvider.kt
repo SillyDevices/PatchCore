@@ -20,32 +20,24 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
+package com.sillydevices.patchcore.android.modules.factory
 
-#import <Foundation/Foundation.h>
-#import "ModuleFactoryWrapper.h"
-#include <patchcore/module/factory/ModuleFactory.hpp>
-#include <patchcore/module/factory/DefaultModuleFactory.hpp>
+import android.util.Log
+import com.sillydevices.patchcore.android.jni.modules.factory.WaveTableProviderJni
+import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
+abstract class AndroidWaveTableProvider: WaveTableProvider {
 
-@implementation ModuleFactoryWrapper {
-    ModuleFactory* _moduleFactory;
-}
-
-- (instancetype)initWithModuleFactory:(void*)moduleFactory {
-    self = [super init];
-    if (self) {
-        _moduleFactory = reinterpret_cast<ModuleFactory *>(moduleFactory);
+    init {
+        Log.d("AndroidWaveTableProvider", "Creating WaveTableProvider")
     }
-    return self;
+
+    override fun release() {
+        Log.d("AndroidWaveTableProvider", "Releasing WaveTableProvider with pointer: ${pointer.nativePointer}")
+        WaveTableProviderJni.waveTableProviderRelease(pointer.nativePointer)
+    }
+
+    protected fun finalize() {
+        release()
+    }
 }
-
-- (void)dealloc {
-    delete _moduleFactory;
-}
-
-- (uintptr_t)getRawPointerToModuleFactory {
-    return reinterpret_cast<uintptr_t>(_moduleFactory);
-}
-
-
-@end

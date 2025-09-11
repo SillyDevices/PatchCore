@@ -20,21 +20,14 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.factory.builder
+package com.sillydevices.patchcore.android.modules.factory
 
-import com.sillydevices.patchcore.android.jni.modules.factory.DefaultModuleFactoryJni
-import com.sillydevices.patchcore.android.modules.factory.AndroidDefaultModuleFactory
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.module.factory.ModuleFactory
+import com.sillydevices.patchcore.module.factory.DefaultModuleFactory
 import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
-actual fun ModuleFactoryBuilder.createDefaultModuleFactory(
-    waveTableProvider: WaveTableProvider,
-    customModuleFactory: ModuleFactory?,
-): ModuleFactory {
-    val pointer = DefaultModuleFactoryJni.defaultModuleFactoryCreate(
-        waveTableProvider.pointer.nativePointer,
-        customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
-    )
-    return AndroidDefaultModuleFactory(ModuleFactoryPointer(pointer))
-}
+class AndroidDefaultModuleFactory(
+    override val pointer: ModuleFactoryPointer,
+    override var waveTableProvider: WaveTableProvider?
+): AndroidModuleFactory(), DefaultModuleFactory
+

@@ -25,11 +25,15 @@ package com.sillydevices.patchcore.ios.modules.factory
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.ios.wrappers.DefaultModuleFactoryWrapper
 import com.sillydevices.patchcore.module.factory.DefaultModuleFactory
+import com.sillydevices.patchcore.module.factory.WaveTableProvider
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toLong
 
 @OptIn(ExperimentalForeignApi::class)
-class IosDefaultModuleFactory(wrapper: DefaultModuleFactoryWrapper) : IosModuleFactory(), DefaultModuleFactory {
+class IosDefaultModuleFactory(
+    wrapper: DefaultModuleFactoryWrapper,
+    override var waveTableProvider: WaveTableProvider?
+) : IosModuleFactory(), DefaultModuleFactory {
 
     //TODO move to IosModuleFactory
     private val factory = wrapper

@@ -27,10 +27,10 @@
 #import <Foundation/Foundation.h>
 #import "WaveTableProviderWrapper.h"
 
-@interface DefaultWaveTableProviderWrapper : NSObject<WaveTableProviderWrapper>
+@interface DefaultWaveTableProviderWrapper : WaveTableProviderWrapper
 
-- (instancetype)initWithSampleRate :(NSInteger)sampleRate;
-    
+- (instancetype)initWithSampleRate:(NSInteger)sampleRate;
+
 @end
 
 #endif /* DefaultWaveTableProviderWrapper_h */

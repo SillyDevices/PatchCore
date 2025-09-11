@@ -26,7 +26,9 @@
 
 #import <Foundation/Foundation.h>
 
-@protocol WaveTableProviderWrapper<NSObject>
+@interface WaveTableProviderWrapper: NSObject
+
+- (instancetype)initWithProvider:(void*)provider; //WaveTableProvider*
 
 - (uintptr_t)getRawPointerToWaveTableProvider;
 

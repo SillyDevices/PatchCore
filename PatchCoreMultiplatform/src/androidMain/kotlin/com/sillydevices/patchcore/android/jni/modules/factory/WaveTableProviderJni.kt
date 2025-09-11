@@ -20,12 +20,9 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.modules.factory
+package com.sillydevices.patchcore.android.jni.modules.factory
 
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
-
-abstract class AndroidWaveTableProvider: WaveTableProvider {
-    override fun release() {
-        //TODO call jni method to release resources
-    }
+object WaveTableProviderJni {
+    @JvmName("waveTableProviderRelease")
+    external fun waveTableProviderRelease(pointer: ULong)
 }

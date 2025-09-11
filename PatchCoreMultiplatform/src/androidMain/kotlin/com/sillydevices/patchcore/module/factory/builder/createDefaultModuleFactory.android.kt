@@ -22,22 +22,20 @@
 
 package com.sillydevices.patchcore.module.factory.builder
 
+import com.sillydevices.patchcore.android.jni.modules.factory.DefaultModuleFactoryJni
+import com.sillydevices.patchcore.android.modules.factory.AndroidDefaultModuleFactory
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.ios.modules.factory.IosDefaultModuleFactory
-import com.sillydevices.patchcore.ios.wrappers.DefaultModuleFactoryWrapper
 import com.sillydevices.patchcore.module.factory.ModuleFactory
 import com.sillydevices.patchcore.module.factory.WaveTableProvider
-import kotlinx.cinterop.ExperimentalForeignApi
 
-@OptIn(ExperimentalForeignApi::class)
 actual fun ModuleFactoryBuilder.createDefaultModuleFactory(
     waveTableProvider: WaveTableProvider,
-    customModuleFactory: ModuleFactory?
+    customModuleFactory: ModuleFactory?,
 ): ModuleFactory {
-    val wrapper = DefaultModuleFactoryWrapper(
+    val pointer = DefaultModuleFactoryJni.defaultModuleFactoryCreate(
         waveTableProvider.pointer.nativePointer,
-        (customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE)
+        customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
     )
     //save WaveTableProvider reference to avoid deallocation
-    return IosDefaultModuleFactory(wrapper, waveTableProvider)
+    return AndroidDefaultModuleFactory(ModuleFactoryPointer(pointer), waveTableProvider)
 }
