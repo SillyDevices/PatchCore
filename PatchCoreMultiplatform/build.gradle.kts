@@ -70,6 +70,8 @@ android {
         }
     }
 
+    ndkVersion = libs.versions.ndk.get()
+
     externalNativeBuild {
         cmake {
             path = file("src/androidMain/cpp/CMakeLists.txt")

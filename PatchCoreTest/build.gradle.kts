@@ -41,6 +41,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
+    ndkVersion = libs.versions.ndk.get()
+
     externalNativeBuild {
         cmake {
             path = File("src/main/cpp/CMakeLists.txt")

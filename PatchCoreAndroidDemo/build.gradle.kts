@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.sillydevices.patchcore.androd.demo"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.sillydevices.patchcore.androd.demo"
