@@ -28,25 +28,28 @@
 
 
 @implementation DefaultModuleFactoryWrapper {
-    ModuleFactory* _moduleFactory;
+    ModuleFactory* _customModuleFactory;
 }
 
 - (instancetype)initWithWaveTableProvider:(uintptr_t)waveTableProvider :(uintptr_t)customModuleFactory {
-    self = [super init];
+    WaveTableProvider *provider = reinterpret_cast<WaveTableProvider*>(waveTableProvider);
+    ModuleFactory* customFactory = reinterpret_cast<ModuleFactory*>(customModuleFactory);
+    
+    ModuleFactory* factory = new DefaultModuleFactory(provider, customFactory);
+    self = [super initWithModuleFactory:factory];
     if (self) {
-        WaveTableProvider *provider = reinterpret_cast<WaveTableProvider*>(waveTableProvider);
-        ModuleFactory* factory = reinterpret_cast<ModuleFactory*>(customModuleFactory);
-        _moduleFactory = new DefaultModuleFactory(provider, factory);
+        _customModuleFactory = factory;
+    } else {
+        delete factory;
+        return nil;
     }
     return self;
 }
 
 - (void)dealloc {
-    delete _moduleFactory;
-}
-
-- (uintptr_t)getRawPointerToModuleFactory {
-    return reinterpret_cast<uintptr_t>(dynamic_cast<ModuleFactory*>(_moduleFactory));
+    //TODO should wrap _customModuleFactory to some managed object
+    //good for now, i can't imagine a use case with more than one DefaultModuleFactory
+    delete _customModuleFactory;
 }
 
 

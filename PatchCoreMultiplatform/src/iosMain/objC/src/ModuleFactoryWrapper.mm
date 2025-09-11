@@ -31,12 +31,20 @@
     ModuleFactory* _moduleFactory;
 }
 
+- (instancetype)initWithModuleFactory:(void*)moduleFactory {
+    self = [super init];
+    if (self) {
+        _moduleFactory = reinterpret_cast<ModuleFactory *>(moduleFactory);
+    }
+    return self;
+}
+
 - (void)dealloc {
     delete _moduleFactory;
 }
 
 - (uintptr_t)getRawPointerToModuleFactory {
-    return reinterpret_cast<uintptr_t>(dynamic_cast<ModuleFactory*>(_moduleFactory));
+    return reinterpret_cast<uintptr_t>(_moduleFactory);
 }
 
 

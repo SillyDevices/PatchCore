@@ -27,7 +27,7 @@
 #import <Foundation/Foundation.h>
 #import "ModuleFactoryWrapper.h"
 
-@interface DefaultModuleFactoryWrapper : NSObject<ModuleFactoryWrapper>
+@interface DefaultModuleFactoryWrapper : ModuleFactoryWrapper
 
 - (instancetype)initWithWaveTableProvider :(uintptr_t)waveTableProvider :(uintptr_t)customModuleFactory;
     
