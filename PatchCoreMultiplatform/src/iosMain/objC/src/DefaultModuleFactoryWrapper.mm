@@ -38,7 +38,7 @@
     ModuleFactory* factory = new DefaultModuleFactory(provider, customFactory);
     self = [super initWithModuleFactory:factory];
     if (self) {
-        _customModuleFactory = factory;
+        _customModuleFactory = customFactory;
     } else {
         delete factory;
         return nil;
