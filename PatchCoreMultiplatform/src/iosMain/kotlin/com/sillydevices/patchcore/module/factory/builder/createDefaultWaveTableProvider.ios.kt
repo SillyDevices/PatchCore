@@ -23,14 +23,10 @@
 package com.sillydevices.patchcore.module.factory.builder
 
 import com.sillydevices.patchcore.ios.modules.factory.IosDefaultWaveTableProvider
-import com.sillydevices.patchcore.ios.wrappers.DefaultWaveTableProviderWrapper
 import com.sillydevices.patchcore.module.factory.WaveTableProvider
 import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun ModuleFactoryBuilder.createDefaultWaveTableProvider(
-    sampleRate: Int
-): WaveTableProvider {
-    val wrapper = DefaultWaveTableProviderWrapper(sampleRate.toLong())
-    return IosDefaultWaveTableProvider(wrapper)
+actual fun ModuleFactoryBuilder.createDefaultWaveTableProvider(sampleRate: Int): WaveTableProvider {
+    return IosDefaultWaveTableProvider(sampleRate)
 }

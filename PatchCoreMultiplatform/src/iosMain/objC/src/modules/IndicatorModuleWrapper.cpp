@@ -21,9 +21,7 @@
  */
 
 
-#import "modules/IndicatorModuleWrapper.h"
-
-#import <Foundation/Foundation.h>
+#include "modules/IndicatorModuleWrapper.h"
 
 #include <patchcore/module/Module.hpp>
 #include <patchcore/modules/IndicatorModule.hpp>

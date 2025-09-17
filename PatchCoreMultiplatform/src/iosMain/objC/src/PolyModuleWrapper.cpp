@@ -21,18 +21,17 @@
  */
 
 
-#import <Foundation/Foundation.h>
-#import "PolyModuleWrapper.h"
+
+#include "PolyModuleWrapper.h"
+#include "ModuleParameterWrapper.h"
 
 #include <patchCore/module/factory/ModuleFactory.hpp>
 #include <patchCore/module/PolyModule.hpp>
 
-#include "ModuleParameterWrapper.h"
-
-uintptr_t polyModuleNew(uintptr_t module_factory_pointer, NSString *name, int sample_rate, int polyphony) {
+uintptr_t polyModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate, int polyphony) {
     auto *factory = reinterpret_cast<ModuleFactory *>(module_factory_pointer);
     if (factory == nullptr) throw std::runtime_error("ModuleFactory pointer is null");
-    std::string nameString([name UTF8String]);
+    std::string nameString(name);
     Module *managedModule = new PolyModule(factory, nameString, sample_rate, polyphony);
     return reinterpret_cast<uintptr_t>(managedModule);
 }

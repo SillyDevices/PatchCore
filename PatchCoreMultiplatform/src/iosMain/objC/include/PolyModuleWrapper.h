@@ -24,17 +24,15 @@
 #ifndef PolyModuleWrapper_h
 #define PolyModuleWrapper_h
 
-#import <Foundation/Foundation.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-
-uintptr_t polyModuleNew(uintptr_t module_factory_pointer, NSString *name, int sample_rate, int polyphony);
+uintptr_t polyModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate, int polyphony);
 void polyModuleRelease(uintptr_t poly_module_pointer);
-
 
 
 #ifdef __cplusplus

@@ -24,13 +24,21 @@
 #ifndef DefaultWaveTableProviderWrapper_h
 #define DefaultWaveTableProviderWrapper_h
 
-#import <Foundation/Foundation.h>
-#import "WaveTableProviderWrapper.h"
 
-@interface DefaultWaveTableProviderWrapper : WaveTableProviderWrapper
+#include <stdint.h>
 
-- (instancetype)initWithSampleRate:(NSInteger)sampleRate;
 
-@end
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+uintptr_t  defaultWaveTableProviderWrapperCreate(int sampleRate);
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* DefaultWaveTableProviderWrapper_h */

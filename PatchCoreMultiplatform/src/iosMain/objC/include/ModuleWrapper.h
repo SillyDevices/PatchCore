@@ -24,19 +24,16 @@
 #ifndef ModuleWrapper_h
 #define ModuleWrapper_h
 
-#import <Foundation/Foundation.h>
-
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-
-uintptr_t moduleGetModuleOutput(uintptr_t module_pointer, NSString *output_name);
-uintptr_t moduleGetModuleInput(uintptr_t module_pointer, NSString *input_name);
-uintptr_t moduleGetUserInput(uintptr_t module_pointer, NSString *input_name);
-
+uintptr_t moduleGetModuleOutput(uintptr_t module_pointer, char* output_name);
+uintptr_t moduleGetModuleInput(uintptr_t module_pointer, char* input_name);
+uintptr_t moduleGetUserInput(uintptr_t module_pointer, char* input_name);
 
 
 #ifdef __cplusplus

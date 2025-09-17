@@ -24,18 +24,16 @@
 #ifndef UserInputWrapper_h
 #define UserInputWrapper_h
 
-#import <Foundation/Foundation.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-
 void floatUserInputSetValue(uintptr_t user_input_pointer, float value);
 void enumUserInputSetValue(uintptr_t user_input_pointer, int value);
 void boolUserInputSetValue(uintptr_t user_input_pointer, bool value);
-
 
 
 #ifdef __cplusplus

@@ -9,6 +9,7 @@ headers =   modules/KeyboardModuleWrapper.h \
             ModularSynthWrapper.h \
             ModuleParameterWrapper.h \
             ModuleWrapper.h \
+            ModuleParameterWrapper.h \
             PatchModuleWrapper.h \
             PolyModuleWrapper.h \
             UserInputWrapper.h \

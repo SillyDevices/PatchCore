@@ -33,6 +33,7 @@ import com.sillydevices.patchcore.module.io.output.ModuleOutput
 import com.sillydevices.patchcore.module.io.user.UserInput
 import com.sillydevices.patchcore.ios.wrappers.*
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.cstr
 
 
 @OptIn(ExperimentalForeignApi::class)
@@ -49,17 +50,17 @@ open class IosModuleContext(
     }
 
     override fun getModuleInputPointer(input: ModuleInput): ModuleInputPointer {
-        val inputPointer = moduleGetModuleInput(_pointer.nativePointer, input.name)
+        val inputPointer = moduleGetModuleInput(_pointer.nativePointer, input.name.cstr)
         return ModuleInputPointer(inputPointer)
     }
 
     override fun getModuleOutputPointer(output: ModuleOutput): ModuleOutputPointer {
-        val outputPointer = moduleGetModuleOutput(_pointer.nativePointer, output.name)
+        val outputPointer = moduleGetModuleOutput(_pointer.nativePointer, output.name.cstr)
         return ModuleOutputPointer(outputPointer)
     }
 
     override fun getUserInputPointer(userInput: UserInput): UserInputPointer {
-        val userInputPointer = moduleGetUserInput(_pointer.nativePointer, userInput.name)
+        val userInputPointer = moduleGetUserInput(_pointer.nativePointer, userInput.name.cstr)
         return UserInputPointer(userInputPointer)
     }
 

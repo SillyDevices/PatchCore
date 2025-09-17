@@ -24,17 +24,15 @@
 #ifndef IndicatorModuleWrapper_h
 #define IndicatorModuleWrapper_h
 
-#import <Foundation/Foundation.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-
 void setIndicatorBufferSize(uintptr_t pointer, int size);
 int copyIndicatorBuffer(uintptr_t pointer, float* buffer, int size, int startIndex);
-
 
 
 #ifdef __cplusplus

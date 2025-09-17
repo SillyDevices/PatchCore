@@ -21,36 +21,14 @@
  */
 
 
-#import <Foundation/Foundation.h>
-#import "DefaultModuleFactoryWrapper.h"
+#include "ModuleFactoryWrapper.h"
+
 #include <patchcore/module/factory/ModuleFactory.hpp>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 
-
-@implementation DefaultModuleFactoryWrapper {
-    ModuleFactory* _customModuleFactory;
+void moduleFactoryRelease(uintptr_t moduleFactoryPointer){
+    ModuleFactory* factory = reinterpret_cast<ModuleFactory *>(moduleFactoryPointer);
+    if (factory == nullptr) return;
+    delete factory;
 }
 
-- (instancetype)initWithWaveTableProvider:(uintptr_t)waveTableProvider :(uintptr_t)customModuleFactory {
-    WaveTableProvider *provider = reinterpret_cast<WaveTableProvider*>(waveTableProvider);
-    ModuleFactory* customFactory = reinterpret_cast<ModuleFactory*>(customModuleFactory);
-    
-    ModuleFactory* factory = new DefaultModuleFactory(provider, customFactory);
-    self = [super initWithModuleFactory:factory];
-    if (self) {
-        _customModuleFactory = customFactory;
-    } else {
-        delete factory;
-        return nil;
-    }
-    return self;
-}
-
-- (void)dealloc {
-    //TODO should wrap _customModuleFactory to some managed object
-    //good for now, i can't imagine a use case with more than one DefaultModuleFactory
-    delete _customModuleFactory;
-}
-
-
-@end

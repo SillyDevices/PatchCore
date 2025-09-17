@@ -21,31 +21,12 @@
  */
 
 
-#import <Foundation/Foundation.h>
-#import "ModuleFactoryWrapper.h"
-#include <patchcore/module/factory/ModuleFactory.hpp>
-#include <patchcore/module/factory/DefaultModuleFactory.hpp>
+#include "WaveTableProviderWrapper.h"
 
+#include <patchcore/dsp/wavetable/WaveTableProvider.hpp>
 
-@implementation ModuleFactoryWrapper {
-    ModuleFactory* _moduleFactory;
+void waveTableProviderRelease(uintptr_t waveTableProviderPointer) {
+    WaveTableProvider* provider = reinterpret_cast<WaveTableProvider *>(waveTableProviderPointer);
+    if (provider == nullptr) return;
+    delete provider;
 }
-
-- (instancetype)initWithModuleFactory:(void*)moduleFactory {
-    self = [super init];
-    if (self) {
-        _moduleFactory = reinterpret_cast<ModuleFactory *>(moduleFactory);
-    }
-    return self;
-}
-
-- (void)dealloc {
-    delete _moduleFactory;
-}
-
-- (uintptr_t)getRawPointerToModuleFactory {
-    return reinterpret_cast<uintptr_t>(_moduleFactory);
-}
-
-
-@end

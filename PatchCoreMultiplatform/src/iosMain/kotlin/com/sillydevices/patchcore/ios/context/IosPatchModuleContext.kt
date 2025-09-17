@@ -33,8 +33,24 @@ import com.sillydevices.patchcore.module.io.input.ModuleInput
 import com.sillydevices.patchcore.module.io.output.ModuleOutput
 import com.sillydevices.patchcore.module.io.user.UserInput
 import com.sillydevices.patchcore.ios.wrappers.*
-import com.sillydevices.patchcore.module.factory.ModuleParameter.ParameterType
+import com.sillydevices.patchcore.module.factory.ModuleParameter
+import kotlinx.cinterop.AutofreeScope
+import kotlinx.cinterop.CArrayPointer
+import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.CValuesRef
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.IntVar
+import kotlinx.cinterop.MemScope
+import kotlinx.cinterop.NativePointed
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.allocArray
+import kotlinx.cinterop.asStableRef
+import kotlinx.cinterop.cValue
+import kotlinx.cinterop.cValuesOf
+import kotlinx.cinterop.cstr
+import kotlinx.cinterop.get
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.nativeHeap
 
 @OptIn(ExperimentalForeignApi::class)
 open class IosPatchModuleContext(
@@ -45,28 +61,33 @@ open class IosPatchModuleContext(
 ): PatchModuleContext, IosModuleContext(pointer, contextFactory) {
 
     override fun createModule(module: FactoryModule): ModulePointer {
-        val parameters: Map<Any?, Any> = module.parameters.associate {
-            val type = it.getType()
-            val name = it.getName()
-            name to when (type) {
-                ParameterType.ENUM.ordinal -> ModuleParameterWrapper(it.getEnum())
-                ParameterType.FLOAT.ordinal -> ModuleParameterWrapper(it.getFloat())
-                ParameterType.BOOLEAN.ordinal -> ModuleParameterWrapper(it.getBoolean())
-                else -> throw IllegalArgumentException("Unknown parameter type: $type")
+        memScoped {
+            val paramCount = module.parameters.size
+            val paramsArray = allocArray<ModuleParameterWrapper>(paramCount)
+            module.parameters.forEachIndexed { i, it ->
+                paramsArray.get(i).apply {
+                    type = it.getType()
+                    enumValue = it.getEnum()
+                    boolValue = if (it.getBoolean()) 1 else 0
+                    floatValue = it.getFloat()
+                    key = it.getName().cstr.getPointer(this@memScoped)
+                }
             }
+            val pointer = patchModuleCreateModule(
+                getPointer().nativePointer,
+                module.moduleType.value.cstr,
+                module.name.cstr,
+                paramsArray,
+                paramCount.toULong()
+            )
+            return ModulePointer(pointer)
         }
-        val pointer = patchModuleCreateModule(
-            getPointer().nativePointer,
-            module.moduleType.value,
-            module.name,
-            parameters)
-        return ModulePointer(pointer)
     }
 
     override fun createPatchModule(newPatchModule: PatchModule): ModulePointer {
         val pointer = patchModuleNew(
             moduleFactory.pointer.nativePointer,
-            newPatchModule.name,
+            newPatchModule.name.cstr,
             newPatchModule.sampleRate)
         return ModulePointer(pointer)
     }
@@ -74,7 +95,7 @@ open class IosPatchModuleContext(
     override fun createPolyModule(newPolyModule: PolyModule): ModulePointer {
         val pointer = polyModuleNew(
             moduleFactory.pointer.nativePointer,
-            newPolyModule.name,
+            newPolyModule.name.cstr,
             newPolyModule.sampleRate,
             newPolyModule.polyphonyCount
         )
@@ -85,21 +106,21 @@ open class IosPatchModuleContext(
         patchModuleAddInput(
             getPointer().nativePointer,
             input.pointer.nativePointer,
-            withName)
+            withName.cstr)
     }
 
     override fun addOutput(output: ModuleOutput, withName: String) {
         patchModuleAddOutput(
             getPointer().nativePointer,
             output.pointer.nativePointer,
-            withName)
+            withName.cstr)
     }
 
     override fun addUserInput(userInput: UserInput, withName: String) {
         patchModuleAddUserInput(
             getPointer().nativePointer,
             userInput.pointer.nativePointer,
-            withName)
+            withName.cstr)
     }
 
     override fun addPatch(output: ModuleOutput, input: ModuleInput) {

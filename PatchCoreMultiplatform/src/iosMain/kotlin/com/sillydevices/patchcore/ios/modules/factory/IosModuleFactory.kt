@@ -24,14 +24,20 @@ package com.sillydevices.patchcore.ios.modules.factory
 
 import com.sillydevices.patchcore.module.factory.ModuleFactory
 import com.sillydevices.patchcore.module.factory.WaveTableProvider
+import com.sillydevices.patchcore.ios.wrappers.*
+import kotlinx.cinterop.ExperimentalForeignApi
 
+@OptIn(ExperimentalForeignApi::class)
 abstract class IosModuleFactory: ModuleFactory {
 
     protected abstract var waveTableProvider: WaveTableProvider?
+
     override fun release() {
         waveTableProvider = null
-        //TODO release native
-//        moduleFactoryRelease(pointer.nativePointer)
+        moduleFactoryRelease(pointer.nativePointer)
+    }
 
+    protected fun finalize() {
+        release()
     }
 }

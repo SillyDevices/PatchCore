@@ -21,19 +21,16 @@
  */
 
 
-#import <Foundation/Foundation.h>
-#import "PatchModuleWrapper.h"
+#include "PatchModuleWrapper.h"
+#include "ModuleParameterWrapper.h"
 
 #include <patchCore/module/factory/ModuleFactory.hpp>
 #include <patchCore/module/PatchModule.hpp>
 
-#include "ModuleParameterWrapper.h"
-
-
-uintptr_t patchModuleNew(uintptr_t module_factory_pointer, NSString *name, int sample_rate) {
+uintptr_t patchModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate) {
     auto *factory = reinterpret_cast<ModuleFactory *>(module_factory_pointer);
     if (factory == nullptr) throw std::runtime_error("ModuleFactory pointer is null");
-    std::string nameString([name UTF8String]);
+    std::string nameString(name);
     PatchModule *patchModule = new PatchModule(factory, nameString, sample_rate);
     return reinterpret_cast<uintptr_t>(static_cast<Module*>(patchModule));
 }
@@ -44,25 +41,40 @@ void patchModuleRelease(uintptr_t patch_module_pointer) {
     delete modulePtr;
 }
 
-uintptr_t patchModuleCreateModule(uintptr_t patch_module_pointer, NSString *module_type, NSString *module_name, NSDictionary* parameters) {
+uintptr_t patchModuleCreateModule(uintptr_t patch_module_pointer, char* module_type, char* module_name, ModuleParameterWrapper* parameters, unsigned long parameters_count) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
 
-    std::string moduleTypeNameString([module_type UTF8String]);
-    std::string moduleNameString([module_name UTF8String]);
+    std::string moduleTypeNameString(module_type);
+    std::string moduleNameString(module_name);
     
     std::map<std::string, ModuleParameter> nativeParameters;
-    
-    for (NSString *key in parameters) {
-        std::string keyStr = std::string([key UTF8String]);
-        id value = parameters[key];
-        if ([value isKindOfClass:[ModuleParameterWrapper class]]) {
-            ModuleParameterWrapper *wrapper = (ModuleParameterWrapper*) value;
-            ModuleParameter *param = (ModuleParameter*)[wrapper getRawPointerToModuleParameter];
-            nativeParameters.insert({ keyStr, *param});
-        } else {
-            NSLog(@"Unsupported type for key: %@", key);
+
+    for (unsigned long i = 0; i < parameters_count; ++i) {
+        ModuleParameterWrapper &paramWrapper = parameters[i];
+        std::string key = std::string(paramWrapper.key);
+        switch (paramWrapper.type) {
+            case 0: // enum
+            {
+                ModuleParameter paramEnum = ModuleParameter(paramWrapper.enumValue);
+                nativeParameters.insert({ key, paramEnum});
+            }
+                break;
+            case 1: // float
+            {
+                ModuleParameter paramFloat = ModuleParameter(paramWrapper.floatValue);
+                nativeParameters.insert({key, paramFloat});
+            }
+                break;
+            case 2: // bool
+            {
+                ModuleParameter paramBool = ModuleParameter(paramWrapper.boolValue);
+                nativeParameters.insert({ key, paramBool});
+            }
+                break;
+            default:
+                throw std::runtime_error("Unknown parameter type");
         }
     }
 
@@ -81,45 +93,45 @@ void patchModuleAddModule(uintptr_t patch_module_pointer, uintptr_t managed_modu
     patchModule->addModule(std::unique_ptr<Module>(managedModulePtr));
 }
 
-uintptr_t patchModuleGetModule(uintptr_t patch_module_pointer, NSString *module_name) {
+uintptr_t patchModuleGetModule(uintptr_t patch_module_pointer, char* module_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
-    std::string moduleNameString([module_name UTF8String]);
-    Module *result = patchModule->getModule(moduleNameString);
-    return reinterpret_cast<uintptr_t>(result);
+    std::string moduleNameString(module_name);
+    Module *resultModule = patchModule->getModule(moduleNameString);
+    return reinterpret_cast<uintptr_t>(resultModule);
 }
 
-void patchModuleAddInput(uintptr_t patch_module_pointer, uintptr_t input_pointer, NSString *input_name) {
+void patchModuleAddInput(uintptr_t patch_module_pointer, uintptr_t input_pointer, char* input_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
     
     auto input = reinterpret_cast<ModuleInput *>(input_pointer);
     if (input == nullptr) throw std::runtime_error("Input pointer is null");
-    std::string inputNameString([input_name UTF8String]);
+    std::string inputNameString(input_name);
     patchModule->addInput(input, inputNameString);
 }
 
-void patchModuleAddOutput(uintptr_t patch_module_pointer, uintptr_t output_pointer, NSString *output_name) {
+void patchModuleAddOutput(uintptr_t patch_module_pointer, uintptr_t output_pointer, char* output_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
     
     auto output = reinterpret_cast<ModuleOutput *>(output_pointer);
     if (output == nullptr) throw std::runtime_error("Output pointer is null");
-    std::string outputNameString([output_name UTF8String]);
+    std::string outputNameString(output_name);
     patchModule->addOutput(output, outputNameString);
 }
 
-void patchModuleAddUserInput(uintptr_t patch_module_pointer, uintptr_t user_input_pointer, NSString *input_name) {
+void patchModuleAddUserInput(uintptr_t patch_module_pointer, uintptr_t user_input_pointer, char* input_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
 
     auto userInput = reinterpret_cast<UserInput *>(user_input_pointer);
     if (userInput == nullptr) throw std::runtime_error("UserInput pointer is null");
-    std::string inputNameString([input_name UTF8String]);
+    std::string inputNameString(input_name);
     patchModule->addUserInput(userInput, inputNameString);
 }
 

@@ -24,13 +24,18 @@
 #ifndef DefaultModuleFactoryWrapper_h
 #define DefaultModuleFactoryWrapper_h
 
-#import <Foundation/Foundation.h>
-#import "ModuleFactoryWrapper.h"
+#include <stdint.h>
 
-@interface DefaultModuleFactoryWrapper : ModuleFactoryWrapper
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-- (instancetype)initWithWaveTableProvider :(uintptr_t)waveTableProvider :(uintptr_t)customModuleFactory;
-    
-@end
+
+uintptr_t defaultModuleFactoryCreate(uintptr_t waveTableProviderPointer, uintptr_t customModuleFactoryPointer);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DefaultModuleFactoryWrapper_h */

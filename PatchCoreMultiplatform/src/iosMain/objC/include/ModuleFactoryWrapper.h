@@ -24,14 +24,19 @@
 #ifndef ModuleFactoryWraper_h
 #define ModuleFactoryWraper_h
 
-#import <Foundation/Foundation.h>
+#include <stdint.h>
 
-@interface ModuleFactoryWrapper: NSObject
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-- (instancetype)initWithModuleFactory:(void*)moduleFactory;
 
-- (uintptr_t)getRawPointerToModuleFactory;
+void moduleFactoryRelease(uintptr_t moduleFactoryPointer);
 
-@end
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* ModuleFactoryWraper_h */

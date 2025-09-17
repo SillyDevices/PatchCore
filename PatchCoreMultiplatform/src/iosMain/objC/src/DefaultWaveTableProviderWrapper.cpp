@@ -21,46 +21,16 @@
  */
 
 
-#import <Foundation/Foundation.h>
-#import "ModuleParameterWrapper.h"
-#include <patchcore/module/ModuleParameter.hpp>
 
-@implementation ModuleParameterWrapper {
-    ModuleParameter* _parameter;
+#include "DefaultWaveTableProviderWrapper.h"
+
+#include <patchcore/dsp/wavetable/WaveTableProvider.hpp>
+#include <patchcore/dsp/wavetable/DefaultWaveTableProvider.hpp>
+
+
+
+uintptr_t  defaultWaveTableProviderWrapperCreate(int sampleRate) {
+    WaveTableProvider *provider = new DefaultWaveTableProvider(sampleRate);
+    uintptr_t result = reinterpret_cast<uintptr_t>(provider);
+    return result;
 }
-
-- (instancetype)initWithInt:(int)value {
-    self = [super init];
-    if (self) {
-        _parameter = new ModuleParameter(value);
-    }
-    return self;
-}
-
-- (instancetype)initWithFloat:(float)value {
-    self = [super init];
-    if (self) {
-        _parameter = new ModuleParameter(value);
-    }
-    return self;
-}
-
-- (instancetype)initWithBool:(bool)value {
-    self = [super init];
-    if (self) {
-        _parameter = new ModuleParameter(value);
-    }
-    return self;
-}
-
-
-- (void)dealloc {
-    delete _parameter;
-}
-
-- (void*)getRawPointerToModuleParameter {
-    return (void*)_parameter;
-}
-
-
-@end

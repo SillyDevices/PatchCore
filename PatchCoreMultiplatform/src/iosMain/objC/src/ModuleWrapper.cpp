@@ -21,30 +21,27 @@
  */
 
 
-#import <Foundation/Foundation.h>
-
 #import "ModuleWrapper.h"
-
 #include <patchcore/module/Module.hpp>
 
-uintptr_t moduleGetModuleOutput(uintptr_t module_pointer, NSString *output_name) {
+uintptr_t moduleGetModuleOutput(uintptr_t module_pointer, char* output_name) {
     auto module = reinterpret_cast<Module *>(module_pointer);
-    std::string outputNameString = std::string([output_name UTF8String]);
+    std::string outputNameString = std::string(output_name);
     auto result = module->getModuleOutput(outputNameString);
     return reinterpret_cast<uintptr_t>(result);
 }
 
-uintptr_t moduleGetModuleInput(uintptr_t module_pointer, NSString *input_name) {
+uintptr_t moduleGetModuleInput(uintptr_t module_pointer, char* input_name) {
     auto module = reinterpret_cast<Module *>(module_pointer);
     if (module == nullptr) throw std::runtime_error("Module pointer is null");
-    std::string inputNameString([input_name UTF8String]);
+    std::string inputNameString(input_name);
     auto result = module->getModuleInput(inputNameString);
     return reinterpret_cast<uintptr_t>(result);
 }
 
-uintptr_t moduleGetUserInput(uintptr_t module_pointer, NSString *input_name) {
+uintptr_t moduleGetUserInput(uintptr_t module_pointer, char* input_name) {
     auto module = reinterpret_cast<Module *>(module_pointer);
-    std::string inputNameString([input_name UTF8String]);
+    std::string inputNameString(input_name);
     auto result = module->getUserInput(inputNameString);
     auto pointerLong = reinterpret_cast<uintptr_t>(result);
     return pointerLong;

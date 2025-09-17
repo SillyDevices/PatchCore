@@ -24,14 +24,19 @@
 #ifndef WaveTableProviderWrapper_h
 #define WaveTableProviderWrapper_h
 
-#import <Foundation/Foundation.h>
+#include <stdint.h>
 
-@interface WaveTableProviderWrapper: NSObject
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-- (instancetype)initWithProvider:(void*)provider; //WaveTableProvider*
 
-- (uintptr_t)getRawPointerToWaveTableProvider;
+void waveTableProviderRelease(uintptr_t waveTableProviderPointer);
 
-@end
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* WaveTableProviderWrapper_h */
