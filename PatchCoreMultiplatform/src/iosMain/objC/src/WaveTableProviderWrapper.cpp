@@ -25,7 +25,7 @@
 
 #include <patchcore/dsp/wavetable/WaveTableProvider.hpp>
 
-void waveTableProviderRelease(uintptr_t waveTableProviderPointer) {
+void waveTableProviderDelete(uintptr_t waveTableProviderPointer) {
     WaveTableProvider* provider = reinterpret_cast<WaveTableProvider *>(waveTableProviderPointer);
     if (provider == nullptr) return;
     delete provider;

@@ -24,4 +24,7 @@ package com.sillydevices.patchcore.platform.factory
 
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-expect fun platformWaveTableProviderRelease(waveTableProviderPointer: WaveTableProviderPointer)
+expect object PlatformWaveTableProvider {
+
+    fun delete(waveTableProviderPointer: WaveTableProviderPointer)
+}

@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 
-void waveTableProviderRelease(uintptr_t waveTableProviderPointer);
+void waveTableProviderDelete(uintptr_t waveTableProviderPointer);
 
 
 #ifdef __cplusplus

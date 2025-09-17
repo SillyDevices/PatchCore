@@ -23,10 +23,12 @@
 package com.sillydevices.patchcore.platform.factory
 
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
-import com.sillydevices.patchcore.ios.wrappers.waveTableProviderRelease
+import com.sillydevices.patchcore.ios.wrappers.waveTableProviderDelete
 import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun platformWaveTableProviderRelease(waveTableProviderPointer: WaveTableProviderPointer) {
-    waveTableProviderRelease(waveTableProviderPointer.nativePointer)
+actual object PlatformWaveTableProvider {
+    actual fun delete(waveTableProviderPointer: WaveTableProviderPointer) {
+        waveTableProviderDelete(waveTableProviderPointer.nativePointer)
+    }
 }

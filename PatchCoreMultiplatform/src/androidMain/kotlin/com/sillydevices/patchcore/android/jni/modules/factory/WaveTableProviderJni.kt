@@ -23,6 +23,6 @@
 package com.sillydevices.patchcore.android.jni.modules.factory
 
 object WaveTableProviderJni {
-    @JvmName("waveTableProviderRelease")
-    external fun waveTableProviderRelease(pointer: ULong)
+    @JvmName("waveTableProviderDelete")
+    external fun waveTableProviderDelete(pointer: ULong)
 }

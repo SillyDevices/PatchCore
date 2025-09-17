@@ -25,6 +25,8 @@ package com.sillydevices.patchcore.platform.factory
 import com.sillydevices.patchcore.android.jni.modules.factory.WaveTableProviderJni
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-actual fun platformWaveTableProviderRelease(waveTableProviderPointer: WaveTableProviderPointer) {
-    WaveTableProviderJni.waveTableProviderRelease(waveTableProviderPointer.nativePointer)
+actual object PlatformWaveTableProvider {
+    actual fun delete(waveTableProviderPointer: WaveTableProviderPointer) {
+        WaveTableProviderJni.waveTableProviderDelete(waveTableProviderPointer.nativePointer)
+    }
 }
