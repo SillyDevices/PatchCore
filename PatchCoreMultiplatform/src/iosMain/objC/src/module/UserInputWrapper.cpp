@@ -21,7 +21,7 @@
  */
 
 
-#include "UserInputWrapper.h"
+#include "module/UserInputWrapper.h"
 
 #include <patchcore/module/input/user/FloatUserInput.hpp>
 #include <patchcore/module/input/user/EnumUserInput.hpp>

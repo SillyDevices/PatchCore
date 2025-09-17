@@ -21,10 +21,10 @@
  */
 
 
-#include "ModuleFactoryWrapper.h"
+#include "factory/ModuleFactoryWrapper.h"
 
-#include <patchcore/module/factory/ModuleFactory.hpp>
-#include <patchcore/module/factory/DefaultModuleFactory.hpp>
+#include "patchcore/module/factory/ModuleFactory.hpp"
+#include "patchcore/module/factory/DefaultModuleFactory.hpp"
 
 void moduleFactoryDelete(uintptr_t moduleFactoryPointer){
     ModuleFactory* factory = reinterpret_cast<ModuleFactory *>(moduleFactoryPointer);

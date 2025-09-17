@@ -21,12 +21,24 @@
  */
 
 
-#include "WaveTableProviderWrapper.h"
+#ifndef UserInputWrapper_h
+#define UserInputWrapper_h
 
-#include <patchcore/dsp/wavetable/WaveTableProvider.hpp>
+#include <stdint.h>
+#include <stdbool.h>
 
-void waveTableProviderDelete(uintptr_t waveTableProviderPointer) {
-    WaveTableProvider* provider = reinterpret_cast<WaveTableProvider *>(waveTableProviderPointer);
-    if (provider == nullptr) return;
-    delete provider;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+void floatUserInputSetValue(uintptr_t user_input_pointer, float value);
+void enumUserInputSetValue(uintptr_t user_input_pointer, int value);
+void boolUserInputSetValue(uintptr_t user_input_pointer, bool value);
+
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* UserInputWrapper_h */

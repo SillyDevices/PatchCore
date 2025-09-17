@@ -22,10 +22,10 @@
 
 
 
-#include "DefaultWaveTableProviderWrapper.h"
+#include "factory/DefaultWaveTableProviderWrapper.h"
 
-#include <patchcore/dsp/wavetable/WaveTableProvider.hpp>
-#include <patchcore/dsp/wavetable/DefaultWaveTableProvider.hpp>
+#include "patchcore/dsp/wavetable/WaveTableProvider.hpp"
+#include "patchcore/dsp/wavetable/DefaultWaveTableProvider.hpp"
 
 
 

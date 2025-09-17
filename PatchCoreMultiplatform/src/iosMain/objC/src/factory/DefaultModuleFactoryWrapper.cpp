@@ -21,23 +21,21 @@
  */
 
 
-#ifndef UserInputWrapper_h
-#define UserInputWrapper_h
 
-#include <stdint.h>
+#include "factory/DefaultModuleFactoryWrapper.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "patchcore/module/factory/ModuleFactory.hpp"
+#include "patchcore/module/factory/DefaultModuleFactory.hpp"
 
 
-void floatUserInputSetValue(uintptr_t user_input_pointer, float value);
-void enumUserInputSetValue(uintptr_t user_input_pointer, int value);
-void boolUserInputSetValue(uintptr_t user_input_pointer, bool value);
+uintptr_t defaultModuleFactoryNew(uintptr_t waveTableProviderPointer, uintptr_t customModuleFactoryPointer){
+    WaveTableProvider* waveTableProvider = reinterpret_cast<WaveTableProvider *>(waveTableProviderPointer);
+    if (waveTableProvider == nullptr) {
+        throw std::runtime_error("WaveTableProvider pointer is null");
+    }
+    ModuleFactory* customModuleFactory = reinterpret_cast<ModuleFactory *>(customModuleFactoryPointer);
 
-
-#ifdef __cplusplus
+    ModuleFactory *factory = new DefaultModuleFactory(waveTableProvider, customModuleFactory);
+    uintptr_t result = reinterpret_cast<uintptr_t>(factory);
+    return result;
 }
-#endif
-
-#endif /* UserInputWrapper_h */

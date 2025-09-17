@@ -28,11 +28,11 @@ add_library( # Sets the name of the library.
         jni/module/PolyModuleJni.cpp
         jni/module/UserInputJni.cpp
 
-        jni/ModularSynthJni.cpp
-        jni/AudioInterfaceJni.cpp
-
         jni/modules/KeyboardModuleJni.cpp
         jni/modules/IndicatorModuleJni.cpp
+
+        jni/ModularSynthJni.cpp
+        jni/AudioInterfaceJni.cpp
 
         jni/test/ModularSynthTesterJni.cpp
 )

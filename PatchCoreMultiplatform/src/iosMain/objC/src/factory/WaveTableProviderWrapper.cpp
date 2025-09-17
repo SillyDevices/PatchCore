@@ -21,21 +21,12 @@
  */
 
 
+#include "factory/WaveTableProviderWrapper.h"
 
-#include "DefaultModuleFactoryWrapper.h"
+#include "patchcore/dsp/wavetable/WaveTableProvider.hpp"
 
-#include <patchcore/module/factory/ModuleFactory.hpp>
-#include <patchcore/module/factory/DefaultModuleFactory.hpp>
-
-
-uintptr_t defaultModuleFactoryNew(uintptr_t waveTableProviderPointer, uintptr_t customModuleFactoryPointer){
-    WaveTableProvider* waveTableProvider = reinterpret_cast<WaveTableProvider *>(waveTableProviderPointer);
-    if (waveTableProvider == nullptr) {
-        throw std::runtime_error("WaveTableProvider pointer is null");
-    }
-    ModuleFactory* customModuleFactory = reinterpret_cast<ModuleFactory *>(customModuleFactoryPointer);
-
-    ModuleFactory *factory = new DefaultModuleFactory(waveTableProvider, customModuleFactory);
-    uintptr_t result = reinterpret_cast<uintptr_t>(factory);
-    return result;
+void waveTableProviderDelete(uintptr_t waveTableProviderPointer) {
+    WaveTableProvider* provider = reinterpret_cast<WaveTableProvider *>(waveTableProviderPointer);
+    if (provider == nullptr) return;
+    delete provider;
 }

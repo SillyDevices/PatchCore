@@ -22,8 +22,8 @@
 
 
 
-#include "PolyModuleWrapper.h"
-#include "ModuleParameterWrapper.h"
+#include "module/PolyModuleWrapper.h"
+#include "module/ModuleParameterWrapper.h"
 
 #include <patchCore/module/factory/ModuleFactory.hpp>
 #include <patchCore/module/PolyModule.hpp>

@@ -21,8 +21,8 @@
  */
 
 
-#include "PatchModuleWrapper.h"
-#include "ModuleParameterWrapper.h"
+#include "module/PatchModuleWrapper.h"
+#include "module/ModuleParameterWrapper.h"
 
 #include <patchCore/module/factory/ModuleFactory.hpp>
 #include <patchCore/module/PatchModule.hpp>
