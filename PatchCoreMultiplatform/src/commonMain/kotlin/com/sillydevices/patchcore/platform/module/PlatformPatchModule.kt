@@ -33,7 +33,7 @@ import com.sillydevices.patchcore.module.factory.ModuleParameter
 expect object PlatformPatchModule {
 
     fun new(moduleFactoryPointer: ModuleFactoryPointer, name: String, sampleRate: Int): ModulePointer
-    fun release(patchModulePointer: ModulePointer)
+    fun delete(patchModulePointer: ModulePointer)
 
 
     fun createModule(patchModulePointer: ModulePointer, moduleType: String, moduleName: String, parameters: List<ModuleParameter>): ModulePointer

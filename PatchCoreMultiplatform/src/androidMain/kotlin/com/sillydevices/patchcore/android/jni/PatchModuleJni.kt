@@ -28,8 +28,8 @@ object PatchModuleJni {
 
     @JvmName("patchModuleNew")
     external fun patchModuleNew(moduleFactoryPointer: ULong, name: String, sampleRate: Int): ULong
-    @JvmName("patchModuleRelease")
-    external fun patchModuleRelease(patchModuleManagedPointer: ULong)
+    @JvmName("patchModuleDelete")
+    external fun patchModuleDelete(patchModuleManagedPointer: ULong)
 
     @JvmName("patchModuleCreateModule")
     external fun patchModuleCreateModule(patchModuleManagedPointer: ULong, moduleType: String, moduleName: String, parameters: List<ModuleParameter>): ULong

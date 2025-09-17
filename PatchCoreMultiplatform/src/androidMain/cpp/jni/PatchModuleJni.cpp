@@ -47,7 +47,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleNew(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleRelease(
+Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleDelete(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer) {
     auto modulePtr = reinterpret_cast<Module *>(patch_module_pointer);
     if (modulePtr == nullptr) throw std::runtime_error("PatchModule pointer is null");

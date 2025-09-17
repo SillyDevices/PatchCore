@@ -12,7 +12,7 @@ import com.sillydevices.patchcore.ios.wrappers.patchModuleAddPatch
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddUserInput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleCreateModule
 import com.sillydevices.patchcore.ios.wrappers.patchModuleNew
-import com.sillydevices.patchcore.ios.wrappers.patchModuleRelease
+import com.sillydevices.patchcore.ios.wrappers.patchModuleDelete
 import com.sillydevices.patchcore.ios.wrappers.patchModuleResetPatch
 import com.sillydevices.patchcore.module.factory.ModuleParameter
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -33,8 +33,8 @@ actual object PlatformPatchModule {
         ))
     }
 
-    actual fun release(patchModulePointer: ModulePointer) {
-        patchModuleRelease(patchModulePointer.nativePointer)
+    actual fun delete(patchModulePointer: ModulePointer) {
+        patchModuleDelete(patchModulePointer.nativePointer)
     }
 
     actual fun createModule(patchModulePointer: ModulePointer, moduleType: String, moduleName: String, parameters: List<ModuleParameter>): ModulePointer {

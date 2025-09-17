@@ -35,7 +35,7 @@ uintptr_t patchModuleNew(uintptr_t module_factory_pointer, char* name, int sampl
     return reinterpret_cast<uintptr_t>(static_cast<Module*>(patchModule));
 }
 
-void patchModuleRelease(uintptr_t patch_module_pointer) {
+void patchModuleDelete(uintptr_t patch_module_pointer) {
     auto modulePtr = reinterpret_cast<Module *>(patch_module_pointer);
     if (modulePtr == nullptr) throw std::runtime_error("PatchModule pointer is null");
     delete modulePtr;

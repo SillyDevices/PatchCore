@@ -116,7 +116,7 @@ open class PatchModuleContextImpl(
 
     //TODO move release to parent class
     override fun release() {
-        PlatformPatchModule.release(getPointer())
+        PlatformPatchModule.delete(getPointer())
     }
 
 }

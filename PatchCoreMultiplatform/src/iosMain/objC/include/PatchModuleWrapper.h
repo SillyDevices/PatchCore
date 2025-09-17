@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 uintptr_t patchModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate);
-void patchModuleRelease(uintptr_t patch_module_pointer);
+void patchModuleDelete(uintptr_t patch_module_pointer);
 uintptr_t patchModuleCreateModule(uintptr_t patch_module_pointer, char* module_type, char* module_name, ModuleParameterWrapper* parameters, unsigned long parameters_count);
 void patchModuleAddModule(uintptr_t patch_module_pointer, uintptr_t managed_module_pointer);
 uintptr_t patchModuleGetModule(uintptr_t patch_module_pointer, char* module_name);

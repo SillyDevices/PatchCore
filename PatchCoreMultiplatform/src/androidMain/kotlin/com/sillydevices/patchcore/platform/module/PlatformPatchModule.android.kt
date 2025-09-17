@@ -42,8 +42,8 @@ actual object PlatformPatchModule {
         )
     }
 
-    actual fun release(patchModulePointer: ModulePointer) {
-        PatchModuleJni.patchModuleRelease(patchModulePointer.nativePointer)
+    actual fun delete(patchModulePointer: ModulePointer) {
+        PatchModuleJni.patchModuleDelete(patchModulePointer.nativePointer)
     }
 
     actual fun createModule(patchModulePointer: ModulePointer, moduleType: String, moduleName: String, parameters: List<ModuleParameter>): ModulePointer {
