@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 
-uintptr_t modularSynthCreate(uintptr_t module_factory_pointer, int sample_rate);
+uintptr_t modularSynthNew(uintptr_t module_factory_pointer, int sample_rate);
 
 
 #ifdef __cplusplus

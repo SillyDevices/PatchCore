@@ -23,6 +23,6 @@
 package com.sillydevices.patchcore.android.jni
 
 object ModularSynthJni {
-    @JvmName("modularSynthCreate")
-    external fun modularSynthCreate(moduleFactoryPointer: ULong, sampleRate: Int): ULong
+    @JvmName("modularSynthNew")
+    external fun modularSynthNew(moduleFactoryPointer: ULong, sampleRate: Int): ULong
 }

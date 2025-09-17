@@ -27,7 +27,7 @@
 #include <patchcore/synth/ModularSynth.hpp>
 
 
-uintptr_t modularSynthCreate(uintptr_t module_factory_pointer, int sample_rate) {
+uintptr_t modularSynthNew(uintptr_t module_factory_pointer, int sample_rate) {
     auto factory = reinterpret_cast<ModuleFactory *>(module_factory_pointer);
     ModularSynth* synth = new ModularSynth(factory, sample_rate);
     auto modulePtr = static_cast<Module *>(synth);

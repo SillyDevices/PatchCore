@@ -59,7 +59,7 @@ class PatchCoreContextImpl(
     }
 
     override fun <T: ModularSynth> createSynth(moduleFactory: ModuleFactory, synth: T): T {
-        val synthPointer = PlatformModularSynth.create(moduleFactory.pointer, synth.sampleRate)
+        val synthPointer = PlatformModularSynth.new(moduleFactory.pointer, synth.sampleRate)
         val context = ModularSynthContextImpl(synthPointer, moduleFactory, contextFactory)
         //important: apply context before returning
         synth.applyContext(context)

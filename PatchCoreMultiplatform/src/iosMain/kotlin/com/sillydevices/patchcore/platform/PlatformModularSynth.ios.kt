@@ -24,15 +24,15 @@ package com.sillydevices.patchcore.platform
 
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
-import com.sillydevices.patchcore.ios.wrappers.modularSynthCreate
+import com.sillydevices.patchcore.ios.wrappers.modularSynthNew
 import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
 actual object PlatformModularSynth {
 
-    actual fun create(moduleFactoryPointer: ModuleFactoryPointer, sampleRate: Int): ModulePointer {
+    actual fun new(moduleFactoryPointer: ModuleFactoryPointer, sampleRate: Int): ModulePointer {
         return ModulePointer(
-            modularSynthCreate(
+            modularSynthNew(
                 moduleFactoryPointer.nativePointer,
                 sampleRate)
         )

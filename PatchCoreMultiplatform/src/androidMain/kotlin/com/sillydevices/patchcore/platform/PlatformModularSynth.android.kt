@@ -28,9 +28,9 @@ import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
 actual object PlatformModularSynth {
 
-    actual fun create(moduleFactoryPointer: ModuleFactoryPointer, sampleRate: Int): ModulePointer {
+    actual fun new(moduleFactoryPointer: ModuleFactoryPointer, sampleRate: Int): ModulePointer {
         return ModulePointer(
-            ModularSynthJni.modularSynthCreate(
+            ModularSynthJni.modularSynthNew(
                 moduleFactoryPointer.nativePointer,
                 sampleRate)
         )

@@ -27,5 +27,5 @@ import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
 expect object PlatformModularSynth {
 
-    fun create(moduleFactoryPointer: ModuleFactoryPointer, sampleRate: Int): ModulePointer
+    fun new(moduleFactoryPointer: ModuleFactoryPointer, sampleRate: Int): ModulePointer
 }
