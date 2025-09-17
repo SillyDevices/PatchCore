@@ -24,6 +24,10 @@ package com.sillydevices.patchcore.context.factory
 
 import com.sillydevices.patchcore.context.ModuleContext
 import com.sillydevices.patchcore.context.PatchModuleContext
+import com.sillydevices.patchcore.context.modules.IndicatorModuleContext
+import com.sillydevices.patchcore.context.modules.IndicatorModuleContextImpl
+import com.sillydevices.patchcore.context.modules.KeyboardModuleContext
+import com.sillydevices.patchcore.context.modules.KeyboardModuleContextImpl
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 import kotlin.reflect.KClass
 
@@ -33,4 +37,45 @@ interface ModuleContextFactory {
         pointer: ModulePointer,
         parentContext: PatchModuleContext,
         contextFactory: ContextFactory): T?
+}
+
+
+internal class DefaultModuleContextFactoryImpl(val customModuleContextFactory: ModuleContextFactory?): ModuleContextFactory {
+
+    override fun <T : ModuleContext> createModuleContext(
+        moduleClass: KClass<T>,
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext,
+        contextFactory: ContextFactory
+    ): T? {
+        val moduleContext = customModuleContextFactory?.createModuleContext(moduleClass, pointer, parentContext, contextFactory)
+        if (moduleContext != null) {
+            return moduleContext as T
+        }
+        when (moduleClass) {
+            KeyboardModuleContext::class -> {
+                return createKeyboardModuleContext(pointer, parentContext, contextFactory) as T
+            }
+            IndicatorModuleContext::class -> {
+                return createIndicatorModuleContext(pointer, parentContext, contextFactory) as T
+            }
+        }
+        return null
+    }
+
+    private fun createKeyboardModuleContext(
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext,
+        contextFactory: ContextFactory
+    ): KeyboardModuleContext {
+        return KeyboardModuleContextImpl(pointer, contextFactory)
+    }
+
+    private fun createIndicatorModuleContext(
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext,
+        contextFactory: ContextFactory
+    ): IndicatorModuleContext {
+        return IndicatorModuleContextImpl(pointer, contextFactory)
+    }
 }

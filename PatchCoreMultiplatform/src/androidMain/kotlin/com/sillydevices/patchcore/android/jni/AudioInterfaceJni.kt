@@ -22,13 +22,13 @@
 
 package com.sillydevices.patchcore.android.jni
 
-import com.sillydevices.patchcore.android.audiointerface.AndroidAudioInterfaceOptions
+import com.sillydevices.patchcore.audiointerface.AndroidAudioInterfaceOptions
 
 object AudioInterfaceJni {
-    @JvmName("audioInterfaceCreate")
-    external fun audioInterfaceCreate(): ULong
-    @JvmName("audioInterfaceRelease")
-    external fun audioInterfaceRelease(audioInterfacePointer: ULong)
+    @JvmName("audioInterfaceNew")
+    external fun audioInterfaceNew(): ULong
+    @JvmName("audioInterfaceDelete")
+    external fun audioInterfaceDelete(audioInterfacePointer: ULong)
     @JvmName("audioInterfaceStartAudio")
     external fun audioInterfaceStartAudio(audioInterfacePointer: ULong)
     @JvmName("audioInterfaceStopAudio")

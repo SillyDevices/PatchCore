@@ -22,6 +22,8 @@
 
 package com.sillydevices.patchcore.internal
 
+
+//TODO make auto ManagedObject that releases itself on finalize
 interface ManagedObject {
     fun release()
 }

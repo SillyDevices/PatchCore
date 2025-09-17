@@ -26,8 +26,7 @@ import com.sillydevices.patchcore.module.FactoryModule
 import com.sillydevices.patchcore.module.factory.ModuleParameter
 import com.sillydevices.patchcore.module.factory.ModuleType
 
-class BiQuadVCFModule(name: String):
-    FactoryModule(name, ModuleType.BiQuadVcf)
+class BiQuadVCFModule(name: String): FactoryModule(name, ModuleType.BiQuadVcf)
 {
     enum class Type {
         LOWPASS_1POLE,

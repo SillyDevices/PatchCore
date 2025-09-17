@@ -23,8 +23,27 @@
 package com.sillydevices.patchcore.context.modules
 
 import com.sillydevices.patchcore.context.ModuleContext
+import com.sillydevices.patchcore.context.ModuleContextImpl
+import com.sillydevices.patchcore.context.factory.ContextFactory
+import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.platform.modules.PlatformIndicatorModule
 
 interface IndicatorModuleContext: ModuleContext {
     fun setSize(newSize: Int)
     suspend fun copyInto(buffer: FloatArray, desiredCount: Int, startIndex: Int): Int
+}
+
+
+class IndicatorModuleContextImpl(pointer: ModulePointer, contextFactory: ContextFactory):
+    IndicatorModuleContext,
+    ModuleContextImpl(pointer, contextFactory)
+{
+    override fun setSize(newSize: Int) {
+        PlatformIndicatorModule.setIndicatorBufferSize(getPointer(), newSize)
+    }
+
+    override suspend fun copyInto(buffer: FloatArray, desiredCount: Int, startIndex: Int): Int {
+        return PlatformIndicatorModule.copyIndicatorBuffer(getPointer(), buffer, desiredCount, startIndex)
+    }
+
 }

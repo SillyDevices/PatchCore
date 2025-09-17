@@ -1,18 +1,22 @@
 language = Objective-C
 
-headers =   modules/KeyboardModuleWrapper.h \
+headers =   factory/DefaultModuleFactoryWrapper.h \
+            factory/DefaultWaveTableProviderWrapper.h \
+            factory/ModuleFactoryWrapper.h \
+            factory/WaveTableProviderWrapper.h \
+            \
+            module/ModuleParameterWrapper.h \
+            module/ModuleWrapper.h \
+            module/PatchModuleWrapper.h \
+            module/PolyModuleWrapper.h \
+            module/UserInputWrapper.h \
+            \
+            modules/IndicatorModuleWrapper.h \
+            modules/KeyboardModuleWrapper.h \
+            \
             CommonAudioInterface.h \
-            WaveTableProviderWrapper.h \
-            DefaultWaveTableProviderWrapper.h \
-            ModuleFactoryWrapper.h \
-            DefaultModuleFactoryWrapper.h \
-            ModularSynthWrapper.h \
-            ModuleParameterWrapper.h \
-            ModuleWrapper.h \
-            PatchModuleWrapper.h \
-            PolyModuleWrapper.h \
-            UserInputWrapper.h \
-            modules/IndicatorModuleWrapper.h
+            ModularSynthWrapper.h
+
 
 package = com.sillydevices.patchcore.ios.wrappers
 

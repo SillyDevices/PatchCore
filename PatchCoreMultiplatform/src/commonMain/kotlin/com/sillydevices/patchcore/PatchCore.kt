@@ -46,7 +46,7 @@ class PatchCore(
     private val context = contextFactory.createPatchCoreContext()
     private val moduleFactory = moduleFactory(ModuleFactoryBuilderImpl)
 
-    fun <T: AudioInterface> createAudioInterface(): T {
+    fun createAudioInterface(): AudioInterface {
         return context.createAudioInterface()
     }
 

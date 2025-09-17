@@ -23,8 +23,24 @@
 package com.sillydevices.patchcore.context.modules
 
 import com.sillydevices.patchcore.context.ModuleContext
+import com.sillydevices.patchcore.context.ModuleContextImpl
+import com.sillydevices.patchcore.context.factory.ContextFactory
+import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.platform.modules.PlatformKeyboardModule
 
 interface KeyboardModuleContext: ModuleContext {
     fun onPress(cvValue: Float, velocity: Float = 1f)
     fun onRelease(cvValue: Float)
+}
+
+
+class KeyboardModuleContextImpl(pointer: ModulePointer, contextFactory: ContextFactory): KeyboardModuleContext, ModuleContextImpl(pointer, contextFactory) {
+
+    override fun onPress(cvValue: Float, velocity: Float) {
+        PlatformKeyboardModule.keyboardModuleOnEvent(getPointer(), true, cvValue, velocity)
+    }
+
+    override fun onRelease(cvValue: Float) {
+        PlatformKeyboardModule.keyboardModuleOnEvent(getPointer(), false, cvValue, 0f)
+    }
 }

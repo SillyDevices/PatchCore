@@ -22,11 +22,14 @@
 
 package com.sillydevices.patchcore.module.factory.builder
 
+import com.sillydevices.patchcore.module.factory.DefaultModuleFactory
 import com.sillydevices.patchcore.module.factory.ModuleFactory
 import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
 
-expect fun ModuleFactoryBuilder.createDefaultModuleFactory(
+fun ModuleFactoryBuilder.createDefaultModuleFactory(
     waveTableProvider: WaveTableProvider,
     customModuleFactory: ModuleFactory? = null
-): ModuleFactory
+): ModuleFactory {
+    return DefaultModuleFactory(waveTableProvider, customModuleFactory)
+}

@@ -24,7 +24,14 @@ package com.sillydevices.patchcore.module.factory
 
 import com.sillydevices.patchcore.internal.ManagedObject
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
+import com.sillydevices.patchcore.platform.factory.PlatformModuleFactory
 
-interface ModuleFactory: ManagedObject {
-    val pointer: ModuleFactoryPointer
+abstract class ModuleFactory: ManagedObject {
+    protected abstract var waveTableProvider: WaveTableProvider?
+    abstract val pointer: ModuleFactoryPointer
+
+    override fun release() {
+        waveTableProvider = null
+        PlatformModuleFactory.delete(pointer)
+    }
 }

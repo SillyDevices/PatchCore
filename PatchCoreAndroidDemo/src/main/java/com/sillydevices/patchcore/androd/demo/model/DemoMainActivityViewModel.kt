@@ -26,8 +26,7 @@ import androidx.lifecycle.ViewModel
 import com.sillydevices.patchcore.PatchCore
 import com.sillydevices.patchcore.androd.demo.ui.DemoVCOInteractorMock
 import com.sillydevices.patchcore.androd.demo.ui.DemoVcoInteractor
-import com.sillydevices.patchcore.android.audiointerface.AndroidAudioInterface
-import com.sillydevices.patchcore.android.audiointerface.AndroidAudioInterfaceOptions
+import com.sillydevices.patchcore.audiointerface.AndroidAudioInterfaceOptions
 import com.sillydevices.patchcore.modules.AttenuverterModule
 import com.sillydevices.patchcore.modules.envelope.ADSREnvelopeModule
 import com.sillydevices.patchcore.modules.envelope.FaderEnvelopeModule
@@ -112,7 +111,7 @@ class AudioEngine: CoroutineScope by CoroutineScope(Dispatchers.Default){
 
     val synth = patchCore.createSynth(DemoSynth())
 
-    private val audioInterface = patchCore.createAudioInterface<AndroidAudioInterface>().apply {
+    private val audioInterface = patchCore.createAudioInterface().apply {
         setOptions(AndroidAudioInterfaceOptions(
             bufferSizeMultiplayer = 10,
             useStabilizedCallback = false,

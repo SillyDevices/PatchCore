@@ -29,7 +29,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_ModularSynthJni_modularSynthCreate(
+Java_com_sillydevices_patchcore_android_jni_ModularSynthJni_modularSynthNew(
         JNIEnv *env, jobject thiz, jlong module_factory_pointer, jint sample_rate) {
     auto factory = reinterpret_cast<ModuleFactory *>(module_factory_pointer);
     ModularSynth* synth = new ModularSynth(factory, sample_rate);

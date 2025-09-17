@@ -22,4 +22,7 @@
 
 package com.sillydevices.patchcore.context.factory
 
-internal expect fun createContextFactory(moduleContextFactory: ModuleContextFactory? = null): ContextFactory
+internal fun createContextFactory(moduleContextFactory: ModuleContextFactory? = null): ContextFactory {
+    val defaultModuleContextFactory = DefaultModuleContextFactoryImpl(moduleContextFactory)
+    return ContextFactoryImpl(defaultModuleContextFactory)
+}
