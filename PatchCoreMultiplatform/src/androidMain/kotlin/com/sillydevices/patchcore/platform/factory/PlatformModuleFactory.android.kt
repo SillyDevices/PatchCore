@@ -25,6 +25,10 @@ package com.sillydevices.patchcore.platform.factory
 import com.sillydevices.patchcore.android.jni.modules.factory.ModuleFactoryJni
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 
-actual fun platformModuleFactoryRelease(pointer: ModuleFactoryPointer) {
-    ModuleFactoryJni.moduleFactoryRelease(pointer.nativePointer)
+
+actual object PlatformModuleFactory {
+
+    actual fun delete(pointer: ModuleFactoryPointer) {
+        ModuleFactoryJni.moduleFactoryDelete(pointer.nativePointer)
+    }
 }

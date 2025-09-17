@@ -24,4 +24,8 @@ package com.sillydevices.patchcore.platform.factory
 
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 
-expect fun platformModuleFactoryRelease(pointer: ModuleFactoryPointer)
+
+expect object PlatformModuleFactory {
+
+    fun delete(pointer: ModuleFactoryPointer)
+}

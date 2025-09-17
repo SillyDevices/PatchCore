@@ -26,7 +26,7 @@
 #include <patchcore/module/factory/ModuleFactory.hpp>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 
-void moduleFactoryRelease(uintptr_t moduleFactoryPointer){
+void moduleFactoryDelete(uintptr_t moduleFactoryPointer){
     ModuleFactory* factory = reinterpret_cast<ModuleFactory *>(moduleFactoryPointer);
     if (factory == nullptr) return;
     delete factory;

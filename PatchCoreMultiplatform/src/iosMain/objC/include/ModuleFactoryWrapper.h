@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 
-void moduleFactoryRelease(uintptr_t moduleFactoryPointer);
+void moduleFactoryDelete(uintptr_t moduleFactoryPointer);
 
 
 #ifdef __cplusplus

@@ -24,7 +24,7 @@ package com.sillydevices.patchcore.module.factory
 
 import com.sillydevices.patchcore.internal.ManagedObject
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.platform.factory.platformModuleFactoryRelease
+import com.sillydevices.patchcore.platform.factory.PlatformModuleFactory
 
 abstract class ModuleFactory: ManagedObject {
     protected abstract var waveTableProvider: WaveTableProvider?
@@ -32,6 +32,6 @@ abstract class ModuleFactory: ManagedObject {
 
     override fun release() {
         waveTableProvider = null
-        platformModuleFactoryRelease(pointer)
+        PlatformModuleFactory.delete(pointer)
     }
 }

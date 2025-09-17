@@ -23,6 +23,6 @@
 package com.sillydevices.patchcore.android.jni.modules.factory
 
 object ModuleFactoryJni {
-    @JvmName("moduleFactoryRelease")
-    external fun moduleFactoryRelease(pointer: ULong)
+    @JvmName("moduleFactoryDelete")
+    external fun moduleFactoryDelete(pointer: ULong)
 }

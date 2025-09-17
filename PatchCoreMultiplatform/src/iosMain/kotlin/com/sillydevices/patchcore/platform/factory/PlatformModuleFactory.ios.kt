@@ -23,10 +23,13 @@
 package com.sillydevices.patchcore.platform.factory
 
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.ios.wrappers.moduleFactoryRelease
+import com.sillydevices.patchcore.ios.wrappers.moduleFactoryDelete
 import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun platformModuleFactoryRelease(pointer: ModuleFactoryPointer) {
-    moduleFactoryRelease(pointer.nativePointer)
+actual object PlatformModuleFactory {
+
+    actual fun delete(pointer: ModuleFactoryPointer) {
+        moduleFactoryDelete(pointer.nativePointer)
+    }
 }

@@ -27,7 +27,7 @@
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_modules_factory_ModuleFactoryJni_moduleFactoryRelease(
+Java_com_sillydevices_patchcore_android_jni_modules_factory_ModuleFactoryJni_moduleFactoryDelete(
         JNIEnv *env, jobject thiz, jlong pointer) {
     auto *factory = reinterpret_cast<ModuleFactory *>(pointer);
     if (factory == nullptr) {
