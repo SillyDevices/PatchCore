@@ -22,6 +22,7 @@
 
 package com.sillydevices.patchcore.context
 
+import com.sillydevices.patchcore.context.factory.ContextFactory
 import com.sillydevices.patchcore.internal.NativeContextWithPointer
 import com.sillydevices.patchcore.internal.pointers.ModuleInputPointer
 import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
@@ -30,6 +31,7 @@ import com.sillydevices.patchcore.internal.pointers.UserInputPointer
 import com.sillydevices.patchcore.module.io.input.ModuleInput
 import com.sillydevices.patchcore.module.io.output.ModuleOutput
 import com.sillydevices.patchcore.module.io.user.UserInput
+import com.sillydevices.patchcore.platform.module.PlatformModule
 
 
 interface ModuleContext: NativeContextWithPointer<ModulePointer> {
@@ -37,6 +39,35 @@ interface ModuleContext: NativeContextWithPointer<ModulePointer> {
     fun getModuleInputPointer(input: ModuleInput): ModuleInputPointer
     fun getModuleOutputPointer(output: ModuleOutput): ModuleOutputPointer
     fun getUserInputPointer(userInput: UserInput): UserInputPointer
+}
+
+open class ModuleContextImpl(
+    pointer: ModulePointer,
+    contextFactory: ContextFactory,
+): ModuleContext {
+
+    protected val _contextFactory: ContextFactory = contextFactory
+    protected val _pointer: ModulePointer = pointer
+
+    override fun getPointer(): ModulePointer {
+        return _pointer
+    }
+
+    override fun getModuleInputPointer(input: ModuleInput): ModuleInputPointer {
+        return PlatformModule.getModuleInput(_pointer, input.name)
+    }
+
+    override fun getModuleOutputPointer(output: ModuleOutput): ModuleOutputPointer {
+        return PlatformModule.getModuleOutput(_pointer, output.name)
+    }
+
+    override fun getUserInputPointer(userInput: UserInput): UserInputPointer {
+        return PlatformModule.getUserInput(_pointer, userInput.name)
+    }
+
+    override fun getContextFactory(): ContextFactory {
+        return _contextFactory
+    }
 }
 
 object EmptyModuleContext : ModuleContext {

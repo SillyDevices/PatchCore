@@ -79,7 +79,7 @@ Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceSetO
     auto *audioInterface = reinterpret_cast<OboeAudioInterface*>(audio_interface_pointer);
     if (audioInterface == nullptr) throw std::runtime_error("AudioInterface pointer is null");
     OboeAudioInterface::PlayerOptions playerOptions;
-    jclass optionsClass = env->FindClass("com/sillydevices/patchcore/android/audiointerface/AndroidAudioInterfaceOptions");//env->GetObjectClass(options);
+    jclass optionsClass = env->FindClass("com/sillydevices/patchcore/audiointerface/AndroidAudioInterfaceOptions");//env->GetObjectClass(options);
     jfieldID bufferSizeMultiplayerField = env->GetFieldID(optionsClass, "bufferSizeMultiplayer", "I");
     jfieldID useStabilizedCallbackField = env->GetFieldID(optionsClass, "useStabilizedCallback", "Z");
     jfieldID useCpuAffinityField = env->GetFieldID(optionsClass, "useCpuAffinity", "Z");

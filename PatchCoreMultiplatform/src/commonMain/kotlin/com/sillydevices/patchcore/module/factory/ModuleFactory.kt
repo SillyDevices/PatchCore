@@ -24,7 +24,7 @@ package com.sillydevices.patchcore.module.factory
 
 import com.sillydevices.patchcore.internal.ManagedObject
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.platform.platformModuleFactoryRelease
+import com.sillydevices.patchcore.platform.factory.platformModuleFactoryRelease
 
 abstract class ModuleFactory: ManagedObject {
     protected abstract var waveTableProvider: WaveTableProvider?

@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.android.jni
 
-import com.sillydevices.patchcore.android.audiointerface.AndroidAudioInterfaceOptions
+import com.sillydevices.patchcore.audiointerface.AndroidAudioInterfaceOptions
 
 object AudioInterfaceJni {
     @JvmName("audioInterfaceCreate")

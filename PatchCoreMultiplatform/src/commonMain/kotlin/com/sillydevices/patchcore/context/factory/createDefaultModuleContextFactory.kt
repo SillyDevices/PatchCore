@@ -22,4 +22,6 @@
 
 package com.sillydevices.patchcore.context.factory
 
-expect fun ModuleContextFactoryBuilder.createDefaultModuleContextFactory(customModuleContextFactory: ModuleContextFactory? = null): ModuleContextFactory
+fun ModuleContextFactoryBuilder.createDefaultModuleContextFactory(customModuleContextFactory: ModuleContextFactory? = null): ModuleContextFactory {
+    return DefaultModuleContextFactoryImpl(customModuleContextFactory)
+}

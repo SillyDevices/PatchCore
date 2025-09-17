@@ -22,6 +22,8 @@
 
 package com.sillydevices.patchcore.audiointerface
 
+import com.sillydevices.patchcore.internal.pointers.AudioInterfacePointer
+import com.sillydevices.patchcore.platform.PlatformAudioInterface
 import com.sillydevices.patchcore.synth.ModularSynth
 
 
@@ -32,5 +34,31 @@ interface AudioInterface {
     fun isStarted(): Boolean
 
     fun setSynth(synth: ModularSynth)
-    fun setOptions(options: AudioInterfaceOptions)
+    fun setOptions(vararg options: AudioInterfaceOptions)
+}
+
+class AudioInterfaceImpl(): AudioInterface {
+
+    protected val pointer: AudioInterfacePointer = PlatformAudioInterface.create()
+
+    override fun start() {
+        PlatformAudioInterface.startAudio(pointer)
+    }
+
+    override fun stop() {
+        PlatformAudioInterface.stopAudio(pointer)
+    }
+
+    override fun isStarted(): Boolean {
+        return PlatformAudioInterface.isStarted(pointer)
+    }
+
+    override fun setSynth(synth: ModularSynth) {
+        PlatformAudioInterface.setSynth(pointer, synth.pointer)
+    }
+
+    override fun setOptions(vararg options: AudioInterfaceOptions) {
+        PlatformAudioInterface.setOptions(pointer, options.toList())
+    }
+
 }

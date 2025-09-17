@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.module.factory
 
-import com.sillydevices.patchcore.platform.platformDefaultModuleFactoryCreate
+import com.sillydevices.patchcore.platform.factory.platformDefaultModuleFactoryCreate
 
 class DefaultModuleFactory(
     waveTableProvider: WaveTableProvider,

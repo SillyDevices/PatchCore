@@ -24,7 +24,7 @@ package com.sillydevices.patchcore.module.factory
 
 import com.sillydevices.patchcore.internal.ManagedObject
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
-import com.sillydevices.patchcore.platform.platformWaveTableProviderRelease
+import com.sillydevices.patchcore.platform.factory.platformWaveTableProviderRelease
 
 
 abstract class WaveTableProvider: ManagedObject {
