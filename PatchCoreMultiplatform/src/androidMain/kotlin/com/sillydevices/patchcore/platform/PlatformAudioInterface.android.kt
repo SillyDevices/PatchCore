@@ -30,14 +30,14 @@ import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
 
 actual object PlatformAudioInterface {
-    actual fun create(): AudioInterfacePointer {
+    actual fun new(): AudioInterfacePointer {
         return AudioInterfacePointer(
-            AudioInterfaceJni.audioInterfaceCreate()
+            AudioInterfaceJni.audioInterfaceNew()
         )
     }
 
-    actual fun release(pointer: AudioInterfacePointer) {
-        AudioInterfaceJni.audioInterfaceRelease(pointer.nativePointer)
+    actual fun delete(pointer: AudioInterfacePointer) {
+        AudioInterfaceJni.audioInterfaceDelete(pointer.nativePointer)
     }
 
     actual fun startAudio(pointer: AudioInterfacePointer) {

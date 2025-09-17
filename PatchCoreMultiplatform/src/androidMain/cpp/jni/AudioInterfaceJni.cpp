@@ -29,7 +29,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceCreate(
+Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceNew(
         JNIEnv *env, jobject thiz) {
     OboeAudioInterface* interface = new OboeAudioInterface();
     jlong result = reinterpret_cast<jlong>(interface);
@@ -38,7 +38,7 @@ Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceCrea
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceRelease(
+Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceDelete(
         JNIEnv *env, jobject thiz, jlong audio_interface_pointer) {
     auto *audioInterface = reinterpret_cast<OboeAudioInterface *>(audio_interface_pointer);
     if (audioInterface == nullptr) throw std::runtime_error("AudioInterface pointer is null");

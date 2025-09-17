@@ -29,9 +29,9 @@ import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
 expect object PlatformAudioInterface {
 
-    fun create(): AudioInterfacePointer
+    fun new(): AudioInterfacePointer
 
-    fun release(pointer: AudioInterfacePointer)
+    fun delete(pointer: AudioInterfacePointer)
 
 
     fun startAudio(pointer: AudioInterfacePointer)

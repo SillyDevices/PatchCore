@@ -31,13 +31,13 @@ import kotlinx.cinterop.ExperimentalForeignApi
 @OptIn(ExperimentalForeignApi::class)
 actual object PlatformAudioInterface {
 
-    actual fun create(): AudioInterfacePointer {
+    actual fun new(): AudioInterfacePointer {
         return AudioInterfacePointer(
             CommonAudioInterface()
         )
     }
 
-    actual fun release(pointer: AudioInterfacePointer) {
+    actual fun delete(pointer: AudioInterfacePointer) {
         // Nothing to release
     }
 

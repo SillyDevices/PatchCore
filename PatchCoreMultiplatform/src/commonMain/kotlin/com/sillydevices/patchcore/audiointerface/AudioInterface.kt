@@ -39,7 +39,7 @@ interface AudioInterface {
 
 class AudioInterfaceImpl(): AudioInterface {
 
-    protected val pointer: AudioInterfacePointer = PlatformAudioInterface.create()
+    protected val pointer: AudioInterfacePointer = PlatformAudioInterface.new()
 
     override fun start() {
         PlatformAudioInterface.startAudio(pointer)
