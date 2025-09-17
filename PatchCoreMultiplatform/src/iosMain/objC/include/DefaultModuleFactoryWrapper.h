@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 
-uintptr_t defaultModuleFactoryCreate(uintptr_t waveTableProviderPointer, uintptr_t customModuleFactoryPointer);
+uintptr_t defaultModuleFactoryNew(uintptr_t waveTableProviderPointer, uintptr_t customModuleFactoryPointer);
 
 
 #ifdef __cplusplus

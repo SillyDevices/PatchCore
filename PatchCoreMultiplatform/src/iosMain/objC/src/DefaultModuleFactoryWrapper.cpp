@@ -28,7 +28,7 @@
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 
 
-uintptr_t defaultModuleFactoryCreate(uintptr_t waveTableProviderPointer, uintptr_t customModuleFactoryPointer){
+uintptr_t defaultModuleFactoryNew(uintptr_t waveTableProviderPointer, uintptr_t customModuleFactoryPointer){
     WaveTableProvider* waveTableProvider = reinterpret_cast<WaveTableProvider *>(waveTableProviderPointer);
     if (waveTableProvider == nullptr) {
         throw std::runtime_error("WaveTableProvider pointer is null");

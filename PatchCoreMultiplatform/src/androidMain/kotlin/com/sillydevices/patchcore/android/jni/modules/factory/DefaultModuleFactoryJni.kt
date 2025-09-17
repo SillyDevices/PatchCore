@@ -23,6 +23,6 @@
 package com.sillydevices.patchcore.android.jni.modules.factory
 
 object DefaultModuleFactoryJni {
-    @JvmName("defaultModuleFactoryCreate")
-    external fun defaultModuleFactoryCreate(waveTableProvider: ULong, customModuleFactoryPointer: ULong): ULong
+    @JvmName("defaultModuleFactoryNew")
+    external fun defaultModuleFactoryNew(waveTableProvider: ULong, customModuleFactoryPointer: ULong): ULong
 }

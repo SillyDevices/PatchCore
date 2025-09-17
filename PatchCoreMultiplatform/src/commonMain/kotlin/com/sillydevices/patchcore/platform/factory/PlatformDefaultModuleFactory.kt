@@ -25,5 +25,8 @@ package com.sillydevices.patchcore.platform.factory
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-expect fun platformDefaultModuleFactoryCreate(waveTableProviderPointer: WaveTableProviderPointer, customModuleFactoryPointer: ModuleFactoryPointer?): ModuleFactoryPointer
 
+expect object PlatformDefaultModuleFactory {
+
+    fun new(waveTableProviderPointer: WaveTableProviderPointer, customModuleFactoryPointer: ModuleFactoryPointer?): ModuleFactoryPointer
+}

@@ -26,13 +26,13 @@ import com.sillydevices.patchcore.android.jni.modules.factory.DefaultModuleFacto
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-actual fun platformDefaultModuleFactoryCreate(
-    waveTableProviderPointer: WaveTableProviderPointer,
-    customModuleFactoryPointer: ModuleFactoryPointer?
-): ModuleFactoryPointer {
-    return ModuleFactoryPointer(
-    DefaultModuleFactoryJni.defaultModuleFactoryCreate(
-        waveTableProviderPointer.nativePointer,
-        customModuleFactoryPointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
-    ))
+
+actual object PlatformDefaultModuleFactory {
+    actual fun new(waveTableProviderPointer: WaveTableProviderPointer, customModuleFactoryPointer: ModuleFactoryPointer?): ModuleFactoryPointer {
+        return ModuleFactoryPointer(
+            DefaultModuleFactoryJni.defaultModuleFactoryNew(
+                waveTableProviderPointer.nativePointer,
+                customModuleFactoryPointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
+            ))
+    }
 }

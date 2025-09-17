@@ -29,7 +29,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_modules_factory_DefaultModuleFactoryJni_defaultModuleFactoryCreate(
+Java_com_sillydevices_patchcore_android_jni_modules_factory_DefaultModuleFactoryJni_defaultModuleFactoryNew(
         JNIEnv *env, jobject thiz, jlong wave_table_provider, jlong custom_module_factory_pointer) {
     WaveTableProvider* waveTableProvider = reinterpret_cast<WaveTableProvider *>(wave_table_provider);
     if (waveTableProvider == nullptr) {

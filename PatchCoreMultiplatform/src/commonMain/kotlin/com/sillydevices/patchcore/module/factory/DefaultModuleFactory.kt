@@ -22,14 +22,14 @@
 
 package com.sillydevices.patchcore.module.factory
 
-import com.sillydevices.patchcore.platform.factory.platformDefaultModuleFactoryCreate
+import com.sillydevices.patchcore.platform.factory.PlatformDefaultModuleFactory
 
 class DefaultModuleFactory(
     waveTableProvider: WaveTableProvider,
     val customModuleFactory: ModuleFactory? = null
 ): ModuleFactory() {
     override var waveTableProvider: WaveTableProvider? = waveTableProvider
-    private val _pointer = platformDefaultModuleFactoryCreate(waveTableProvider.pointer, customModuleFactory?.pointer)
+    private val _pointer = PlatformDefaultModuleFactory.new(waveTableProvider.pointer, customModuleFactory?.pointer)
     override val pointer = _pointer
 }
 

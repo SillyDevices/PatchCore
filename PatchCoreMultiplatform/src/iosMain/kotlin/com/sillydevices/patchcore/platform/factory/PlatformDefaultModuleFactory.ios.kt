@@ -24,17 +24,19 @@ package com.sillydevices.patchcore.platform.factory
 
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
-import com.sillydevices.patchcore.ios.wrappers.defaultModuleFactoryCreate
+import com.sillydevices.patchcore.ios.wrappers.defaultModuleFactoryNew
 import kotlinx.cinterop.ExperimentalForeignApi
 
+
+
 @OptIn(ExperimentalForeignApi::class)
-actual fun platformDefaultModuleFactoryCreate(
-    waveTableProviderPointer: WaveTableProviderPointer,
-    customModuleFactoryPointer: ModuleFactoryPointer?
-): ModuleFactoryPointer {
-    return ModuleFactoryPointer(
-        defaultModuleFactoryCreate(
-            waveTableProviderPointer.nativePointer,
-            customModuleFactoryPointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
-    ))
+actual object PlatformDefaultModuleFactory {
+
+    actual fun new(waveTableProviderPointer: WaveTableProviderPointer, customModuleFactoryPointer: ModuleFactoryPointer?): ModuleFactoryPointer {
+        return ModuleFactoryPointer(
+            defaultModuleFactoryNew(
+                waveTableProviderPointer.nativePointer,
+                customModuleFactoryPointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
+            ))
+    }
 }
