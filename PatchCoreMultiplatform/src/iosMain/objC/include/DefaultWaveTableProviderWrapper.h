@@ -33,7 +33,7 @@ extern "C" {
 #endif
 
 
-uintptr_t  defaultWaveTableProviderWrapperCreate(int sampleRate);
+uintptr_t  defaultWaveTableProviderWrapperNew(int sampleRate);
 
 
 #ifdef __cplusplus

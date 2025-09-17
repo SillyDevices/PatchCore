@@ -24,4 +24,7 @@ package com.sillydevices.patchcore.platform.factory
 
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-expect fun platformDefaultWaveTableProviderCreate(sampleRate: Int): WaveTableProviderPointer
+expect object PlatformDefaultWaveTableProvider {
+
+    fun new(sampleRate: Int): WaveTableProviderPointer
+}

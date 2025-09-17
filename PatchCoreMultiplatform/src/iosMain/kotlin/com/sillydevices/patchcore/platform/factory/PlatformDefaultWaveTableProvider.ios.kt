@@ -23,12 +23,15 @@
 package com.sillydevices.patchcore.platform.factory
 
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
-import com.sillydevices.patchcore.ios.wrappers.defaultWaveTableProviderWrapperCreate
+import com.sillydevices.patchcore.ios.wrappers.defaultWaveTableProviderWrapperNew
 import kotlinx.cinterop.ExperimentalForeignApi
 
+
 @OptIn(ExperimentalForeignApi::class)
-actual fun platformDefaultWaveTableProviderCreate(sampleRate: Int): WaveTableProviderPointer {
-    return WaveTableProviderPointer(
-        defaultWaveTableProviderWrapperCreate(sampleRate)
-    )
+actual object PlatformDefaultWaveTableProvider {
+    actual fun new(sampleRate: Int): WaveTableProviderPointer {
+        return WaveTableProviderPointer(
+            defaultWaveTableProviderWrapperNew(sampleRate)
+        )
+    }
 }

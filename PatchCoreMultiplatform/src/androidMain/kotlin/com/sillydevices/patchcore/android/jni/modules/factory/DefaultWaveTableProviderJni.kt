@@ -23,6 +23,6 @@
 package com.sillydevices.patchcore.android.jni.modules.factory
 
 object DefaultWaveTableProviderJni {
-    @JvmName("defaultWaveTableProviderCreate")
-    external fun defaultWaveTableProviderCreate(sampleRate: Int): ULong
+    @JvmName("defaultWaveTableProviderNew")
+    external fun defaultWaveTableProviderNew(sampleRate: Int): ULong
 }

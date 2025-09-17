@@ -22,9 +22,9 @@
 
 package com.sillydevices.patchcore.module.factory
 
-import com.sillydevices.patchcore.platform.factory.platformDefaultWaveTableProviderCreate
+import com.sillydevices.patchcore.platform.factory.PlatformDefaultWaveTableProvider
 
 class DefaultWaveTableProvider(sampleRate: Int) : WaveTableProvider() {
-    private val _pointer = platformDefaultWaveTableProviderCreate(sampleRate)
+    private val _pointer = PlatformDefaultWaveTableProvider.new(sampleRate)
     override val pointer = _pointer
 }

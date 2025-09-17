@@ -29,7 +29,7 @@
 
 
 
-uintptr_t  defaultWaveTableProviderWrapperCreate(int sampleRate) {
+uintptr_t  defaultWaveTableProviderWrapperNew(int sampleRate) {
     WaveTableProvider *provider = new DefaultWaveTableProvider(sampleRate);
     uintptr_t result = reinterpret_cast<uintptr_t>(provider);
     return result;

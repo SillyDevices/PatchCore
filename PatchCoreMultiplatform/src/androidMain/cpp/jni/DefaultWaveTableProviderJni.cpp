@@ -27,7 +27,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_modules_factory_DefaultWaveTableProviderJni_defaultWaveTableProviderCreate(
+Java_com_sillydevices_patchcore_android_jni_modules_factory_DefaultWaveTableProviderJni_defaultWaveTableProviderNew(
         JNIEnv *env, jobject thiz, jint sampleRate) {
     WaveTableProvider *provider = new DefaultWaveTableProvider(sampleRate);
     jlong result = reinterpret_cast<jlong>(provider);

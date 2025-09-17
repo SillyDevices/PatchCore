@@ -25,8 +25,11 @@ package com.sillydevices.patchcore.platform.factory
 import com.sillydevices.patchcore.android.jni.modules.factory.DefaultWaveTableProviderJni
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-actual fun platformDefaultWaveTableProviderCreate(sampleRate: Int): WaveTableProviderPointer {
-    return WaveTableProviderPointer(
-        DefaultWaveTableProviderJni.defaultWaveTableProviderCreate(sampleRate)
-    )
+
+actual object PlatformDefaultWaveTableProvider {
+    actual fun new(sampleRate: Int): WaveTableProviderPointer {
+        return WaveTableProviderPointer(
+            DefaultWaveTableProviderJni.defaultWaveTableProviderNew(sampleRate)
+        )
+    }
 }
