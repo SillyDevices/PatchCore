@@ -20,17 +20,8 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.factory.builder
+package com.sillydevices.patchcore.platform
 
-import com.sillydevices.patchcore.android.jni.modules.factory.DefaultWaveTableProviderJni
-import com.sillydevices.patchcore.android.modules.factory.AndroidDefaultWaveTableProvider
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
 
-
-actual fun ModuleFactoryBuilder.createDefaultWaveTableProvider(
-    sampleRate: Int,
-): WaveTableProvider {
-    val pointer = DefaultWaveTableProviderJni.defaultWaveTableProviderCreate(sampleRate)
-    return AndroidDefaultWaveTableProvider(WaveTableProviderPointer(pointer))
-}
+expect fun platformDefaultWaveTableProviderCreate(sampleRate: Int): WaveTableProviderPointer

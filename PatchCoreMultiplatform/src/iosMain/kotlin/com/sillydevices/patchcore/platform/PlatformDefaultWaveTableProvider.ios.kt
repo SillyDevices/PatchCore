@@ -20,13 +20,15 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.factory.builder
+package com.sillydevices.patchcore.platform
 
-import com.sillydevices.patchcore.ios.modules.factory.IosDefaultWaveTableProvider
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
+import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
+import com.sillydevices.patchcore.ios.wrappers.defaultWaveTableProviderWrapperCreate
 import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun ModuleFactoryBuilder.createDefaultWaveTableProvider(sampleRate: Int): WaveTableProvider {
-    return IosDefaultWaveTableProvider(sampleRate)
+actual fun platformDefaultWaveTableProviderCreate(sampleRate: Int): WaveTableProviderPointer {
+    return WaveTableProviderPointer(
+        defaultWaveTableProviderWrapperCreate(sampleRate)
+    )
 }

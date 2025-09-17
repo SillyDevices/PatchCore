@@ -20,28 +20,19 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.ios.modules.factory
+package com.sillydevices.patchcore.platform
 
+import com.sillydevices.patchcore.android.jni.modules.factory.DefaultModuleFactoryJni
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.ios.wrappers.*
-import com.sillydevices.patchcore.module.factory.DefaultModuleFactory
-import com.sillydevices.patchcore.module.factory.ModuleFactory
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
-import kotlinx.cinterop.ExperimentalForeignApi
+import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-
-@OptIn(ExperimentalForeignApi::class)
-class IosDefaultModuleFactory(
-    waveTableProvider: WaveTableProvider,
-    val customModuleFactory: ModuleFactory? = null
-) : IosModuleFactory(), DefaultModuleFactory {
-
-    override var waveTableProvider: WaveTableProvider? = waveTableProvider
-    private val _pointer = ModuleFactoryPointer(defaultModuleFactoryCreate(
-        waveTableProvider.pointer.nativePointer,
-        customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
+actual fun platformDefaultModuleFactoryCreate(
+    waveTableProviderPointer: WaveTableProviderPointer,
+    customModuleFactoryPointer: ModuleFactoryPointer?
+): ModuleFactoryPointer {
+    return ModuleFactoryPointer(
+    DefaultModuleFactoryJni.defaultModuleFactoryCreate(
+        waveTableProviderPointer.nativePointer,
+        customModuleFactoryPointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
     ))
-
-    override val pointer = _pointer
 }
-

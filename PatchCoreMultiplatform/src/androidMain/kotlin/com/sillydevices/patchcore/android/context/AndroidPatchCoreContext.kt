@@ -23,17 +23,12 @@
 package com.sillydevices.patchcore.android.context
 
 import com.sillydevices.patchcore.android.audiointerface.AndroidAudioInterface
-import com.sillydevices.patchcore.android.context.factory.DefaultAndroidContextFactory
 import com.sillydevices.patchcore.android.jni.AudioInterfaceJni
 import com.sillydevices.patchcore.android.jni.ModularSynthJni
-import com.sillydevices.patchcore.android.jni.modules.factory.DefaultModuleFactoryJni
-import com.sillydevices.patchcore.context.PatchCoreContext
-import com.sillydevices.patchcore.android.modules.factory.AndroidDefaultModuleFactory
 import com.sillydevices.patchcore.audiointerface.AudioInterface
+import com.sillydevices.patchcore.context.PatchCoreContext
 import com.sillydevices.patchcore.context.factory.ContextFactory
-import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
-import com.sillydevices.patchcore.module.factory.DefaultModuleFactory
 import com.sillydevices.patchcore.module.factory.ModuleFactory
 import com.sillydevices.patchcore.synth.ModularSynth
 

@@ -22,7 +22,11 @@
 
 package com.sillydevices.patchcore.module.factory.builder
 
+import com.sillydevices.patchcore.module.factory.DefaultWaveTableProvider
 import com.sillydevices.patchcore.module.factory.WaveTableProvider
+import com.sillydevices.patchcore.platform.platformDefaultWaveTableProviderCreate
 
 
-expect fun ModuleFactoryBuilder.createDefaultWaveTableProvider(sampleRate: Int): WaveTableProvider
+fun ModuleFactoryBuilder.createDefaultWaveTableProvider(sampleRate: Int): WaveTableProvider {
+    return DefaultWaveTableProvider(sampleRate)
+}

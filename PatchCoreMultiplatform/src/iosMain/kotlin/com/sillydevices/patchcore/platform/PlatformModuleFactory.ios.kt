@@ -20,10 +20,13 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.internal
+package com.sillydevices.patchcore.platform
 
+import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
+import com.sillydevices.patchcore.ios.wrappers.moduleFactoryRelease
+import kotlinx.cinterop.ExperimentalForeignApi
 
-//TODO make auto ManagedObject that releases itself on finalize
-interface ManagedObject {
-    fun release()
+@OptIn(ExperimentalForeignApi::class)
+actual fun platformModuleFactoryRelease(pointer: ModuleFactoryPointer) {
+    moduleFactoryRelease(pointer.nativePointer)
 }

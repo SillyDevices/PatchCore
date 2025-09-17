@@ -20,24 +20,11 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.modules.factory
+package com.sillydevices.patchcore.platform
 
-import android.util.Log
-import com.sillydevices.patchcore.android.jni.modules.factory.WaveTableProviderJni
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
+import com.sillydevices.patchcore.android.jni.modules.factory.ModuleFactoryJni
+import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 
-abstract class AndroidWaveTableProvider: WaveTableProvider {
-
-    init {
-        Log.d("AndroidWaveTableProvider", "Creating WaveTableProvider")
-    }
-
-    override fun release() {
-        Log.d("AndroidWaveTableProvider", "Releasing WaveTableProvider with pointer: ${pointer.nativePointer}")
-        WaveTableProviderJni.waveTableProviderRelease(pointer.nativePointer)
-    }
-
-    protected fun finalize() {
-        release()
-    }
+actual fun platformModuleFactoryRelease(pointer: ModuleFactoryPointer) {
+    ModuleFactoryJni.moduleFactoryRelease(pointer.nativePointer)
 }

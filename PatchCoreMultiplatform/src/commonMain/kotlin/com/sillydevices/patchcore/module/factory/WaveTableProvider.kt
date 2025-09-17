@@ -24,7 +24,18 @@ package com.sillydevices.patchcore.module.factory
 
 import com.sillydevices.patchcore.internal.ManagedObject
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
+import com.sillydevices.patchcore.platform.platformWaveTableProviderRelease
 
-interface WaveTableProvider: ManagedObject {
-    val pointer: WaveTableProviderPointer
+
+abstract class WaveTableProvider: ManagedObject {
+
+    abstract val pointer: WaveTableProviderPointer
+
+    override fun release() {
+        platformWaveTableProviderRelease(pointer)
+    }
+
+    protected fun finalize() {
+        release()
+    }
 }

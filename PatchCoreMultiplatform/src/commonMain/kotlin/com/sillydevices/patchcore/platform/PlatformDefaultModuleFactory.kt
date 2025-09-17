@@ -20,22 +20,10 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.factory.builder
+package com.sillydevices.patchcore.platform
 
-import com.sillydevices.patchcore.android.jni.modules.factory.DefaultModuleFactoryJni
-import com.sillydevices.patchcore.android.modules.factory.AndroidDefaultModuleFactory
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.module.factory.ModuleFactory
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
+import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-actual fun ModuleFactoryBuilder.createDefaultModuleFactory(
-    waveTableProvider: WaveTableProvider,
-    customModuleFactory: ModuleFactory?,
-): ModuleFactory {
-    val pointer = DefaultModuleFactoryJni.defaultModuleFactoryCreate(
-        waveTableProvider.pointer.nativePointer,
-        customModuleFactory?.pointer?.nativePointer ?: ModuleFactoryPointer.NULL_VALUE
-    )
-    //save WaveTableProvider reference to avoid deallocation
-    return AndroidDefaultModuleFactory(ModuleFactoryPointer(pointer), waveTableProvider)
-}
+expect fun platformDefaultModuleFactoryCreate(waveTableProviderPointer: WaveTableProviderPointer, customModuleFactoryPointer: ModuleFactoryPointer?): ModuleFactoryPointer
+

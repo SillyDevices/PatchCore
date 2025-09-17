@@ -20,11 +20,11 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.modules.factory
+package com.sillydevices.patchcore.module.factory
 
-import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
+import com.sillydevices.patchcore.platform.platformDefaultWaveTableProviderCreate
 
-class AndroidDefaultWaveTableProvider(
-    override val pointer: WaveTableProviderPointer
-) : AndroidWaveTableProvider()
+class DefaultWaveTableProvider(sampleRate: Int) : WaveTableProvider() {
+    private val _pointer = platformDefaultWaveTableProviderCreate(sampleRate)
+    override val pointer = _pointer
+}

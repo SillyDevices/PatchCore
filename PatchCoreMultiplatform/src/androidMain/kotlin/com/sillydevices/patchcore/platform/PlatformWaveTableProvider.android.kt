@@ -20,24 +20,11 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.ios.modules.factory
+package com.sillydevices.patchcore.platform
 
-import com.sillydevices.patchcore.module.factory.ModuleFactory
-import com.sillydevices.patchcore.module.factory.WaveTableProvider
-import com.sillydevices.patchcore.ios.wrappers.*
-import kotlinx.cinterop.ExperimentalForeignApi
+import com.sillydevices.patchcore.android.jni.modules.factory.WaveTableProviderJni
+import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
-@OptIn(ExperimentalForeignApi::class)
-abstract class IosModuleFactory: ModuleFactory {
-
-    protected abstract var waveTableProvider: WaveTableProvider?
-
-    override fun release() {
-        waveTableProvider = null
-        moduleFactoryRelease(pointer.nativePointer)
-    }
-
-    protected fun finalize() {
-        release()
-    }
+actual fun platformWaveTableProviderRelease(waveTableProviderPointer: WaveTableProviderPointer) {
+    WaveTableProviderJni.waveTableProviderRelease(waveTableProviderPointer.nativePointer)
 }
