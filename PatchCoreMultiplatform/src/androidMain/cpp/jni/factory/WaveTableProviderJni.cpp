@@ -20,9 +20,15 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.jni.modules.factory
+#include <jni.h>
 
-object WaveTableProviderJni {
-    @JvmName("waveTableProviderDelete")
-    external fun waveTableProviderDelete(pointer: ULong)
+#include <patchcore/dsp/wavetable/DefaultWaveTableProvider.hpp>
+#include <stdexcept>
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_factory_WaveTableProviderJni_waveTableProviderDelete(JNIEnv *env, jobject thiz, jlong pointer) {
+    auto *provider = reinterpret_cast<WaveTableProvider *>(pointer);
+    if (provider == nullptr) return;
+    delete provider;
 }

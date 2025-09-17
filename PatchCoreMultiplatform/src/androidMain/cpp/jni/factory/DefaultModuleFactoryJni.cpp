@@ -20,16 +20,23 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
+
 #include <jni.h>
 
-#include <PatchCore/dsp/wavetable/DefaultWaveTableProvider.hpp>
+#include <patchcore/module/factory/ModuleFactory.hpp>
+#include <patchcore/module/factory/DefaultModuleFactory.hpp>
 
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_modules_factory_DefaultWaveTableProviderJni_defaultWaveTableProviderNew(
-        JNIEnv *env, jobject thiz, jint sampleRate) {
-    WaveTableProvider *provider = new DefaultWaveTableProvider(sampleRate);
-    jlong result = reinterpret_cast<jlong>(provider);
+Java_com_sillydevices_patchcore_android_jni_factory_DefaultModuleFactoryJni_defaultModuleFactoryNew(
+        JNIEnv *env, jobject thiz, jlong wave_table_provider, jlong custom_module_factory_pointer) {
+    WaveTableProvider* waveTableProvider = reinterpret_cast<WaveTableProvider *>(wave_table_provider);
+    if (waveTableProvider == nullptr) {
+        throw std::runtime_error("WaveTableProvider pointer is null");
+    }
+    ModuleFactory* customModuleFactory = reinterpret_cast<ModuleFactory *>(custom_module_factory_pointer);
+    ModuleFactory *factory = new DefaultModuleFactory(waveTableProvider, customModuleFactory);
+    jlong result = reinterpret_cast<jlong>(factory);
     return result;
 }

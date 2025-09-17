@@ -20,10 +20,13 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.jni
+package com.sillydevices.patchcore.android.jni.module
 
-object PolyModuleJni {
-    @JvmName("polyModuleNew")
-    external fun polyModuleNew(moduleFactoryPointer: ULong, name: String, sampleRate: Int, polyphony: Int): ULong
-//    external fun polyModuleRelease(polyModuleManagedPointer: Long)
+object ModuleJni {
+    @JvmName("moduleGetModuleOutput")
+    external fun moduleGetModuleOutput(modulePointer: ULong, outputName: String): ULong
+    @JvmName("moduleGetModuleInput")
+    external fun moduleGetModuleInput(modulePointer: ULong, inputName: String): ULong
+    @JvmName("moduleGetUserInput")
+    external fun moduleGetUserInput(modulePointer: ULong, inputName: String): ULong
 }

@@ -20,9 +20,13 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.jni.modules.factory
+package com.sillydevices.patchcore.android.jni.module
 
-object DefaultWaveTableProviderJni {
-    @JvmName("defaultWaveTableProviderNew")
-    external fun defaultWaveTableProviderNew(sampleRate: Int): ULong
+object UserInputJni {
+    @JvmName("floatUserInputSetValue")
+    external fun floatUserInputSetValue(userInputPointer: ULong, value: Float)
+    @JvmName("enumUserInputSetValue")
+    external fun enumUserInputSetValue(userInputPointer: ULong, value: Int)
+    @JvmName("boolUserInputSetValue")
+    external fun boolUserInputSetValue(userInputPointer: ULong, value: Boolean)
 }

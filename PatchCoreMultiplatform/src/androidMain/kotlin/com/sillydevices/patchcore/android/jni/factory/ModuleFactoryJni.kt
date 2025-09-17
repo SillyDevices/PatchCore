@@ -20,7 +20,7 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.jni.modules.factory
+package com.sillydevices.patchcore.android.jni.factory
 
 object ModuleFactoryJni {
     @JvmName("moduleFactoryDelete")

@@ -23,12 +23,12 @@
 
 #include <jni.h>
 
-#include <PatchCore/module/factory/ModuleFactory.hpp>
-#include <PatchCore/module/PolyModule.hpp>
+#include <patchcore/module/factory/ModuleFactory.hpp>
+#include <patchcore/module/PolyModule.hpp>
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_PolyModuleJni_polyModuleNew(
+Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_polyModuleNew(
         JNIEnv *env, jobject thiz, jlong module_factory_pointer, jstring name, jint sample_rate,
         jint polyphony) {
     auto *factory = reinterpret_cast<ModuleFactory *>(module_factory_pointer);
@@ -42,7 +42,7 @@ Java_com_sillydevices_patchcore_android_jni_PolyModuleJni_polyModuleNew(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PolyModuleJni_polyModuleRelease(
+Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_polyModuleRelease(
         JNIEnv *env, jobject thiz, jlong poly_module_pointer) {
     auto modulePtr = reinterpret_cast<Module *>(poly_module_pointer);
     if (modulePtr == nullptr) throw std::runtime_error("PolyModule pointer is null");

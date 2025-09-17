@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.platform.module
 
-import com.sillydevices.patchcore.android.jni.PatchModuleJni
+import com.sillydevices.patchcore.android.jni.module.PatchModuleJni
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.ModuleInputPointer
 import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer

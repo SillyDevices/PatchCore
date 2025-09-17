@@ -24,16 +24,16 @@
 #include <jni.h>
 #include <android/log_macros.h>
 
-#include <PatchCore/module/input/UserInput.hpp>
-#include <PatchCore/module/input/user/FloatUserInput.hpp>
-#include <PatchCore/module/input/user/BoolUserInput.hpp>
-#include <PatchCore/module/input/user/EnumUserInput.hpp>
+#include <patchcore/module/input/UserInput.hpp>
+#include <patchcore/module/input/user/FloatUserInput.hpp>
+#include <patchcore/module/input/user/BoolUserInput.hpp>
+#include <patchcore/module/input/user/EnumUserInput.hpp>
 
 #define LOG_TAG "PatchCoreJni"
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_UserInputJni_floatUserInputSetValue(
+Java_com_sillydevices_patchcore_android_jni_module_UserInputJni_floatUserInputSetValue(
         JNIEnv *env, jobject thiz, jlong user_input_pointer, jfloat value) {
 //    ALOGD("-------------------------------------------------------------------");
 //    ALOGD("Setting FloatUserInput pointer: %ld", user_input_pointer);
@@ -49,7 +49,7 @@ Java_com_sillydevices_patchcore_android_jni_UserInputJni_floatUserInputSetValue(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_UserInputJni_enumUserInputSetValue(
+Java_com_sillydevices_patchcore_android_jni_module_UserInputJni_enumUserInputSetValue(
         JNIEnv *env, jobject thiz, jlong user_input_pointer, jint value) {
     auto userInput = reinterpret_cast<EnumUserInput *>(user_input_pointer);
     if (userInput == nullptr) throw std::runtime_error("UserInput pointer is null");
@@ -58,7 +58,7 @@ Java_com_sillydevices_patchcore_android_jni_UserInputJni_enumUserInputSetValue(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_UserInputJni_boolUserInputSetValue(
+Java_com_sillydevices_patchcore_android_jni_module_UserInputJni_boolUserInputSetValue(
         JNIEnv *env, jobject thiz, jlong user_input_pointer, jboolean value) {
     auto userInput = reinterpret_cast<BoolUserInput *>(user_input_pointer);
     if (userInput == nullptr) throw std::runtime_error("UserInput pointer is null");

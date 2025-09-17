@@ -18,14 +18,15 @@ add_library( # Sets the name of the library.
         android/AudioInterface/utils/CpuLoadCounter.cpp
         android/AudioInterface/utils/AudioStreamCallbackProxy.cpp
 
-        jni/DefaultWaveTableProviderJni.cpp
-        jni/WaveTableProviderJni.cpp
-        jni/DefaultModuleFactoryJni.cpp
-        jni/ModuleFactoryJni.cpp
-        jni/ModuleJni.cpp
-        jni/PatchModuleJni.cpp
-        jni/PolyModuleJni.cpp
-        jni/UserInputJni.cpp
+        jni/factory/DefaultWaveTableProviderJni.cpp
+        jni/factory/WaveTableProviderJni.cpp
+        jni/factory/DefaultModuleFactoryJni.cpp
+        jni/factory/ModuleFactoryJni.cpp
+
+        jni/module/ModuleJni.cpp
+        jni/module/PatchModuleJni.cpp
+        jni/module/PolyModuleJni.cpp
+        jni/module/UserInputJni.cpp
 
         jni/ModularSynthJni.cpp
         jni/AudioInterfaceJni.cpp

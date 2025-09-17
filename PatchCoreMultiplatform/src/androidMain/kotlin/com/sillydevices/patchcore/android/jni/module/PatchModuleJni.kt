@@ -20,7 +20,7 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.jni
+package com.sillydevices.patchcore.android.jni.module
 
 import com.sillydevices.patchcore.module.factory.ModuleParameter
 

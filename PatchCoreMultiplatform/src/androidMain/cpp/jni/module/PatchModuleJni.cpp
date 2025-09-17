@@ -23,10 +23,10 @@
 
 #include <jni.h>
 
-#include "utils/KotlinParametersConverter.h"
+#include "../utils/KotlinParametersConverter.h"
 
-#include <PatchCore/module/factory/ModuleFactory.hpp>
-#include <PatchCore/module/PatchModule.hpp>
+#include <patchcore/module/factory/ModuleFactory.hpp>
+#include <patchcore/module/PatchModule.hpp>
 
 #include <android/log_macros.h>
 
@@ -34,7 +34,7 @@
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleNew(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleNew(
         JNIEnv *env, jobject thiz, jlong module_factory_pointer, jstring name, jint sample_rate) {
     auto *factory = reinterpret_cast<ModuleFactory *>(module_factory_pointer);
     if (factory == nullptr) throw std::runtime_error("ModuleFactory pointer is null");
@@ -47,7 +47,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleNew(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleDelete(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleDelete(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer) {
     auto modulePtr = reinterpret_cast<Module *>(patch_module_pointer);
     if (modulePtr == nullptr) throw std::runtime_error("PatchModule pointer is null");
@@ -56,7 +56,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleDelete(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleCreateModule(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleCreateModule(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jstring module_type,
         jstring module_name, jobject parameters) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -80,7 +80,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleCreateModu
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddModule(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddModule(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong managed_module_pointer) {
     //remove pointer to managed_module_pointer from java object after this call, or just do not delete this poiner
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -93,7 +93,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddModule(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-        Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleGetModule(
+        Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleGetModule(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jstring module_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
@@ -108,7 +108,7 @@ JNIEXPORT jlong JNICALL
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddInput(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddInput(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong input_pointer,
         jstring input_name) {
     ALOGD("-------------------------------------------------------------------");
@@ -125,7 +125,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddInput(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddOutput(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddOutput(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong output_pointer,
         jstring output_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -142,7 +142,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddOutput(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddUserInput(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddUserInput(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong user_input_pointer,
         jstring input_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -162,7 +162,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddUserInp
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddPatch(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddPatch(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong from_output_pointer,
         jlong to_input_pointer) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -177,7 +177,7 @@ Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleAddPatch(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_PatchModuleJni_patchModuleResetPatch(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleResetPatch(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto patchModule = dynamic_cast<PatchModule *>(module);

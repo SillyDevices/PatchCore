@@ -25,13 +25,13 @@
 #include <android/log_macros.h>
 
 #include <string>
-#include <PatchCore/module/Module.hpp>
+#include <patchcore/module/Module.hpp>
 
 #define LOG_TAG "ModuleJni"
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_ModuleJni_moduleGetModuleOutput(
+Java_com_sillydevices_patchcore_android_jni_module_ModuleJni_moduleGetModuleOutput(
         JNIEnv *env, jobject thiz,jlong module_pointer, jstring output_name) {
     auto module = reinterpret_cast<Module *>(module_pointer);
     const char* outputNameChars = env->GetStringUTFChars(output_name, nullptr);
@@ -43,7 +43,7 @@ Java_com_sillydevices_patchcore_android_jni_ModuleJni_moduleGetModuleOutput(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_ModuleJni_moduleGetModuleInput(
+Java_com_sillydevices_patchcore_android_jni_module_ModuleJni_moduleGetModuleInput(
         JNIEnv *env, jobject thiz, jlong module_pointer, jstring input_name) {
     auto module = reinterpret_cast<Module *>(module_pointer);
     if (module == nullptr) throw std::runtime_error("Module pointer is null");
@@ -56,7 +56,7 @@ Java_com_sillydevices_patchcore_android_jni_ModuleJni_moduleGetModuleInput(
 
 extern "C"
 JNIEXPORT jlong JNICALL
-Java_com_sillydevices_patchcore_android_jni_ModuleJni_moduleGetUserInput(
+Java_com_sillydevices_patchcore_android_jni_module_ModuleJni_moduleGetUserInput(
         JNIEnv *env, jobject thiz, jlong module_pointer, jstring input_name) {
     auto module = reinterpret_cast<Module *>(module_pointer);
     const char* inputNameChars = env->GetStringUTFChars(input_name, nullptr);

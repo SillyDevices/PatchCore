@@ -20,9 +20,18 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.jni.modules.factory
 
-object DefaultModuleFactoryJni {
-    @JvmName("defaultModuleFactoryNew")
-    external fun defaultModuleFactoryNew(waveTableProvider: ULong, customModuleFactoryPointer: ULong): ULong
+#include <jni.h>
+
+#include <patchcore/module/factory/ModuleFactory.hpp>
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_factory_ModuleFactoryJni_moduleFactoryDelete(
+        JNIEnv *env, jobject thiz, jlong pointer) {
+    auto *factory = reinterpret_cast<ModuleFactory *>(pointer);
+    if (factory == nullptr) {
+        return;
+    }
+    delete factory;
 }

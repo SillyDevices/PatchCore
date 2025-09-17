@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.platform.factory
 
-import com.sillydevices.patchcore.android.jni.modules.factory.DefaultWaveTableProviderJni
+import com.sillydevices.patchcore.android.jni.factory.DefaultWaveTableProviderJni
 import com.sillydevices.patchcore.internal.pointers.WaveTableProviderPointer
 
 

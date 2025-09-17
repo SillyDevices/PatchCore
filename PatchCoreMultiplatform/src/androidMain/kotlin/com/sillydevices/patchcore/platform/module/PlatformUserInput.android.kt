@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.platform.module
 
-import com.sillydevices.patchcore.android.jni.UserInputJni
+import com.sillydevices.patchcore.android.jni.module.UserInputJni
 import com.sillydevices.patchcore.internal.pointers.UserInputPointer
 
 actual object PlatformUserInput {
