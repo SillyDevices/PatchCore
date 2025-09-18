@@ -24,16 +24,15 @@
 #ifndef KeyboardModuleWrapper_h
 #define KeyboardModuleWrapper_h
 
-#import <Foundation/Foundation.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-
 void keyboardModuleOnEvent(uintptr_t pointer, bool is_pressed, float note, float velocity);
-
 
 
 #ifdef __cplusplus

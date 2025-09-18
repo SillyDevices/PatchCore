@@ -22,6 +22,15 @@
 
 package com.sillydevices.patchcore.context
 
-interface ModularSynthContext: PatchModuleContext {
+import com.sillydevices.patchcore.context.factory.ContextFactory
+import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.module.factory.ModuleFactory
 
-}
+interface ModularSynthContext: PatchModuleContext
+
+
+class ModularSynthContextImpl(
+    pointer: ModulePointer,
+    moduleFactory: ModuleFactory,
+    contextFactory: ContextFactory
+): ModularSynthContext, PatchModuleContextImpl(pointer, moduleFactory, contextFactory)

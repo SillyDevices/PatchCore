@@ -23,15 +23,47 @@
 package com.sillydevices.patchcore.context
 
 import com.sillydevices.patchcore.audiointerface.AudioInterface
-import com.sillydevices.patchcore.module.factory.DefaultModuleFactory
+import com.sillydevices.patchcore.audiointerface.AudioInterfaceImpl
+import com.sillydevices.patchcore.context.factory.ContextFactory
 import com.sillydevices.patchcore.module.factory.ModuleFactory
+import com.sillydevices.patchcore.platform.PlatformLibraryLoader
+import com.sillydevices.patchcore.platform.PlatformModularSynth
 import com.sillydevices.patchcore.synth.ModularSynth
+import kotlin.concurrent.Volatile
 
 
 //Main context of the Library, should contain main classes constructors and destructors
 interface PatchCoreContext {
 
-    fun <T: AudioInterface> createAudioInterface(): T
+    fun createAudioInterface(): AudioInterface
 
-    fun <T: ModularSynth> createSynth(factory: ModuleFactory, synth: T): T
+    fun <T: ModularSynth> createSynth(moduleFactory: ModuleFactory, synth: T): T
+}
+
+
+class PatchCoreContextImpl(
+    private val contextFactory: ContextFactory,
+): PatchCoreContext {
+
+    @Volatile
+    private var isLoaded = false
+
+    init {
+        if (!isLoaded) {
+            isLoaded = PlatformLibraryLoader.load()
+        }
+    }
+
+    override fun createAudioInterface(): AudioInterface {
+        return AudioInterfaceImpl()
+    }
+
+    override fun <T: ModularSynth> createSynth(moduleFactory: ModuleFactory, synth: T): T {
+        val synthPointer = PlatformModularSynth.new(moduleFactory.pointer, synth.sampleRate)
+        val context = ModularSynthContextImpl(synthPointer, moduleFactory, contextFactory)
+        //important: apply context before returning
+        synth.applyContext(context)
+        return synth
+    }
+
 }

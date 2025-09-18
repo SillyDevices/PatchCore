@@ -23,9 +23,13 @@
 package com.sillydevices.patchcore.context.factory
 
 import com.sillydevices.patchcore.context.ModuleContext
+import com.sillydevices.patchcore.context.ModuleContextImpl
 import com.sillydevices.patchcore.context.PatchCoreContext
+import com.sillydevices.patchcore.context.PatchCoreContextImpl
 import com.sillydevices.patchcore.context.PatchModuleContext
+import com.sillydevices.patchcore.context.PatchModuleContextImpl
 import com.sillydevices.patchcore.context.UserInputContext
+import com.sillydevices.patchcore.context.UserInputContextImpl
 import com.sillydevices.patchcore.context.modules.IndicatorModuleContext
 import com.sillydevices.patchcore.context.modules.KeyboardModuleContext
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
@@ -52,4 +56,49 @@ interface ContextFactory {
 
 //    fun createKeyboardModuleContext(pointer: ModulePointer, parentContext: PatchModuleContext): KeyboardModuleContext
 //    fun createIndicatorModuleContext(pointer: ModulePointer, parentContext: PatchModuleContext): IndicatorModuleContext
+}
+
+
+class ContextFactoryImpl(
+    private val moduleContextFactory: ModuleContextFactory
+): ContextFactory {
+
+    override fun createPatchCoreContext(): PatchCoreContext {
+        return PatchCoreContextImpl(this)
+    }
+
+    override fun createPolyModuleContext(
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext
+    ): PatchModuleContext {
+        return createPatchModuleContext(pointer, parentContext)
+    }
+
+    override fun createPatchModuleContext(
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext
+    ): PatchModuleContext {
+        parentContext as PatchModuleContextImpl
+        return PatchModuleContextImpl(pointer, parentContext.moduleFactory, parentContext.getContextFactory())
+    }
+
+    override fun createModuleContext(
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext
+    ): ModuleContext {
+        return ModuleContextImpl(pointer, this)
+    }
+
+    override fun createUserInputContext(pointer: UserInputPointer): UserInputContext {
+        return UserInputContextImpl(pointer)
+    }
+
+    override fun <T : ModuleContext> createModuleContext(
+        moduleClass: KClass<T>,
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext
+    ): T {
+        return moduleContextFactory.createModuleContext(moduleClass, pointer, parentContext, this)
+            ?: throw RuntimeException("Module context for ${moduleClass.simpleName} not found in factory: $moduleContextFactory")
+    }
 }

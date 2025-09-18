@@ -61,8 +61,8 @@ class SoundEngine {
 
     private val patchCore = PatchCore()
     private val synth = patchCore.createSynth(Synth())
-    private val audioInterface: AudioInterface = patchCore.createAudioInterface<AudioInterface>().apply {
-        setOptions( createOptions() )
+    private val audioInterface: AudioInterface = patchCore.createAudioInterface().apply {
+        setOptions( AndroidAudioInterfaceOptions(), /*..., iOSAudioInterfaceOptions*/ )
         setSynth(synth)
     }
 
@@ -102,13 +102,13 @@ Add the dependency to your build.gradle.kts
 ```kotlin
 // for kotlin multiplatform projects
 commonMain.dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.5")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.0")
 }
 // for android projects
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.5")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.0")
     // or
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.1.5")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.2.0")
 }
 
 ```
@@ -145,7 +145,7 @@ add dependency to app module build.gradle.kts
 ```kotlin
 //build.gradle.kts
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.1.5")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.0")
 }
 ```
 
