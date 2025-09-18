@@ -102,7 +102,7 @@ android {
     }
 }
 
-val artifactVersion = "0.2.0"
+val artifactVersion = "0.2.1"
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)
