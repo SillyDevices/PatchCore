@@ -34,6 +34,8 @@ PolyModule::PolyModule(ModuleFactory *factory, std::string name, int sampleRate,
         auto module = std::make_unique<PatchModule>(factory, name, sampleRate);
         voices.push_back(std::move(module));
     }
+    activeVoiceCount = voiceCount;
+    setActiveVoiceCount(voiceCount);
 }
 
 void PolyModule::onStartBuffer(int size) {
@@ -46,8 +48,9 @@ void PolyModule::envelope() {
     for (const auto &proxyInput : proxyInputs) {
         proxyInput->envelope();
     }
-    for (const auto &voice: voices) {
-        voice->envelope();
+    //todo optimize: only active voices
+    for (int i = 0; i < activeVoiceCount; ++i) {
+        voices[i]->envelope();
     }
     for (const auto &proxyOutput : proxyOutputs) {
         proxyOutput->envelope();
@@ -163,6 +166,17 @@ PatchModule *PolyModule::getVoice(size_t index) {
     return voices[index].get();
 }
 
+
+size_t PolyModule::getActiveVoiceCount() const{
+    return activeVoiceCount;
+}
+
+void PolyModule::setActiveVoiceCount(size_t count) {
+    if (count > voiceCount) {
+        throw std::out_of_range("Active voice count cannot be greater than total voice count");
+    }
+    activeVoiceCount = count;
+}
 
 
 
