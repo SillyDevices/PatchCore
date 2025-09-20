@@ -23,6 +23,7 @@
 package com.sillydevices.patchcore.module
 
 import com.sillydevices.patchcore.context.PatchModuleContext
+import com.sillydevices.patchcore.context.PolyModuleContext
 
 open class PolyModule(name: String, val polyphonyCount: Int): PatchModule(name) {
 
@@ -30,6 +31,19 @@ open class PolyModule(name: String, val polyphonyCount: Int): PatchModule(name) 
         val pointer = parentContext.createPolyModule(this)
         val newContext = parentContext.getContextFactory().createPolyModuleContext(pointer, parentContext)
         applyContext(newContext)
+    }
+
+    fun setActiveVoicesCount(count: Int) {
+        if (count < 1 || count > polyphonyCount) {
+            throw IllegalArgumentException("Active voices count must be in range 1..$polyphonyCount")
+        }
+        val context = moduleContext as? PolyModuleContext ?: throw IllegalStateException("Module context is not set")
+        context.setActiveVoicesCount(count)
+    }
+
+    fun getActiveVoicesCount(): Int {
+        val context = moduleContext as? PolyModuleContext ?: throw IllegalStateException("Module context is not set")
+        return context.getActiveVoicesCount()
     }
 
 }

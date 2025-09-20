@@ -26,4 +26,9 @@ object PolyModuleJni {
     @JvmName("polyModuleNew")
     external fun polyModuleNew(moduleFactoryPointer: ULong, name: String, sampleRate: Int, polyphony: Int): ULong
 //    external fun polyModuleRelease(polyModuleManagedPointer: Long)
+
+    @JvmName("setActiveVoicesCount")
+    external fun setActiveVoicesCount(polyModulePointer: ULong, count: Int)
+    @JvmName("getActiveVoicesCount")
+    external fun getActiveVoicesCount(polyModulePointer: ULong): Int
 }
