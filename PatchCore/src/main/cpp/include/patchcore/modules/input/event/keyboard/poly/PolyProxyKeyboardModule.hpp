@@ -46,6 +46,7 @@ public:
     void onEvent(KeyboardEvent event) override;
 
 protected:
+    PolyModule *polyModule;
     std::unique_ptr<RouterKeyboard> keyboard;
     std::vector<KeyboardModule *> keyboards;
 
