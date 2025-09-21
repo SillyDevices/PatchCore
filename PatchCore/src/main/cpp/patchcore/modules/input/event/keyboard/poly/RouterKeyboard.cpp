@@ -62,6 +62,8 @@ void RouterKeyboard::onEvent(KeyboardEvent event) {
 
 void RouterKeyboard::setPolyphony(int count) {
     std::lock_guard<std::mutex> lock(_mutex);
+    if (_polyphony == count) return;
+
     AbstractRouterKeyboard::setPolyphony(count);
 
     for (auto pair: _keyboardsMap) {

@@ -41,3 +41,19 @@ void polyModuleRelease(uintptr_t poly_module_pointer) {
     if (modulePtr == nullptr) throw std::runtime_error("PolyModule pointer is null");
     delete modulePtr;
 }
+
+void polyModuleSetActiveVoicesCount(uintptr_t poly_module_pointer, int count) {
+    auto module = reinterpret_cast<Module *>(poly_module_pointer);
+    auto *patchModule = dynamic_cast<PatchModule *>(module);
+    auto *polyModule = dynamic_cast<PolyModule *>(patchModule);
+    if (polyModule == nullptr) throw std::runtime_error("PolyModule pointer is null");
+    polyModule->setActiveVoiceCount(count);
+}
+
+int polyModuleGetActiveVoicesCount(uintptr_t poly_module_pointer) {
+    auto module = reinterpret_cast<Module *>(poly_module_pointer);
+    auto *patchModule = dynamic_cast<PatchModule *>(module);
+    auto *polyModule = dynamic_cast<PolyModule *>(patchModule);
+    if (polyModule == nullptr) throw std::runtime_error("PolyModule pointer is null");
+    return polyModule->getActiveVoiceCount();
+}

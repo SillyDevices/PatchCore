@@ -24,7 +24,9 @@ package com.sillydevices.patchcore.platform.module
 
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.ios.wrappers.polyModuleGetActiveVoicesCount
 import com.sillydevices.patchcore.ios.wrappers.polyModuleNew
+import com.sillydevices.patchcore.ios.wrappers.polyModuleSetActiveVoicesCount
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cstr
 
@@ -40,4 +42,13 @@ actual object PlatformPolyModule {
                 polyphonyCount
         ))
     }
+
+    actual fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int) {
+        polyModuleSetActiveVoicesCount(polyModulePointer.nativePointer, count)
+    }
+
+    actual fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int {
+        return polyModuleGetActiveVoicesCount(polyModulePointer.nativePointer)
+    }
+
 }

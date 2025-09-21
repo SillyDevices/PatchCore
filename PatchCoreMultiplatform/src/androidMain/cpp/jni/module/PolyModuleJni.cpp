@@ -48,3 +48,24 @@ Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_polyModuleRelea
     if (modulePtr == nullptr) throw std::runtime_error("PolyModule pointer is null");
     delete modulePtr;
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_setActiveVoicesCount(
+        JNIEnv *env, jobject thiz, jlong poly_module_pointer, jint count) {
+    auto module = reinterpret_cast<Module *>(poly_module_pointer);
+    auto *patchModule = dynamic_cast<PatchModule *>(module);
+    auto *polyModule = dynamic_cast<PolyModule *>(patchModule);
+    if (polyModule == nullptr) throw std::runtime_error("PolyModule pointer is null");
+    polyModule->setActiveVoiceCount(count);
+}
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_getActiveVoicesCount(
+        JNIEnv *env, jobject thiz, jlong poly_module_pointer) {
+    auto module = reinterpret_cast<Module *>(poly_module_pointer);
+    auto *patchModule = dynamic_cast<PatchModule *>(module);
+    auto *polyModule = dynamic_cast<PolyModule *>(patchModule);
+    if (polyModule == nullptr) throw std::runtime_error("PolyModule pointer is null");
+    return polyModule->getActiveVoiceCount();
+}

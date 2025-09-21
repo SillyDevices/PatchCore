@@ -21,9 +21,11 @@
  */
 
 #include "patchcore/modules/input/event/keyboard/poly/PolyProxyKeyboardModule.hpp"
+#include "patchcore/module/PolyModule.hpp"
 
 PolyProxyKeyboardModule::PolyProxyKeyboardModule(const Module *module, PolyModule *polyModule):
 PolyProxyModule(module, polyModule), SingleKeyboardModule(module->getModuleName(), module->getSampleRate()) {
+    this->polyModule = polyModule;
     keyboards.reserve(modulesToProxy.size());
     for (Module* _keyboard : modulesToProxy) {
         if (auto casted = dynamic_cast<SingleKeyboardModule*>(_keyboard)) {
@@ -37,5 +39,7 @@ PolyProxyModule(module, polyModule), SingleKeyboardModule(module->getModuleName(
 }
 
 void PolyProxyKeyboardModule::onEvent(KeyboardEvent event) {
+    //TODO optimize. We don't need to set polyphony on every event.
+    keyboard->setPolyphony(polyModule->getActiveVoiceCount());
     keyboard->onEvent(event);
 }

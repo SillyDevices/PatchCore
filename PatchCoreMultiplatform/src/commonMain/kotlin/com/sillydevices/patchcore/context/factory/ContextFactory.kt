@@ -28,6 +28,7 @@ import com.sillydevices.patchcore.context.PatchCoreContext
 import com.sillydevices.patchcore.context.PatchCoreContextImpl
 import com.sillydevices.patchcore.context.PatchModuleContext
 import com.sillydevices.patchcore.context.PatchModuleContextImpl
+import com.sillydevices.patchcore.context.PolyModuleContextImpl
 import com.sillydevices.patchcore.context.UserInputContext
 import com.sillydevices.patchcore.context.UserInputContextImpl
 import com.sillydevices.patchcore.context.modules.IndicatorModuleContext
@@ -71,7 +72,8 @@ class ContextFactoryImpl(
         pointer: ModulePointer,
         parentContext: PatchModuleContext
     ): PatchModuleContext {
-        return createPatchModuleContext(pointer, parentContext)
+        parentContext as PatchModuleContextImpl
+        return PolyModuleContextImpl(pointer, parentContext.moduleFactory, parentContext.getContextFactory())
     }
 
     override fun createPatchModuleContext(

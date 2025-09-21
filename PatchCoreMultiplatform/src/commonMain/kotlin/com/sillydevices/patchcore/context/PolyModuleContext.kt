@@ -20,15 +20,30 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform.module
+package com.sillydevices.patchcore.context
 
-import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
+import com.sillydevices.patchcore.context.factory.ContextFactory
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.module.factory.ModuleFactory
+import com.sillydevices.patchcore.platform.module.PlatformPolyModule
 
-expect object PlatformPolyModule {
+interface PolyModuleContext: PatchModuleContext {
+    fun setActiveVoicesCount(count: Int)
+    fun getActiveVoicesCount(): Int
+}
 
-    fun new(moduleFactoryPointer: ModuleFactoryPointer, name: String, sampleRate: Int, polyphonyCount: Int): ModulePointer
+open class PolyModuleContextImpl(
+    pointer: ModulePointer,
+    moduleFactory: ModuleFactory,
+    contextFactory: ContextFactory,
+): PatchModuleContextImpl(pointer, moduleFactory, contextFactory), PolyModuleContext {
 
-    fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int)
-    fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int
+    override fun setActiveVoicesCount(count: Int) {
+        PlatformPolyModule.setActiveVoicesCount(getPointer(), count)
+    }
+
+    override fun getActiveVoicesCount(): Int {
+        return PlatformPolyModule.getActiveVoicesCount(getPointer())
+    }
+
 }

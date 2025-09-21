@@ -65,12 +65,14 @@ public:
     size_t getVoiceCount() const;
 
     PatchModule* getVoice(size_t index);
-//    size_t getActiveVoiceCount() const;
-//    void setActiveVoiceCount(size_t count);
+
+    size_t getActiveVoiceCount() const;
+    void setActiveVoiceCount(size_t count);
 
 protected:
     std::vector<std::unique_ptr<PatchModule>> voices;
     size_t voiceCount;
+    size_t activeVoiceCount;
 
 //    std::unordered_map<std::string, ModuleInput *> inputs;
 //    std::unordered_map<std::string, ModuleOutput *> outputs;

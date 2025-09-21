@@ -34,6 +34,9 @@ extern "C" {
 uintptr_t polyModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate, int polyphony);
 void polyModuleRelease(uintptr_t poly_module_pointer);
 
+void polyModuleSetActiveVoicesCount(uintptr_t poly_module_pointer, int count);
+int polyModuleGetActiveVoicesCount(uintptr_t poly_module_pointer);
+
 
 #ifdef __cplusplus
 }

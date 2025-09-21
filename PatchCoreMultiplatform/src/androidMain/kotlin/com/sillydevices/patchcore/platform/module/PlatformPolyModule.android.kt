@@ -38,4 +38,17 @@ actual object PlatformPolyModule {
             )
         )
     }
+
+    actual fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int) {
+        PolyModuleJni.setActiveVoicesCount(
+            polyModulePointer.nativePointer,
+            count
+        )
+    }
+
+    actual fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int {
+        return PolyModuleJni.getActiveVoicesCount(
+            polyModulePointer.nativePointer
+        )
+    }
 }
