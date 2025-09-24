@@ -113,7 +113,19 @@ dependencies {
 
 ```
 
-⚠️ Don’t forget to add a swift package dependency to your iOS project from https://github.com/SillyDevices/PatchCore
+⚠️  IOS WARNING:
+
+Don’t forget to add a swift package dependency to your iOS project from https://github.com/SillyDevices/PatchCore
+
+⚠️  ANDROID WARNING:
+
+patchcore-multiplatform-android is supplied as an AAR artifact with unstripped native libraries.
+Make sure to strip them in release builds to reduce the size of your app.
+
+By default AGP strip native libraries only if you have ndk installed. Ensure you have it installed on your LOCAL and CI machines. 
+AGP just skips stripReleaseDebugSymbols if ndk is not found.
+
+```kotlin
 
 
 ## Using for development as submodule
