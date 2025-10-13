@@ -54,6 +54,7 @@ void BaseVCO::phaseIncrement(float frequency) {
     periodStart = false;
     phase += frequency / (float) sampleRate;
     if (phase > 1.0f) nextPeriod();
+    else if (phase < 0.0f) nextNegativePeriod();
 }
 
 void BaseVCO::nextPeriod() {
@@ -61,4 +62,8 @@ void BaseVCO::nextPeriod() {
     phase -= 1.0f;
 }
 
+void BaseVCO::nextNegativePeriod() {
+    periodStart = true;
+    phase += 1.0f;
+}
 
