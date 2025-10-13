@@ -61,6 +61,7 @@ protected:
     float computeFrequency(float voltage);
     void phaseIncrement(float frequency);
     void nextPeriod();
+    void nextNegativePeriod();
 protected:
     float maxFrequency = sampleRate / 2.0f;
 
