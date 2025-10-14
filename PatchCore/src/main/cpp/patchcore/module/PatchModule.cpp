@@ -83,6 +83,9 @@ void PatchModule::onStartBuffer(int size) {
 }
 
 void PatchModule::envelope() {
+    //need to sync router.envelope
+    //it's not a best option to do that
+    std::lock_guard<std::mutex> lock(routerMutex);
     for (const auto input: _proxyModuleInputs) {
         input->envelope();
     }
