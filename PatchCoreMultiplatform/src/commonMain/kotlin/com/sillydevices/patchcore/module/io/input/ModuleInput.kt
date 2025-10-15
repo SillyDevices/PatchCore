@@ -53,4 +53,5 @@ open class ModuleInput(
     }
 
     override fun hashCode(): Int = arrayOf("input", moduleName, name).contentHashCode()
+    override fun toString(): String = "Input($moduleName:$name)"
 }
