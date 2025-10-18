@@ -27,6 +27,7 @@ data class AndroidAudioInterfaceOptions(
     val bufferSizeMultiplayer: Int = 2,
     val useStabilizedCallback: Boolean = true,
     val useCpuAffinity: Boolean = true,
+    val useBestCpuByMaxId: Boolean = true,
     val useGameMode: Boolean = true
 ): AudioInterfaceOptions {
     override fun equals(other: Any?): Boolean {
@@ -41,6 +42,7 @@ data class AndroidAudioInterfaceOptions(
         if (bufferSizeMultiplayer != other.bufferSizeMultiplayer) return false
         if (useStabilizedCallback != other.useStabilizedCallback) return false
         if (useCpuAffinity != other.useCpuAffinity) return false
+        if (useBestCpuByMaxId != other.useBestCpuByMaxId) return false
         if (useGameMode != other.useGameMode) return false
 
         return true
@@ -51,6 +53,7 @@ data class AndroidAudioInterfaceOptions(
         result = 31 * result + bufferSizeMultiplayer
         result = 31 * result + useStabilizedCallback.hashCode()
         result = 31 * result + useCpuAffinity.hashCode()
+        result = 31 * result + useBestCpuByMaxId.hashCode()
         result = 31 * result + useGameMode.hashCode()
         return result
     }

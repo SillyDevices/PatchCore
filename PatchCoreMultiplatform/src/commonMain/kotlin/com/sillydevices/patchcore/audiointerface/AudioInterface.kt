@@ -35,6 +35,8 @@ interface AudioInterface {
 
     fun setSynth(synth: ModularSynth)
     fun setOptions(vararg options: AudioInterfaceOptions)
+
+    fun getDebugInfo(): DebugInfo
 }
 
 class AudioInterfaceImpl(): AudioInterface {
@@ -59,6 +61,10 @@ class AudioInterfaceImpl(): AudioInterface {
 
     override fun setOptions(vararg options: AudioInterfaceOptions) {
         PlatformAudioInterface.setOptions(pointer, options.toList())
+    }
+
+    override fun getDebugInfo(): DebugInfo {
+        return PlatformAudioInterface.getDebugInfo(pointer)
     }
 
 }

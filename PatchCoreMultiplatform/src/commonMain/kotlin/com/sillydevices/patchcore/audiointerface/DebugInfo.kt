@@ -20,30 +20,11 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform
+package com.sillydevices.patchcore.audiointerface
 
-import com.sillydevices.patchcore.audiointerface.AudioInterfaceOptions
-import com.sillydevices.patchcore.audiointerface.DebugInfo
-import com.sillydevices.patchcore.internal.pointers.AudioInterfacePointer
-import com.sillydevices.patchcore.internal.pointers.ModulePointer
-
-
-expect object PlatformAudioInterface {
-
-    fun new(): AudioInterfacePointer
-
-    fun delete(pointer: AudioInterfacePointer)
-
-
-    fun startAudio(pointer: AudioInterfacePointer)
-
-    fun stopAudio(pointer: AudioInterfacePointer)
-
-    fun isStarted(pointer: AudioInterfacePointer): Boolean
-
-    fun setSynth(pointer: AudioInterfacePointer, synthPointer: ModulePointer)
-
-    fun setOptions(pointer: AudioInterfacePointer, options: List<AudioInterfaceOptions>)
-
-    fun getDebugInfo(pointer: AudioInterfacePointer): DebugInfo
-}
+data class DebugInfo (
+    val xRunCount: Int,
+    val cpuId: Int,
+    val bufferSizeInFrames: Int,
+    val cpuLoad: Double
+)
