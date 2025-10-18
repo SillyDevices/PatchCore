@@ -18,6 +18,8 @@ jobs:
         with:
           distribution: 'jetbrains' # See 'Supported distributions' for available options
           java-version: '17'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v4
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
