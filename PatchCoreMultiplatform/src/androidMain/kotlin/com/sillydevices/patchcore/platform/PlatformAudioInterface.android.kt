@@ -25,6 +25,7 @@ package com.sillydevices.patchcore.platform
 import com.sillydevices.patchcore.android.jni.AudioInterfaceJni
 import com.sillydevices.patchcore.audiointerface.AndroidAudioInterfaceOptions
 import com.sillydevices.patchcore.audiointerface.AudioInterfaceOptions
+import com.sillydevices.patchcore.audiointerface.DebugInfo
 import com.sillydevices.patchcore.internal.pointers.AudioInterfacePointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
@@ -63,5 +64,9 @@ actual object PlatformAudioInterface {
         options.filter { it is AndroidAudioInterfaceOptions }.forEach {
             AudioInterfaceJni.audioInterfaceSetOptions(pointer.nativePointer, it as AndroidAudioInterfaceOptions)
         }
+    }
+
+    actual fun getDebugInfo(pointer: AudioInterfacePointer): DebugInfo {
+        return AudioInterfaceJni.audioInterfaceGetDebugInfo(pointer.nativePointer)
     }
 }

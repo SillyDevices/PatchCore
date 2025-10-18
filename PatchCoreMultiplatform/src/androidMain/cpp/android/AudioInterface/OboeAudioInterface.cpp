@@ -22,7 +22,7 @@
 
 
 #include "OboeAudioInterface.hpp"
-#include <android/log.h>
+#include <android/log_macros.h>
 #include <stdexcept>
 #include <string>
 #include <oboe/StabilizedCallback.h>
@@ -42,6 +42,7 @@ void OboeAudioInterface::setOptions(OboeAudioInterface::PlayerOptions options) {
             .useStabilizedCallback = options.useStabilizedCallback,
             .useCpuAffinity = options.useCpuAffinity,
             .useGameMode = options.useGameMode,
+            .useBestCpuByMaxId = options.useBestCpuByMaxId,
             .preferredCpuIds = options.preferredCpuIds
     };
     this->options = newOptions;
@@ -168,22 +169,32 @@ oboe::DataCallbackResult OboeAudioInterface::onAudioReady(oboe::AudioStream *obo
     currentCpuId = sched_getcpu();
 
     if (!isAffinitySet) {
-        if (!options.useCpuAffinity){
+        if (options.useBestCpuByMaxId) {
+            preferredCpuId = std::thread::hardware_concurrency() - 1;
+            setThreadAffinity(preferredCpuId);
             isAffinitySet = true;
         } else {
-            if (waitAffinityFramesCounter < AFFINITY_FRAMES){
-                auto lastLoad = proxy.get()->getCurrentLoad();
-                if (lastCpuId != -1){
-                    cpuLoadCounter.updateCpuLoad(lastCpuId, lastLoad);
-                }
-                lastCpuId = currentCpuId;
-                waitAffinityFramesCounter+=numFrames;
+            if (!options.useCpuAffinity) {
+                isAffinitySet = true;
             } else {
-                if (preferredCpuId == -1) {
-                    preferredCpuId = cpuLoadCounter.getBestCpuId();
+                if (waitAffinityFramesCounter < AFFINITY_FRAMES) {
+                    auto lastLoad = proxy.get()->getCurrentLoad();
+                    if (lastCpuId != -1) {
+                        cpuLoadCounter.updateCpuLoad(lastCpuId, lastLoad);
+                    }
+                    lastCpuId = currentCpuId;
+                    waitAffinityFramesCounter += numFrames;
+                } else {
+                    if (preferredCpuId == -1) {
+                        preferredCpuId = cpuLoadCounter.getBestCpuId();
+                    }
+                    isAffinitySet = setThreadAffinity(preferredCpuId);
                 }
-                isAffinitySet = setThreadAffinity(preferredCpuId);
             }
+        }
+    } else {
+        if (preferredCpuId != currentCpuId && preferredCpuId != -1 && options.useCpuAffinity) {
+            setThreadAffinity(preferredCpuId);
         }
     }
 

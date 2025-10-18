@@ -84,11 +84,13 @@ Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceSetO
     jfieldID useStabilizedCallbackField = env->GetFieldID(optionsClass, "useStabilizedCallback", "Z");
     jfieldID useCpuAffinityField = env->GetFieldID(optionsClass, "useCpuAffinity", "Z");
     jfieldID preferredCpuIdsField = env->GetFieldID(optionsClass, "preferredCpuIds", "[I");
+    jfieldID useBestCpuByMaxIdField = env->GetFieldID(optionsClass, "useBestCpuByMaxId", "Z");
     jfieldID gameModeField = env->GetFieldID(optionsClass, "useGameMode", "Z");
     playerOptions.bufferSizeMultiplayer = env->GetIntField(options, bufferSizeMultiplayerField);
     playerOptions.useStabilizedCallback = env->GetBooleanField(options, useStabilizedCallbackField);
     playerOptions.useCpuAffinity = env->GetBooleanField(options, useCpuAffinityField);
     playerOptions.useGameMode = env->GetBooleanField(options, gameModeField);
+    playerOptions.useBestCpuByMaxId = env->GetBooleanField(options, useBestCpuByMaxIdField);
     jintArray preferredCpuIdsArray = (jintArray) env->GetObjectField(options, preferredCpuIdsField);
     jint *preferredCpuIds = env->GetIntArrayElements(preferredCpuIdsArray, nullptr);
     int length = env->GetArrayLength(preferredCpuIdsArray);
@@ -113,4 +115,21 @@ Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceSetS
         if (synth == nullptr) throw std::runtime_error("Synth pointer is null");
         audioInterface->setSynth(synth);
     }
+}
+
+extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_sillydevices_patchcore_android_jni_AudioInterfaceJni_audioInterfaceGetDebugInfo(
+        JNIEnv *env, jobject thiz, jlong audio_interface_pointer) {
+    auto *audioInterface = reinterpret_cast<OboeAudioInterface *>(audio_interface_pointer);
+    if (audioInterface == nullptr) throw std::runtime_error("AudioInterface pointer is null");
+    OboeAudioInterface::DebugInfo debugInfo = audioInterface->getDebugInfo();
+    jclass debugInfoClass = env->FindClass("com/sillydevices/patchcore/audiointerface/DebugInfo");
+    jmethodID constructor = env->GetMethodID(debugInfoClass, "<init>", "(IIID)V");
+    jobject debugInfoObject = env->NewObject(debugInfoClass, constructor,
+                                             debugInfo.xRunCount,
+                                             debugInfo.cpuId,
+                                             debugInfo.bufferSizeInFrames,
+                                             debugInfo.cpuLoad);
+    return debugInfoObject;
 }

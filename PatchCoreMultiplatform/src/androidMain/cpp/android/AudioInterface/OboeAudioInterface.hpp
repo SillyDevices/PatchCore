@@ -45,6 +45,7 @@ public:
         bool useStabilizedCallback;
         bool useCpuAffinity;
         bool useGameMode;
+        bool useBestCpuByMaxId;
         std::vector<int> preferredCpuIds;
     };
 

@@ -23,6 +23,7 @@
 package com.sillydevices.patchcore.platform
 
 import com.sillydevices.patchcore.audiointerface.AudioInterfaceOptions
+import com.sillydevices.patchcore.audiointerface.DebugInfo
 import com.sillydevices.patchcore.internal.pointers.AudioInterfacePointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 import com.sillydevices.patchcore.ios.wrappers.CommonAudioInterface
@@ -59,5 +60,15 @@ actual object PlatformAudioInterface {
 
     actual fun setOptions(pointer: AudioInterfacePointer, options: List<AudioInterfaceOptions>) {
         //no options for iOS
+    }
+
+    actual fun getDebugInfo(pointer: AudioInterfacePointer): DebugInfo {
+        //MOCK implementation
+        return DebugInfo(
+            xRunCount = 0,
+            cpuId = 0,
+            bufferSizeInFrames = 0,
+            cpuLoad = 0.0
+        )
     }
 }

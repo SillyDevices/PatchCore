@@ -23,6 +23,7 @@
 package com.sillydevices.patchcore.android.jni
 
 import com.sillydevices.patchcore.audiointerface.AndroidAudioInterfaceOptions
+import com.sillydevices.patchcore.audiointerface.DebugInfo
 
 object AudioInterfaceJni {
     @JvmName("audioInterfaceNew")
@@ -39,4 +40,6 @@ object AudioInterfaceJni {
     external fun audioInterfaceSetOptions(audioInterfacePointer: ULong, options: AndroidAudioInterfaceOptions)
     @JvmName("audioInterfaceSetSynth")
     external fun audioInterfaceSetSynth(audioInterfacePointer: ULong, synthPointer: ULong)
+    @JvmName("audioInterfaceGetDebugInfo")
+    external fun audioInterfaceGetDebugInfo(audioInterfacePointer: ULong): DebugInfo
 }

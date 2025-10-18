@@ -55,4 +55,5 @@ open class ModuleOutput(
     }
 
     override fun hashCode(): Int = arrayOf("output", moduleName, name).contentHashCode()
+    override fun toString(): String = "Output($moduleName:$name)"
 }
