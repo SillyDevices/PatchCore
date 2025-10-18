@@ -170,8 +170,8 @@ oboe::DataCallbackResult OboeAudioInterface::onAudioReady(oboe::AudioStream *obo
 
     if (!isAffinitySet) {
         if (options.useBestCpuByMaxId) {
-            auto bestCpuId = std::thread::hardware_concurrency() - 1;
-            setThreadAffinity(bestCpuId);
+            preferredCpuId = std::thread::hardware_concurrency() - 1;
+            setThreadAffinity(preferredCpuId);
             isAffinitySet = true;
         } else {
             if (!options.useCpuAffinity) {
@@ -191,6 +191,10 @@ oboe::DataCallbackResult OboeAudioInterface::onAudioReady(oboe::AudioStream *obo
                     isAffinitySet = setThreadAffinity(preferredCpuId);
                 }
             }
+        }
+    } else {
+        if (preferredCpuId != currentCpuId && preferredCpuId != -1 && options.useCpuAffinity) {
+            setThreadAffinity(preferredCpuId);
         }
     }
 
