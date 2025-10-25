@@ -26,7 +26,8 @@
 #include <patchcore/modules/ConstModule.hpp>
 #include <patchcore/modules/AttenuverterModule.hpp>
 
-static auto factory = DefaultModuleFactory(44100);
+static auto waveTableProvider = DefaultWaveTableProvider(44100);
+static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
 
 TEST(ModuleTest, interolatedUserInputTest) {
     auto synth = new ModularSynth(&factory, 44100);

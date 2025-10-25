@@ -44,6 +44,10 @@ public:
     ModuleOutput* getVoice(int voiceIndex) {
         return voiceOutputs[voiceIndex];
     }
+    //TODO this is a hack to update voiceOutput from PolyModule::addOutput
+    void setVoiceOutput(int voiceIndex, ModuleOutput* output) {
+        voiceOutputs[voiceIndex] = output;
+    }
     void envelope() {
         value = 0.0f;
         for (auto &voiceOutput : voiceOutputs) {

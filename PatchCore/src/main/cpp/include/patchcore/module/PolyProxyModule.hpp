@@ -30,27 +30,35 @@
 
 class PolyModule;
 
+/*
+ * PolyProxyModule is a proxy for a Module inside a PolyModule.
+ * The main purpose for this class is to pass interface calls to the proxied modules.
+ * Default implementation has only Module get Inputs/Outputs/UserInputs functionality.
+ */
+
 class PolyProxyModule : public Module {
 public:
     PolyProxyModule(const Module* module, PolyModule* polyModule);
+protected:
+    PolyProxyModule(const Module* module);
+public:
+    std::unique_ptr<Module> clone() const override; // throw runtime_error
     virtual ~PolyProxyModule() override = default;
-
-    void envelope() override {
-        throw std::runtime_error("PolyProxyModule does not implement envelope method");
-    }
-
-    std::unique_ptr<Module> clone() const override {
-        throw std::runtime_error("PolyProxyModule does not implement clone method");
-    }
-
-    //TODO test it!!! maybe it shouldn't throw an error
-    std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule *polyModule) const override {
-        throw std::runtime_error("PolyProxyModule does not implement createPolyModuleProxy method");
-    }
+    // module interface
+public:
+    void envelope() override; // throw runtime_error
+    void onStartBuffer(int size) override; // throw runtime_error
+    //for test
+public:
+    // poly module creation
+public:
+    std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule *polyModule) const override; // throw runtime_error
 
 protected:
+    // needed for derived classes to pass calls to the voices
     std::vector<Module *> modulesToProxy;
 
+    // not needed for now, but kept for consistency and future use
     std::vector<std::unique_ptr<PolyProxyInput>> polyProxyInputs;
     std::vector<std::unique_ptr<PolyProxyOutput>> polyProxyOutputs;
     std::vector<std::unique_ptr<PolyProxyUserInput>> polyProxyUserInputs;

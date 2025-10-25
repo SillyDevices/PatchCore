@@ -27,18 +27,20 @@
 #include <patchcore/modules/VCAModule.hpp>
 #include <patchcore/modules/AttenuverterModule.hpp>
 
-static auto factory = DefaultModuleFactory(44100);
+static auto waveTableProvider = DefaultWaveTableProvider(44100);
+static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
 
 TEST(PatchModuleTest, PatchModuleBasicOutputTest) {
     auto synth = new ModularSynth(&factory, 44100);
     ASSERT_NE(synth, nullptr);
 
-    auto patchModule = std::make_unique<PatchModule>(&factory, "voice", 44100);
+    auto patchModule = dynamic_cast<PatchModule *>(
+            synth->addModule(std::make_unique<PatchModule>(&factory, "voice", 44100))
+            );
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.8f) } } );
     patchModule->addOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
 
-    synth->addModule(std::move(patchModule));
     synth->addPatch(synth->getModule("voice")->getModuleOutput("voiceOutput"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
     std::pair<float, float> lastResult = { 0.0f, 0.0f };
@@ -61,7 +63,10 @@ TEST(PatchModuleTest, PatchModuleBasicInputTest) {
     auto synth = new ModularSynth(&factory, 44100);
     ASSERT_NE(synth, nullptr);
 
-    auto patchModule = std::make_unique<PatchModule>(&factory, "voice", 44100);
+    auto patchModule = dynamic_cast<PatchModule *>(
+        synth->addModule(std::make_unique<PatchModule>(&factory, "voice", 44100))
+        );
+
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const_p_one", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) } } );
     patchModule->createModule(VCA_MODULE_TYPE_NAME, "vca", {  } );
     patchModule->addPatch(
@@ -71,7 +76,6 @@ TEST(PatchModuleTest, PatchModuleBasicInputTest) {
     patchModule->addOutput(patchModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
 
     synth->createModule(CONST_MODULE_TYPE_NAME, "const", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.8f) } } );
-    synth->addModule(std::move(patchModule));
 
     synth->addPatch(synth->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), synth->getModule("voice")->getModuleInput("input"));
     synth->addPatch(synth->getModule("voice")->getModuleOutput("output"), synth->getModuleInput(MODULE_OUTPUT_INPUT));

@@ -24,7 +24,8 @@
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
 
-static auto factory = DefaultModuleFactory(44100);
+static auto waveTableProvider = DefaultWaveTableProvider(44100);
+static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
 
 // changeLambda
 void testOutputValue(ModularSynth* synth, float cvValue, std::function<void(float)> changeLambda) {

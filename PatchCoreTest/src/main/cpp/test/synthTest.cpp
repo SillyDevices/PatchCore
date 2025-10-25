@@ -24,7 +24,8 @@
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
 
-static auto factory = DefaultModuleFactory(44100);
+static auto waveTableProvider = DefaultWaveTableProvider(44100);
+static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
 
 TEST(SynthTest, synthCreation) {
     auto synth = new ModularSynth(&factory, 44100);
@@ -33,7 +34,7 @@ TEST(SynthTest, synthCreation) {
 }
 
 TEST(SynthTest, synthTest) {
-auto synth = new ModularSynth(&factory, 44100);
+    auto synth = new ModularSynth(&factory, 44100);
     int countSamples = 10;
     synth->onStartBuffer(countSamples);
     for (int i = 0; i < countSamples; i++) {

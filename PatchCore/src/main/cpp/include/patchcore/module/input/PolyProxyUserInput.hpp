@@ -36,6 +36,8 @@ public:
 
 public:
     virtual UserInput* getVoice(int voiceIndex) = 0;
+    ////TODO this is a hack to update voiceOutput from PolyModule::addUserInput
+    virtual void setVoiceInput(int voiceIndex, ProxyModuleUserInput* voiceInput) = 0;
     virtual void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput* proxyInput) = 0;
 
 protected:

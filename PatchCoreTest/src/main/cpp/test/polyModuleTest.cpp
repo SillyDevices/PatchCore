@@ -25,7 +25,8 @@
 #include <patchcore/synth/ModularSynth.hpp>
 #include <patchcore/module/PolyModule.hpp>
 
-static auto factory = DefaultModuleFactory(44100);
+static auto waveTableProvider = DefaultWaveTableProvider(44100);
+static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
 
 TEST(PolyModuleTest, PatchModuleToPolyBasicOutputTest) {
     auto synth = new ModularSynth(&factory, 44100);
@@ -54,20 +55,51 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicOutputTest) {
     delete synth;
 }
 
+TEST(PolyModuleTest, PatchModuleToPolyBasicOutputInlineTest) {
+    auto synth = new ModularSynth(&factory, 44100);
+    ASSERT_NE(synth,nullptr);
+
+    auto patchModule = dynamic_cast<PolyModule *>(
+            synth->addModule(std::make_unique<PolyModule>(&factory, "voice", 44100, 2))
+            );
+
+    patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.1f)}});
+    patchModule->addOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
+
+    synth->addPatch(synth->getModule("voice")->getModuleOutput("voiceOutput"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
+
+    std::pair<float, float> lastResult = {0.0f, 0.0f};
+
+    int countSamples = 10;
+    synth->onStartBuffer(countSamples);
+    for (int i = 0;i < countSamples;i++) {
+        auto result = synth->computeSample();
+        lastResult = result;
+    }
+    synth->onEndBuffer();
+
+    ASSERT_FLOAT_EQ(lastResult.first, 0.2f);
+    ASSERT_FLOAT_EQ(lastResult.second, 0.2f);
+
+    delete synth;
+}
+
 
 TEST(PolyModuleTest, PatchModuleToPolyBasicIOTest) {
     auto synth = new ModularSynth(&factory, 44100);
     ASSERT_NE(synth,nullptr);
 
-    auto polyModule = std::make_unique<PolyModule>(&factory, "voice", 44100, 2);
+    auto polyModule = dynamic_cast<PolyModule *>(synth->addModule(
+            std::make_unique<PolyModule>(&factory, "voice", 44100, 2)));
 
     polyModule->createModule(VCA_MODULE_TYPE_NAME, "vca", { } );
 
-    auto patchModule = std::make_unique<PatchModule>(&factory, "const_wrapper", 44100);
+    auto patchModule = dynamic_cast<PatchModule *>(polyModule->addModule(
+            std::make_unique<PatchModule>(&factory, "const_wrapper", 44100)));
+
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const_input", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f)}});
     patchModule->addOutput(patchModule->getModule("const_input")->getModuleOutput(CONST_MODULE_OUTPUT), "constOutput");
 
-    polyModule->addModule(std::move(patchModule));
     polyModule->addPatch(
             polyModule->getModule("const_wrapper")->getModuleOutput("constOutput"),
             polyModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_INPUT));
@@ -76,7 +108,7 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicIOTest) {
     polyModule->addOutput(polyModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "voiceOutput");
 
     synth->createModule(CONST_MODULE_TYPE_NAME, "const_cv", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.5f) }} );
-    synth->addModule(std::move(polyModule));
+
     synth->addPatch(
             synth->getModule("const_cv")->getModuleOutput(CONST_MODULE_OUTPUT),
             synth->getModule("voice")->getModuleInput("voiceCV"));

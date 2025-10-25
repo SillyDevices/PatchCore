@@ -33,19 +33,23 @@
 #include <string>
 #include <vector>
 
-// PatchModule can be used to create subModule with multiple modules inside, connections between them and inputs/outputs
-// outward facing inputs/outputs should be exposed manually by calling addInput/addOutput
-// userInputs are available througth getModule("module_name")->getUserInput("input_name") or
-// exposed by addUserInput
-// the main usecase is to create a module dynamically
+/*
+ * PatchModule can be used to create subModule with multiple modules inside, connections between them and inputs/outputs
+ * outward facing inputs/outputs should be exposed manually by calling addInput/addOutput
+ * userInputs are available througth getModule("module_name")->getUserInput("input_name") or
+ * exposed by addUserInput
+ * the main usecase is to create a module dynamically
+ */
 
 class PatchModule : public Module {
 public:
     PatchModule(ModuleFactory *factory, std::string name, int sampleRate);
-    PatchModule(const PatchModule &other);
+    PatchModule(const PatchModule &other); // copy constructor for clone
+public:
     std::unique_ptr<Module> clone() const override;
     virtual ~PatchModule() override;
-
+protected:
+    PatchModule();
     //Module interface
 public:
     void onStartBuffer(int size) override;
@@ -56,6 +60,7 @@ protected:
     //PatchModule specific
     //creates a new input/output from existing ModuleInput/ModuleOutput
 public:
+    //TODO rename to createProxyInput/Output/UserInput
     virtual ProxyModuleInput* addInput(ModuleInput* input, const std::string& withName);
     virtual ProxyModuleOutput* addOutput(ModuleOutput* output, const std::string& withName);
     virtual UserInput* addUserInput(UserInput* input, const std::string& withName);

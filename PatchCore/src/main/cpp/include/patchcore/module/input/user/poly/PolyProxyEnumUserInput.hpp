@@ -45,7 +45,12 @@ public:
     }
     virtual ~PolyProxyEnumUserInput() = default;
 public:
-    void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput *compositeInput) override{
+    void setVoiceInput(int voiceIndex, ProxyModuleUserInput *voiceInput) override {
+        auto casted = dynamic_cast<ProxyModuleEnumUserInput *>(voiceInput);
+        if (casted == nullptr) throw std::runtime_error("PolyProxyEnumUserInput: Composite input is not a CompositeModuleEnumUserInput");
+        voiceInputs[voiceIndex] = casted;
+    }
+    void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput *compositeInput) override {
         auto casted = dynamic_cast<ProxyModuleEnumUserInput *>(compositeInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyEnumUserInput: Composite input is not a CompositeModuleEnumUserInput");
         voiceProxyUserInputs[voiceIndex] = casted;

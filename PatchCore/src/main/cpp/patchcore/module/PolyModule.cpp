@@ -25,15 +25,21 @@
 #include <string>
 #include <stdio.h>
 
+#undef LOG_TAG
+#define LOG_TAG "PolyModule"
+
 PolyModule::PolyModule(ModuleFactory *factory, std::string name, int sampleRate, int voiceCount):
         PatchModule(factory, name, sampleRate) {
     this->voiceCount = voiceCount;
     polyProxies.reserve(voiceCount);
+    _voices.reserve(voiceCount);
     voices.reserve(voiceCount);
     for (int i = 0; i < voiceCount; ++i) {
         auto module = std::make_unique<PatchModule>(factory, name, sampleRate);
-        voices.push_back(std::move(module));
+        _voices.push_back(std::move(module));
+        voices.push_back(_voices.back().get());
     }
+
     activeVoiceCount = voiceCount;
     setActiveVoiceCount(voiceCount);
 }
@@ -61,9 +67,14 @@ ProxyModuleInput *PolyModule::addInput(ModuleInput *input, const std::string &wi
     auto casted = dynamic_cast<PolyProxyInput *>(input);
     if (casted == nullptr) throw std::runtime_error("PolyModule::addInput: input is not a PolyProxyInput");
     // pass corresponding module input to each voice
+//    for (int i = 0; i < voiceCount; ++i) {
+//        auto compositeVoiceInput = voices[i]->addInput(casted->getVoice(i), withName);
+//        casted->setCompositeVoiceInput(i, compositeVoiceInput);
+//    }
     for (int i = 0; i < voiceCount; ++i) {
         auto compositeVoiceInput = voices[i]->addInput(casted->getVoice(i), withName);
         casted->setCompositeVoiceInput(i, compositeVoiceInput);
+        casted->setVoiceInput(i, compositeVoiceInput);
     }
     registerInput(*casted, withName);
     proxyInputs.push_back(casted);
@@ -74,8 +85,12 @@ ProxyModuleOutput *PolyModule::addOutput(ModuleOutput *output, const std::string
     auto casted = dynamic_cast<PolyProxyOutput *>(output);
     if (casted == nullptr) throw std::runtime_error("PolyModule::addOutput: output is not a PolyProxyOutput");
     // pass corresponding module output to each voice
+//    for (int i = 0; i < voiceCount; ++i) {
+//        voices[i]->addOutput(casted->getVoice(i), withName);
+//    }
     for (int i = 0; i < voiceCount; ++i) {
-        voices[i]->addOutput(casted->getVoice(i), withName);
+        auto compositeVoiceOutput= voices[i]->addOutput(casted->getVoice(i), withName);
+        casted->setVoiceOutput(i, compositeVoiceOutput);
     }
     registerOutput(*casted, withName);
     proxyOutputs.push_back(casted);
@@ -89,6 +104,7 @@ UserInput *PolyModule::addUserInput(UserInput *input, const std::string &withNam
     for (int i = 0; i < voiceCount; ++i) {
         auto compositeVoiceUserInput = voices[i]->addUserInput(casted->getVoice(i), withName);
         casted->setProxyVoiceInput(i, dynamic_cast<ProxyModuleUserInput *>(compositeVoiceUserInput));
+        casted->setVoiceInput(i, dynamic_cast<ProxyModuleUserInput *>(compositeVoiceUserInput));
     }
     auto userInput = dynamic_cast<UserInput *>(casted);
     if (userInput == nullptr) throw std::runtime_error("PolyModule::addUserInput: casted input is not a UserInput");
@@ -160,10 +176,10 @@ size_t PolyModule::getVoiceCount() const {
 }
 
 PatchModule *PolyModule::getVoice(size_t index) {
-    if (index >= voices.size()) {
+    if (index >= voiceCount) {
         throw std::out_of_range("Voice index out of range");
     }
-    return voices[index].get();
+    return voices[index];
 }
 
 

@@ -25,6 +25,7 @@
 #include "patchcore/module/input/user/ProxyModuleEnumUserInput.hpp"
 #include "patchcore/module/input/user/ProxyModuleFloatUserInput.hpp"
 #include "patchcore/module/PolyModule.hpp"
+#include "patchcore/module/PolyProxyPatchModule.hpp"
 #include <stdexcept>
 
 
@@ -54,6 +55,11 @@ PatchModule::PatchModule(const PatchModule &other): Module(other.name, other.sam
 
 std::unique_ptr<Module> PatchModule::clone() const {
     return std::make_unique<PatchModule>(*this);
+}
+
+//empty constructor for PolyProxyPatchModule
+PatchModule::PatchModule(): Module("", 44100) {
+
 }
 
 //TODO add destructor to clear vectors with pointers
@@ -124,6 +130,7 @@ Module* PatchModule::createModule(const std::string &moduleTypeName, const std::
     return addModule(std::move(module));
 
 }
+
 
 Module* PatchModule::addModule(std::unique_ptr<Module> module) {
     _modules.push_back(std::move(module));
@@ -356,5 +363,6 @@ void PatchModule::clearModulesToEnvelope() {
 }
 
 std::unique_ptr<PolyProxyModule> PatchModule::createPolyModuleProxy(PolyModule* polyModule) const {
-    return Module::createPolyModuleProxy(polyModule);
+    //TODO create special proxy with add delete patch functions
+    return std::make_unique<PolyProxyPatchModule>(_factory, this, polyModule);
 }

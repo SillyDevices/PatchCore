@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 
 TEST(WaveTableProviderTest, waveTableProviderCreation) {
-    auto waveTableProvider = new DefaultWaveTableProviderJni(44100);
+    auto waveTableProvider = new DefaultWaveTableProvider(44100);
     ASSERT_NE(waveTableProvider, nullptr);
     delete waveTableProvider;
 }
