@@ -23,23 +23,31 @@
 package com.sillydevices.patchcore.android.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.sillydevices.patchcore.PatchCore
 import com.sillydevices.patchcore.android.utils.SynthTester
 import com.sillydevices.patchcore.android.utils.TestPatchCore
+import com.sillydevices.patchcore.android.utils.createPatchCoreForTest
 import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.module.PolyModule
 import com.sillydevices.patchcore.modules.AttenuverterModule
 import com.sillydevices.patchcore.modules.ConstModule
 import com.sillydevices.patchcore.synth.ModularSynth
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class PolyModuleTest {
 
+    lateinit var patchCore: PatchCore
+
+    @Before
+    fun setup() {
+        patchCore = createPatchCoreForTest()
+    }
+
     @Test
     fun testPolyModularSynthWithBiasModule() {
-        val patchCore = TestPatchCore
-
         class TestSynth: ModularSynth() {
 
 
@@ -70,7 +78,6 @@ class PolyModuleTest {
 
     @Test
     fun testPolyModularSynthWithUserInputModule() {
-        val patchCore = TestPatchCore
 
         class CustomModule: PolyModule("poly", 4) {
             val mod by module(AttenuverterModule("mod"))

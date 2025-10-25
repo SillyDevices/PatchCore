@@ -34,7 +34,7 @@ extern "C" {
 uintptr_t patchModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate);
 void patchModuleDelete(uintptr_t patch_module_pointer);
 uintptr_t patchModuleCreateModule(uintptr_t patch_module_pointer, char* module_type, char* module_name, ModuleParameterWrapper* parameters, unsigned long parameters_count);
-void patchModuleAddModule(uintptr_t patch_module_pointer, uintptr_t managed_module_pointer);
+uintptr_t patchModuleAddModule(uintptr_t patch_module_pointer, uintptr_t managed_module_pointer);
 uintptr_t patchModuleGetModule(uintptr_t patch_module_pointer, char* module_name);
 void patchModuleAddInput(uintptr_t patch_module_pointer, uintptr_t input_pointer, char* input_name);
 void patchModuleAddOutput(uintptr_t patch_module_pointer, uintptr_t output_pointer, char* output_name);

@@ -39,6 +39,9 @@ interface PatchModuleContext: ModuleContext {
     fun createPatchModule(newPatchModule: PatchModule): ModulePointer
     fun createPolyModule(newPolyModule: PolyModule): ModulePointer
 
+    fun addModule(pointer: ModulePointer, name: String): ModulePointer
+    fun getModule(name: String): ModulePointer
+
     fun addInput(input: ModuleInput, withName: String)
     fun addOutput(output: ModuleOutput, withName: String)
     fun addUserInput(userInput: UserInput, withName: String)
@@ -82,6 +85,15 @@ open class PatchModuleContextImpl(
        )
     }
 
+    override fun addModule(pointer: ModulePointer, name: String): ModulePointer {
+        return PlatformPatchModule.addModule(getPointer(), pointer)
+    }
+
+    override fun getModule(name: String): ModulePointer {
+        return PlatformPatchModule.getModule(getPointer(), name)
+    }
+
+
     override fun addInput(input: ModuleInput, withName: String) {
         PlatformPatchModule.addInput(
             getPointer(),
@@ -104,6 +116,7 @@ open class PatchModuleContextImpl(
     }
 
     override fun addPatch(output: ModuleOutput, input: ModuleInput) {
+        println("PatchModuleContextImpl: Adding patch from output ${output.moduleName}:${output.name} to input ${input.moduleName}:${input.name}")
         PlatformPatchModule.addPatch(
             getPointer(),
             output.pointer,

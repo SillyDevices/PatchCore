@@ -57,6 +57,19 @@ actual object PlatformPatchModule {
         )
     }
 
+    actual fun addModule(patchModulePointer: ModulePointer, modulePointer: ModulePointer): ModulePointer {
+        return ModulePointer(PatchModuleJni.patchModuleAddModule(
+            patchModulePointer.nativePointer,
+            modulePointer.nativePointer
+        ))
+    }
+    actual fun getModule(patchModulePointer: ModulePointer, moduleName: String): ModulePointer {
+        return ModulePointer(PatchModuleJni.patchModuleGetModule(
+            patchModulePointer.nativePointer,
+            moduleName)
+        )
+    }
+
     actual fun addInput(patchModulePointer: ModulePointer, inputPointer: ModuleInputPointer, withName: String) {
         PatchModuleJni.patchModuleAddInput(
             patchModulePointer.nativePointer,

@@ -135,18 +135,21 @@ open class PatchModule(name: String): Module(name) {
         }
     }
 
+    //TODO rename to exposeInput
     fun createInput(input: ModuleInput, name: String = input.name): ModuleInput {
         val proxy = input.createProxy(moduleName = this.name, withName = name)
         inputs.add(proxy)
         return proxy
     }
 
+    //TODO rename to exposeOutput
     fun createOutput(output: ModuleOutput, name: String = output.name): ModuleOutput {
         val proxy = output.createProxy(moduleName = this.name, withName = name)
         outputs.add(proxy)
         return proxy
     }
 
+    //TODO rename to exposeUserInput
     fun <T: UserInput> createUserInput(userInput: T, name: String = userInput.name): T {
         val proxy: T = userInput.createProxy(moduleName = this.name, withName = name)
         userInputs.add(proxy as ProxyUserInput)
@@ -164,11 +167,45 @@ open class PatchModule(name: String): Module(name) {
     override fun applyContext(context: ModuleContext) {
         context as? PatchModuleContext ?: throw IllegalArgumentException("Context must be of type PatchModuleContext")
         super.applyContext(context)
+        createModulesAndIO(context)
+        applyContextToChild(context)
+    }
 
+    private fun createModulesAndIO(context: PatchModuleContext) {
         for (module in modules) {
             module.createFrom(context)
         }
+        for (input in inputs) {
+            context.addInput(input.input, input.name)
+//            val pointer = context.getModuleInputPointer(input)
+//            input.setPointer(pointer)
+        }
+        for (output in outputs) {
+            context.addOutput(output.output, output.name)
+//            val pointer = context.getModuleOutputPointer(output)
+//            output.setPointer(pointer)
+        }
+        for (userInput in userInputs) {
+            context.addUserInput(userInput.userInput, userInput.name)
 
+//            val pointer = context.getUserInputPointer(userInput)
+//            userInput.applyParentContext(pointer, context)
+        }
+    }
+
+    private fun applyContextToChild(context: PatchModuleContext) {
+        for (input in inputs) {
+            val pointer = context.getModuleInputPointer(input)
+            input.setPointer(pointer)
+        }
+        for (output in outputs) {
+            val pointer = context.getModuleOutputPointer(output)
+            output.setPointer(pointer)
+        }
+        for (userInput in userInputs) {
+            val pointer = context.getUserInputPointer(userInput)
+            userInput.applyParentContext(pointer, context)
+        }
         //this is here only for ModularSynth's outputs
         for (input in registeredInputs) {
             val pointer = context.getModuleInputPointer(input)
@@ -184,25 +221,6 @@ open class PatchModule(name: String): Module(name) {
         }
         //maybe it can be useful for later
 
-        for (input in inputs) {
-            context.addInput(input.input, input.name)
-            val pointer = context.getModuleInputPointer(input)
-            input.setPointer(pointer)
-        }
-        for (output in outputs) {
-            context.addOutput(output.output, output.name)
-            val pointer = context.getModuleOutputPointer(output)
-            output.setPointer(pointer)
-        }
-        for (userInput in userInputs) {
-            context.addUserInput(userInput.userInput, userInput.name)
-
-            val pointer = context.getUserInputPointer(userInput)
-            userInput.applyParentContext(pointer, context)
-//            context.addUserInput(userInput.userInput, userInput.name)
-//            context.updateUserInput(userInput)
-        }
-
         for (settings in modulesSettings) {
             settings.value.invoke(settings.key)
         }
@@ -214,8 +232,10 @@ open class PatchModule(name: String): Module(name) {
 
 
     override fun createFrom(parentContext: PatchModuleContext) {
+        //can be called only from PatchModuleContext or PolyModuleContext
         val pointer = parentContext.createPatchModule(newPatchModule = this)
-        val newContext = parentContext.getContextFactory().createPatchModuleContext(pointer, parentContext)
+        val newPointer = parentContext.addModule(pointer , this.name)
+        val newContext = parentContext.getContextFactory().createPatchModuleContext(newPointer, parentContext)
         applyContext(newContext)
     }
 

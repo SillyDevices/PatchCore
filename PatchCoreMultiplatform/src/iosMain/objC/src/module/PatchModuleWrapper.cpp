@@ -83,14 +83,15 @@ uintptr_t patchModuleCreateModule(uintptr_t patch_module_pointer, char* module_t
     return reinterpret_cast<uintptr_t>(result);
 }
 
-void patchModuleAddModule(uintptr_t patch_module_pointer, uintptr_t managed_module_pointer) {
+uintptr_t patchModuleAddModule(uintptr_t patch_module_pointer, uintptr_t managed_module_pointer) {
     //remove pointer to managed_module_pointer from java object after this call, or just do not delete this poiner
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
     auto *managedModulePtr = reinterpret_cast<Module *>(managed_module_pointer);
     if (managedModulePtr == nullptr) throw std::runtime_error("ManagedModule pointer is not a ManagedNativePtr<Module>");
-    patchModule->addModule(std::unique_ptr<Module>(managedModulePtr));
+    Module *resultModule = patchModule->addModule(std::unique_ptr<Module>(managedModulePtr));
+    return reinterpret_cast<uintptr_t>(resultModule);
 }
 
 uintptr_t patchModuleGetModule(uintptr_t patch_module_pointer, char* module_name) {

@@ -79,7 +79,7 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleCre
 }
 
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddModule(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong managed_module_pointer) {
     //remove pointer to managed_module_pointer from java object after this call, or just do not delete this poiner
@@ -88,7 +88,8 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
     auto *managedModulePtr = reinterpret_cast<Module *>(managed_module_pointer);
     if (managedModulePtr == nullptr) throw std::runtime_error("ManagedModule pointer is not a ManagedNativePtr<Module>");
-    patchModule->addModule(std::unique_ptr<Module>(managedModulePtr));
+    Module *result = patchModule->addModule(std::unique_ptr<Module>(managedModulePtr));
+    return reinterpret_cast<jlong>(result);
 }
 
 extern "C"
@@ -111,7 +112,6 @@ JNIEXPORT void JNICALL
 Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddInput(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong input_pointer,
         jstring input_name) {
-    ALOGD("-------------------------------------------------------------------");
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
@@ -131,7 +131,6 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
-
     auto output = reinterpret_cast<ModuleOutput *>(output_pointer);
     if (output == nullptr) throw std::runtime_error("Output pointer is null");
     const char *outputNameChars = env->GetStringUTFChars(output_name, nullptr);
@@ -152,9 +151,6 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
     auto userInput = reinterpret_cast<UserInput *>(user_input_pointer);
     if (userInput == nullptr) throw std::runtime_error("UserInput pointer is null");
     const char *inputNameChars = env->GetStringUTFChars(input_name, nullptr);
-//    ALOGD("PatchModuleAddUserInput moduleName = %s, inputName = %s", module->getModuleName().c_str(), inputNameChars);
-//    ALOGD("PatchModuleAddUserInput userInputPointer: %lld", user_input_pointer);
-//    ALOGD("PatchModuleAddUserInput userInput: %p", userInput);
     std::string inputNameString(inputNameChars);
     patchModule->addUserInput(userInput, inputNameString);
     env->ReleaseStringUTFChars(input_name, inputNameChars);

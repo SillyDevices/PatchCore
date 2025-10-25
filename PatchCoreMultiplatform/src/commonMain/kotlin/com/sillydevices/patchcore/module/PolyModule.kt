@@ -25,9 +25,12 @@ package com.sillydevices.patchcore.module
 import com.sillydevices.patchcore.context.PatchModuleContext
 import com.sillydevices.patchcore.context.PolyModuleContext
 
-open class PolyModule(name: String, val polyphonyCount: Int): PatchModule(name) {
+open class PolyModule(name: String, val polyphonyCount: Int = 2): PatchModule(name) {
 
     override fun createFrom(parentContext: PatchModuleContext) {
+        if (parentContext is PolyModuleContext) {
+            throw IllegalStateException("Cannot create PolyModule from another PolyModule")
+        }
         val pointer = parentContext.createPolyModule(this)
         val newContext = parentContext.getContextFactory().createPolyModuleContext(pointer, parentContext)
         applyContext(newContext)

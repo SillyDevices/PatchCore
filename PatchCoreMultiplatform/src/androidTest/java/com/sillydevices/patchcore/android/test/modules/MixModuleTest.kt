@@ -65,7 +65,7 @@ class MixModuleTest {
 
     @Test
     fun testMixRight() {
-        val patchCore = TestPatchCore()
+        val patchCore = TestPatchCore
         val synth = patchCore.createSynth(TestSynth())
 
         synth.mix.userCv.setValue(1f)
@@ -81,7 +81,7 @@ class MixModuleTest {
 
     @Test
     fun testMixCenter() {
-        val patchCore = TestPatchCore()
+        val patchCore = TestPatchCore
         val synth = patchCore.createSynth(TestSynth())
 
         synth.mix.userCv.setValue(0f)

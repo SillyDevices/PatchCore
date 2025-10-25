@@ -26,26 +26,29 @@ import com.sillydevices.patchcore.PatchCore
 import com.sillydevices.patchcore.context.factory.createDefaultModuleContextFactory
 import com.sillydevices.patchcore.module.factory.builder.createDefaultModuleFactory
 import com.sillydevices.patchcore.module.factory.builder.createDefaultWaveTableProvider
+import org.junit.After
+import org.junit.Before
 
 
-val TestPatchCore by lazy {
-    PatchCore(
-        moduleFactory = {
-            val waveTableProvider = createDefaultWaveTableProvider(44100)
-            createDefaultModuleFactory(waveTableProvider, null)
-        }, moduleContextFactory = {
-            createDefaultModuleContextFactory()
-        }
-    )
-}
+abstract class BaseTest {
 
-fun createPatchCoreForTest(): PatchCore {
-    return PatchCore(
-        moduleFactory = {
-            val waveTableProvider = createDefaultWaveTableProvider(44100)
-            createDefaultModuleFactory(waveTableProvider, null)
-        }, moduleContextFactory = {
-            createDefaultModuleContextFactory()
-        }
-    )
+    protected lateinit var patchCore: PatchCore
+
+    @Before
+    fun setup() {
+        patchCore = PatchCore(
+            moduleFactory = {
+                val waveTableProvider = createDefaultWaveTableProvider(44100)
+                createDefaultModuleFactory(waveTableProvider, null)
+            }, moduleContextFactory = {
+                createDefaultModuleContextFactory()
+            }
+        )
+    }
+
+    @After
+    fun tearDown() {
+        patchCore.release()
+    }
+
 }
