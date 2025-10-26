@@ -30,6 +30,10 @@ open class EnumUserInput<T : Enum<T>>(moduleName: String, name: String): UserInp
         context.setEnumUserInputValue(value.ordinal)
     }
 
+    infix fun set(value: Enum<T>) {
+        setValue(value)
+    }
+
     override fun <R: UserInput> createProxy(moduleName: String, withName: String): R {
         return ProxyEnumUserInput(moduleName, withName, this) as R
     }
