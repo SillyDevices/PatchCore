@@ -60,8 +60,8 @@ class PolyModuleNestedLevel2Test {
                 val constCv by module(ConstModule("bias", 0.5f))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "inner_nested_in")
-                val output = createOutput(vca.output, "inner_nested_out")
+                val input by expose(vca.input, "inner_nested_in")
+                val output by expose(vca.output, "inner_nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo vca.cv
@@ -74,8 +74,8 @@ class PolyModuleNestedLevel2Test {
                 val innerNested by module(InnerInnerNestedModule("inner_inner_nested"))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "inner_nested_in")
-                val output = createOutput(vca.output, "inner_nested_out")
+                val input by expose(vca.input, "inner_nested_in")
+                val output by expose(vca.output, "inner_nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo innerNested.input
@@ -89,8 +89,8 @@ class PolyModuleNestedLevel2Test {
                 val innerNested by module(InnerNestedModule("inner_nested"))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "nested_in")
-                val output = createOutput(vca.output, "nested_out")
+                val input by expose(vca.input, "nested_in")
+                val output by expose(vca.output, "nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo innerNested.input
@@ -132,8 +132,8 @@ class PolyModuleNestedLevel2Test {
 
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "inner_nested_in")
-                val output = createOutput(vca.output, "inner_nested_out")
+                val input by expose(vca.input, "inner_nested_in")
+                val output by expose(vca.output, "inner_nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo attenuator.input
@@ -150,8 +150,8 @@ class PolyModuleNestedLevel2Test {
                 val innerNested by module(InnerInnerNestedModule("inner_inner_nested"))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "inner_nested_in")
-                val output = createOutput(vca.output, "inner_nested_out")
+                val input by expose(vca.input, "inner_nested_in")
+                val output by expose(vca.output, "inner_nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo attenuator.input
@@ -169,8 +169,8 @@ class PolyModuleNestedLevel2Test {
                 val innerNested by module(InnerNestedModule("inner_nested"))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "nested_in")
-                val output = createOutput(vca.output, "nested_out")
+                val input by expose(vca.input, "nested_in")
+                val output by expose(vca.output, "nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo attenuator.input

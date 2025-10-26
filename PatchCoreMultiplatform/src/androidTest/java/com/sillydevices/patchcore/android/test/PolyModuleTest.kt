@@ -25,7 +25,6 @@ package com.sillydevices.patchcore.android.test
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.sillydevices.patchcore.PatchCore
 import com.sillydevices.patchcore.android.utils.SynthTester
-import com.sillydevices.patchcore.android.utils.TestPatchCore
 import com.sillydevices.patchcore.android.utils.createPatchCoreForTest
 import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.module.PolyModule
@@ -54,7 +53,7 @@ class PolyModuleTest {
 
             inner class CustomModule: PolyModule("custom", 4) {
                 private val bias by module(ConstModule("bias", 0.5f))
-                val output = createOutput(bias.output, "customOutput")
+                val output by expose(bias.output, "customOutput")
             }
 
             private val module by module(CustomModule())
@@ -81,16 +80,16 @@ class PolyModuleTest {
 
         class CustomModule: PolyModule("poly", 4) {
             val mod by module(AttenuverterModule("mod"))
-            val input = createInput(mod.input, "polyInput")
-            val output = createOutput(mod.output, "polyOutput")
-            val cv = createUserInput(mod.cv, "polyCv")
+            val input by expose(mod.input, "polyInput")
+            val output by expose(mod.output, "polyOutput")
+            val cv by expose(mod.cv, "polyCv")
         }
 
         class TestSynth: ModularSynth() {
 
             private val bias by module(ConstModule("bias", 1.0f))
             val module by module(CustomModule())
-            val ctrl = createUserInput(module.cv, "synthCtrl")
+            val ctrl by expose(module.cv, "synthCtrl")
 
             override val defaultPatch: Patch = createPatch {
                 patch(bias.output, module.input)

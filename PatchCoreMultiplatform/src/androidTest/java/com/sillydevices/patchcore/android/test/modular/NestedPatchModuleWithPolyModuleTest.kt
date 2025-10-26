@@ -29,7 +29,6 @@ import com.sillydevices.patchcore.android.utils.createPatchCoreForTest
 import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.module.PatchModule
 import com.sillydevices.patchcore.module.PolyModule
-import com.sillydevices.patchcore.modules.AttenuverterModule
 import com.sillydevices.patchcore.modules.ConstModule
 import com.sillydevices.patchcore.modules.VcaModule
 import com.sillydevices.patchcore.synth.ModularSynth
@@ -63,8 +62,8 @@ class NestedPatchModuleWithPolyModuleTest {
                 val constCv by module(ConstModule("bias", 1.0f))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "nested_in")
-                val output = createOutput(vca.output, "nested_out")
+                val input by expose(vca.input, "nested_in")
+                val output by expose(vca.output, "nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo vca.cv
@@ -98,8 +97,8 @@ class NestedPatchModuleWithPolyModuleTest {
                 val constCv by module(ConstModule("bias", 0.5f))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "inner_nested_in")
-                val output = createOutput(vca.output, "inner_nested_out")
+                val input by expose(vca.input, "inner_nested_in")
+                val output by expose(vca.output, "inner_nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo vca.cv
@@ -112,8 +111,8 @@ class NestedPatchModuleWithPolyModuleTest {
                 val innerNested by module(InnerNestedModule("inner_nested"))
                 val vca by module(VcaModule("vca"))
 
-                val input = createInput(vca.input, "nested_in")
-                val output = createOutput(vca.output, "nested_out")
+                val input by expose(vca.input, "nested_in")
+                val output by expose(vca.output, "nested_out")
 
                 override val defaultPatch = createPatch {
                     constCv.output patchTo innerNested.input

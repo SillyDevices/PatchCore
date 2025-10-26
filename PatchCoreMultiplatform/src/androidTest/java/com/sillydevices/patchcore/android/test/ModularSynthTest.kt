@@ -25,7 +25,6 @@ package com.sillydevices.patchcore.android.test
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.sillydevices.patchcore.PatchCore
 import com.sillydevices.patchcore.android.utils.SynthTester
-import com.sillydevices.patchcore.android.utils.TestPatchCore
 import com.sillydevices.patchcore.android.utils.createPatchCoreForTest
 import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.module.PatchModule
@@ -143,7 +142,7 @@ class ModularSynthTest {
             inner class TestModule: PatchModule("inner") {
                 val bias by module(ConstModule("bias", 1.0f))
                 val modulation by module(AttenuverterModule("mod"))
-                val output = createOutput(modulation.output, "output")
+                val output by expose(modulation.output, "output")
                 //val cv = createUserInput("cv", 0f..1f)
                 override val defaultPatch = createPatch {
                     patch(bias.output, modulation.input)
@@ -179,7 +178,7 @@ class ModularSynthTest {
             val biasCv by module(ConstModule("cv", 0.5f))
             val vca by module(VcaModule("vca"))
 
-            val output = createOutput(vca.output, "output")
+            val output by expose(vca.output, "output")
             override val defaultPatch = createPatch {
                 patch(biasIn.output, vca.input)
                 patch(biasCv.output, vca.cv)
@@ -188,9 +187,9 @@ class ModularSynthTest {
 
         class TestModuleWithInput: PatchModule("in_module") {
             val modulation by module(AttenuverterModule("mod"))
-            val input = createInput(modulation.input, "input")
-            val output = createOutput(modulation.output, "output")
-            val cv = createUserInput(modulation.cv, "cv")
+            val input by expose(modulation.input)
+            val output by expose(modulation.output)
+            val cv by expose(modulation.cv)
         }
 
         class UserInputTestSynth: ModularSynth() {
@@ -198,7 +197,7 @@ class ModularSynthTest {
             val outModule by module(TestModuleWithOutput())
             val inModule by module(TestModuleWithInput())
 
-            val cv = createUserInput(inModule.cv, "synth_cv")
+            val cv by expose(inModule.cv)
 
             override val defaultPatch: Patch = createPatch {
                 patch(outModule.output, inModule.input)

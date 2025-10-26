@@ -25,7 +25,6 @@ package com.sillydevices.patchcore.android.test
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.sillydevices.patchcore.PatchCore
 import com.sillydevices.patchcore.android.utils.SynthTester
-import com.sillydevices.patchcore.android.utils.TestPatchCore
 import com.sillydevices.patchcore.android.utils.createPatchCoreForTest
 import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.module.PatchModule
@@ -52,15 +51,15 @@ class ProxyModuleInputTest {
 
             inner class InnerModule: PatchModule("inner") {
                 val modulation by module(AttenuverterModule("modulation"))
-                val input = createInput(modulation.input, "in")
-                val output = createOutput(modulation.output, "out")
-                val cv = createUserInput(modulation.cv, "cv")
+                val input by expose(modulation.input, "in")
+                val output by expose(modulation.output, "out")
+                val cv by expose(modulation.cv, "cv")
             }
 
             val bias by module(ConstModule("bias", 1.0f))
             val innerModulation by module(InnerModule())
 
-            val cv = createUserInput(innerModulation.cv, "cv")
+            val cv by expose(innerModulation.cv, "cv")
             override val defaultPatch: Patch = createPatch {
                 patch(bias.output, innerModulation.input)
                 patch(innerModulation.output, monoOutput)
