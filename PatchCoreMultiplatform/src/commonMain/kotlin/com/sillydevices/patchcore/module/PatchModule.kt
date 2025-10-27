@@ -174,6 +174,24 @@ open class PatchModule(name: String): Module(name) {
 
     // DSL
 
+    class CreateModuleContext<T:Module>(moduleName: String){
+        val auto: String = moduleName
+        private var settings: ModuleSettings<T>? = null
+
+        infix fun T.with( initialSettings: T.()->Unit ): T {
+            settings = ModuleSettings(initialSettings)
+            return this
+        }
+
+        internal fun getSettings(): ModuleSettings<T>? {
+            return settings
+        }
+    }
+
+    protected fun <T : Module> module(createModule: CreateModuleContext<T>.()->T): CreateModuleDelegateProvider<T> {
+        return CreateModuleDelegateProvider(createModule)
+    }
+
     protected fun <T : Module> module(module: T, initialSettings: (T.()-> Unit)? = null): ModuleDelegateProvider<T> {
         return ModuleDelegateProvider(module, initialSettings?.let { ModuleSettings(it) })
     }
@@ -195,6 +213,15 @@ open class PatchModule(name: String): Module(name) {
     protected class ModuleDelegateProvider<T: Module>(private val module: T, private val settings: ModuleSettings<T>? = null) {
         operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleDelegate<T> {
             val result = thisRef.registeredModuleInternal(module, settings)
+            return ModuleDelegate(result)
+        }
+    }
+
+    protected class CreateModuleDelegateProvider<T: Module>(private val createModule: CreateModuleContext<T>.()->T) {
+        operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleDelegate<T> {
+            val context = CreateModuleContext<T>(property.name)
+            val module = context.createModule()
+            val result = thisRef.registeredModuleInternal(module, context.getSettings())
             return ModuleDelegate(result)
         }
     }
