@@ -202,7 +202,7 @@ ProxyModuleInput* PatchModule::addInput(ModuleInput* input, const std::string& w
 
     ProxyModuleInput* proxyInput = input->createProxy(withName);
     _proxyModuleInputs.push_back(proxyInput);
-    //TODO update router. its output modules can change here
+    //TODO check if router needs update
 
     registerInput(*proxyInput, withName);
     return proxyInput;
@@ -215,9 +215,8 @@ ProxyModuleOutput* PatchModule::addOutput(ModuleOutput* output, const std::strin
 
     ProxyModuleOutput* proxyOutput = output->createProxy(withName);
     _proxyModuleOutputs.push_back(proxyOutput);
-    //TODO update router. its output modules can change here
-
     registerOutput(*proxyOutput, withName);
+    _router.moduleInputChanged(output->getModule());
     return proxyOutput;
 }
 

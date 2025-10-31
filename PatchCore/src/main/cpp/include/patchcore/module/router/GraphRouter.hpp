@@ -42,6 +42,8 @@ public:
     void remove(ModuleOutput* from, ModuleInput* to) override;
     void reset() override;
 
+    void moduleInputChanged(Module* module) override;
+
     void onStartBuffer(int size) override;
     void envelope() override;
 

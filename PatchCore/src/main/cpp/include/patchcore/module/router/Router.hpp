@@ -43,6 +43,8 @@ public:
     void add(ModuleOutput* from, ModuleInput* to) override;
     void remove(ModuleOutput* from, ModuleInput* to) override;
 
+    void moduleInputChanged(Module* module) override;
+
     [[nodiscard]]
     std::vector<std::pair<ModuleOutput*, ModuleInput*>> getPatches() const override;
 

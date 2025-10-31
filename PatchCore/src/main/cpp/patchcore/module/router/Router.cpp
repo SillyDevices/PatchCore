@@ -99,6 +99,10 @@ void Router::remove(ModuleOutput *from, ModuleInput *to) {
     makeInputsAndOutputs();
 }
 
+void Router::moduleInputChanged(Module *module) {
+    //do nothing for now, should work as is.
+}
+
 void Router::makeInputsAndOutputs() {
 
     matrix_inputs.clear();

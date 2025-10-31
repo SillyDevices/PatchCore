@@ -42,6 +42,8 @@ public:
 
     virtual void reset() = 0;
 
+    virtual void moduleInputChanged(Module* module) = 0;
+
     [[nodiscard]]
     virtual std::vector<std::pair<ModuleOutput *, ModuleInput *>> getPatches() const = 0;
 

@@ -28,6 +28,15 @@
 #include <unordered_set>
 
 
+// hashing function for pair<int, int>
+struct PairHash {
+    size_t operator()(const std::pair<int, int> &p) const noexcept {
+        return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+    }
+};
+
+
+
 GraphRouter::GraphRouter(Module *parent): AbstractRouter(), parentModule(parent) {
     if (parent == nullptr) throw std::runtime_error("TopoRouter::TopoRouter: parent module is nullptr");
     modules.push_back(parent);
@@ -41,6 +50,7 @@ void GraphRouter::addModule(Module *module) {
     moduleToId[module] = nextModuleId;
     idToModule[nextModuleId] = module;
     nextModuleId++;
+    // add module by itself does not change anything in the graph, so no need to update it
 }
 
 void GraphRouter::removeModule(Module *module) {
@@ -132,14 +142,36 @@ void GraphRouter::reset() {
 }
 
 
+void GraphRouter::moduleInputChanged(Module* module) {
+    //TODO pre compute outputModules, maybe not needed
+    updateModuleGraph();
+}
+
 
 void GraphRouter::updateModuleGraph() {
     bool hasLoops = false;
 
     int parentModuleId = moduleToId[parentModule];
     //create connection graph with ids
-    std::vector<std::pair<int, int>> moduleGraph;
+
+    std::unordered_set<int> byProxyOutputModuleIds;
     std::unordered_set<int> outputModuleIds;
+
+    for (auto &module: modules) {
+        bool hasProxyOutput = false;
+        auto moduleOutputs = module->getModuleOutputs();
+        for (auto &kv: moduleOutputs) {
+            if (kv.second->hasProxyOutput()) {
+                hasProxyOutput = true;
+                break;
+            }
+        }
+        if (hasProxyOutput) {
+            byProxyOutputModuleIds.insert(moduleToId[module]);
+        }
+    }
+
+    std::unordered_set<std::pair<int, int>, PairHash> moduleGraphSet;
 
     for (const auto &patch: patches) {
         auto fromModuleId = moduleToId[patch.first->getModule()];
@@ -155,28 +187,18 @@ void GraphRouter::updateModuleGraph() {
             outputModuleIds.insert(toModuleId);
         }
 
-        //TODO replace with more efficient way
-        bool hasProxyOutput = false;
-        auto moduleOutputs = toModule->getModuleOutputs();
-        for (auto &kv: moduleOutputs) {
-           if (kv.second->hasProxyOutput()) {
-                hasProxyOutput = true;
-                break;
-           }
-        }
-        if (hasProxyOutput) {
-            outputModuleIds.insert(toModuleId);
-        }
-
-        bool found = false;
-        for (const auto &element: moduleGraph) {
-            if (element.first == fromModuleId && element.second == toModuleId) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) moduleGraph.emplace_back(fromModuleId, toModuleId);
+        moduleGraphSet.insert({ fromModuleId, toModuleId } );
     }
+
+    //add edges from modules with proxy outputs to parent output node
+    for (const auto &moduleId: byProxyOutputModuleIds) {
+        moduleGraphSet.insert({ moduleId, parentModuleId });
+    }
+
+    //outputModuleIds.insert(byProxyOutputModuleIds.begin(), byProxyOutputModuleIds.end());
+    outputModuleIds.insert(parentModuleId);
+
+    std::vector<std::pair<int, int>> moduleGraph = std::vector(moduleGraphSet.begin(), moduleGraphSet.end());
 
     // mo modules in graph; reset connection matrix and update
     if (moduleGraph.empty()) {
@@ -185,7 +207,7 @@ void GraphRouter::updateModuleGraph() {
     }
 
     // prune unreachable nodes from graph
-    auto outputIds = std::vector<int>(outputModuleIds.begin(), outputModuleIds.end());
+    auto outputIds = std::vector<int>(outputModuleIds.begin(), outputModuleIds.end()); // here only parnet module id and modules needing envelope on input connection
     auto filteredModuleGraph = removeUnreachableNodes(moduleGraph, outputIds);
     moduleGraph.swap(filteredModuleGraph);
 
