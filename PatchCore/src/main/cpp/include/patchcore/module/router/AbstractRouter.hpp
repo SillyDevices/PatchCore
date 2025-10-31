@@ -20,51 +20,33 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#ifndef PATCHCORE_MODULEOUTPUT_HPP
-#define PATCHCORE_MODULEOUTPUT_HPP
+#ifndef PATCHCORE_ABSTRACTROUTER_HPP
+#define PATCHCORE_ABSTRACTROUTER_HPP
 
-#include "patchcore/module/output/Output.hpp"
-#include <string>
+#include "../Module.hpp"
 
-class Module;
-class ProxyModuleOutput;
-
-class ModuleOutput: Output {
-
+class AbstractRouter {
 public:
+    virtual ~AbstractRouter() = default;
 
-    ModuleOutput(std::string outputName): name(outputName) {};
-    virtual ~ModuleOutput() = default;
+    virtual void addModule(Module *module) = 0;
 
-    inline const std::string getName() const {
-        return name;
-    };
+    virtual void removeModule(Module *module) = 0;
 
-public:
-    void setModule(Module* module) {
-        _module = module;
-    };
+    virtual void clearModules() = 0;
 
-    Module* getModule() const {
-        return _module;
-    };
+    //TODO rename to addPatch/removePatch/clearPatches
+    virtual void add(ModuleOutput *from, ModuleInput *to) = 0;
 
-    virtual ProxyModuleOutput* createProxy(const std::string& withName);
+    virtual void remove(ModuleOutput *from, ModuleInput *to) = 0;
 
-    bool hasProxyOutput() const {
-        return hasProxy;
-    }
+    virtual void reset() = 0;
 
+    [[nodiscard]]
+    virtual std::vector<std::pair<ModuleOutput *, ModuleInput *>> getPatches() const = 0;
 
-private:
-    std::string name;
-    Module* _module;
-
-    bool hasProxy = false;
-
-public:
-    float value = 0.0f;
-
+    virtual void onStartBuffer(int size) = 0;
+    virtual void envelope() = 0;
 };
 
-#endif //PATCHCORE_MODULEOUTPUT_HPP
+#endif //PATCHCORE_ABSTRACTROUTER_HPP

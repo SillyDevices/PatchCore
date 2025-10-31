@@ -59,6 +59,7 @@ Java_com_sillydevices_patchcore_test_NativeInstrumentedTest_runNativeTests(JNIEn
     return RUN_ALL_TESTS();
 }
 extern "C"
+
 JNIEXPORT jint JNICALL
 Java_com_sillydevices_patchcore_test_NativeInstrumentedTest_runSingleNativeTest(JNIEnv *env,
                                                                                 jobject thiz,

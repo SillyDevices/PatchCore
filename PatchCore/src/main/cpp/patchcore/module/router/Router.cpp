@@ -20,8 +20,13 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/module/Router.hpp"
+#include "patchcore/module/router/Router.hpp"
+#include <unordered_set>
 
+
+Router::Router(Module *parentModule): AbstractRouter(), parentModule(parentModule) {
+
+}
 
 void Router::clearModules() {
     inputs.clear();
@@ -38,8 +43,19 @@ void Router::addModule(Module *module) {
     }
     for (const auto &output: outputsToAdd) {
         outputs[module->getModuleName() + "_" + output.first] = output.second;
+        if (output.second->hasProxyOutput()) {
+            outputModules.insert(module);
+        }
     }
     modules.push_back(module);
+
+    if (module->needEnvelopeOnInputConnection()) {
+        outputModules.insert(module);
+    }
+}
+
+void Router::removeModule(Module *module) {
+    throw std::runtime_error("Router::removeModule not implemented yet");
 }
 
 void Router::reset() {
@@ -53,6 +69,8 @@ void Router::reset() {
         auto input = inputKV.second;
         matrix[input] = std::vector<ModuleOutput *>();
     }
+    modulesToEnvelope.clear();
+    userInputsToEnvelope.clear();
 };
 
 void Router::add(ModuleOutput *from, ModuleInput *to) {
@@ -82,18 +100,49 @@ void Router::remove(ModuleOutput *from, ModuleInput *to) {
 }
 
 void Router::makeInputsAndOutputs() {
+
     matrix_inputs.clear();
     matrix_outputs.clear();
+
+    std::unordered_set<Module*> _modulesToEnvelopeSet;
+
     for (const auto &matrixKV: matrix){
         if (matrixKV.second.empty())
             continue;
         matrixKV.first->value = 0.0f;
         matrix_inputs.push_back(matrixKV.first);
         matrix_outputs.push_back(matrixKV.second);
+
+        // collect modules to envelope
+        auto module = matrixKV.first->getModule();
+        _modulesToEnvelopeSet.insert(module);
+        for (const auto &output: matrixKV.second){
+            auto outputModule = output->getModule();
+            _modulesToEnvelopeSet.insert(outputModule);
+        }
     }
+
+    _modulesToEnvelopeSet.insert(outputModules.begin(), outputModules.end());
+    //remove parentModule from modules to envelope
+    _modulesToEnvelopeSet.erase(parentModule);
+
+    // update modulesToEnvelope vector
+    modulesToEnvelope = std::vector<Module*>(_modulesToEnvelopeSet.begin(), _modulesToEnvelopeSet.end());
+
+    //update userInputsToEnvelope
+    userInputsToEnvelope.clear();
+    std::unordered_set<FloatUserInput*> userInputSet;
+    for (const auto &module: modulesToEnvelope){
+        auto userInputs = module->getInterpolatedInputs();
+        for (auto userInput: userInputs){
+            userInputSet.insert(userInput);
+        }
+    }
+    userInputsToEnvelope = std::vector<FloatUserInput*>(userInputSet.begin(), userInputSet.end());
+
 }
 
-const std::vector<std::pair<ModuleOutput *, ModuleInput *>> Router::getPatches() const {
+std::vector<std::pair<ModuleOutput *, ModuleInput *>> Router::getPatches() const {
     std::vector<std::pair<ModuleOutput *, ModuleInput *>> patches;
     for (const auto &matrixKV: matrix) {
         auto input = matrixKV.first;
@@ -104,6 +153,15 @@ const std::vector<std::pair<ModuleOutput *, ModuleInput *>> Router::getPatches()
     return patches;
 }
 
+void Router::onStartBuffer(int size) {
+    for (const auto &module: modulesToEnvelope){
+        module->onStartBuffer(size);
+    }
+    //TODO move userinput envelope to Module::onStartBuffer
+    for (const auto &userInput: userInputsToEnvelope){
+        userInput->onStartBuffer(size);
+    }
+}
 
 void Router::envelope() {
     int counter = 0;
@@ -115,8 +173,13 @@ void Router::envelope() {
         counter++;
         input->value = sum;
     }
-    //TODO envelope userInputs
-    //TODO envelope modules
+    for (const auto &module: modulesToEnvelope){
+        module->envelope();
+    }
+    //TODO move it to Module::envelope
+    for (const auto &userInput: userInputsToEnvelope){
+        userInput->envelope();
+    }
 }
 
 

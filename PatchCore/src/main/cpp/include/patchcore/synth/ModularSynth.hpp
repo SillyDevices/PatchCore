@@ -29,7 +29,6 @@
 #include "patchcore/module/PatchModule.hpp"
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/input/user/FloatUserInput.hpp"
-#include "patchcore/module/Router.hpp"
 
 #include "patchcore/modules/input/event/keyboard/EventKeyboard.hpp"
 

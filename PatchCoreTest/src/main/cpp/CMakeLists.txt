@@ -23,6 +23,8 @@ add_library(
         test/keyboardTest.cpp
         test/copyModuleTest.cpp
         test/polyModuleTest.cpp
+        test/performanceTest.cpp
+        test/graphRouterTest.cpp
 )
 
 find_package (PatchCore REQUIRED CONFIG)

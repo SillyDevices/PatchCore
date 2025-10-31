@@ -28,11 +28,20 @@
 #include "patchcore/module/PolyProxyPatchModule.hpp"
 #include <stdexcept>
 
+#ifdef ANDROID
+#include <android/log_macros.h>
+#undef LOG_TAG
+#define LOG_TAG "PatchModule"
+#endif
+
 
 PatchModule::PatchModule(ModuleFactory *factory, std::string name, int sampleRate): Module(name, sampleRate), _factory(factory){
+    ALOGD("PatchModule[%s]::Constructor _Router address = %p", name.c_str(), &_router);
+
 }
 
 PatchModule::PatchModule(const PatchModule &other): Module(other.name, other.sampleRate), _factory(other._factory) {
+    ALOGD("PatchModule[%s]::CopyConstructor", other.name.c_str());
     //clone modules, includes intialization of
     //_modules and _inputs
     //_modulestoAlwaysEnvelope and _interpolatedInputsToAlwaysEnvelope
@@ -59,7 +68,7 @@ std::unique_ptr<Module> PatchModule::clone() const {
 
 //empty constructor for PolyProxyPatchModule
 PatchModule::PatchModule(): Module("", 44100) {
-
+    ALOGD("PatchModule::EmptyConstructor");
 }
 
 //TODO add destructor to clear vectors with pointers
@@ -80,42 +89,25 @@ PatchModule::~PatchModule() {
 };
 
 void PatchModule::onStartBuffer(int size) {
-    for (const auto &module: _modulesToAlwaysEnvelope) {
-        module->onStartBuffer(size);
-    }
-    for (const auto &module: _modulesToEnvelope) {
-        module->onStartBuffer(size);
-    }
+    std::lock_guard<std::mutex> lock(routerMutex);
+    _router.onStartBuffer(size);
 }
 
 void PatchModule::envelope() {
     //need to sync router.envelope
     //it's not a best option to do that
     std::lock_guard<std::mutex> lock(routerMutex);
+
+    // What about _proxyModuleUserInputs? who envelope them? maybe parrent Module does it?
+
     for (const auto input: _proxyModuleInputs) {
         input->envelope();
     }
-    envelopeModules();
+
     _router.envelope();
+
     for (auto output: _proxyModuleOutputs) {
         output->envelope();
-    }
-}
-
-void PatchModule::envelopeModules() {
-
-    for (auto &input: _interpolatedInputsToAlwaysEnvelope) {
-        input->envelope();
-    }
-    //TODO move this to the module itself
-    for (auto &input: _interpolatedInputsToEnvelope) {
-        input->envelope();
-    }
-    for (auto &module: _modulesToAlwaysEnvelope) {
-        module->envelope();
-    }
-    for (auto &module: _modulesToEnvelope) {
-        module->envelope();
     }
 }
 
@@ -136,25 +128,13 @@ Module* PatchModule::addModule(std::unique_ptr<Module> module) {
     _modules.push_back(std::move(module));
     auto added = _modules.back().get();
     _router.addModule(added);
-
-    auto inputs = added->getInterpolatedInputs();
-    for (auto input: inputs) {
-        _inputs.push_back(input);
-    }
-
-    //TODO rename method to needAlwaysEnvelope or isMetaModule or something like that
-    if (added->needEnvelopeOnInputConnection()) {
-        addModuleToEnvelope(added);
-    }
-
     return added;
 }
 
 void PatchModule::clearModules() {
-    clearModulesToEnvelope();
     _modules.clear();
     _router.clearModules();
-    _inputs.clear();
+    //TODO clear proxy inputs and outputs?
 }
 
 Module* PatchModule::getModule(const std::string &moduleName) const {
@@ -173,9 +153,8 @@ void PatchModule::resetPatch() {
     {
         std::lock_guard<std::mutex> lock(routerMutex);
         _router.reset();
-        _modulesToEnvelope.clear();
-        _interpolatedInputsToEnvelope.clear();
 
+        //TODO not used!!! check and delete
         for (const auto &module: _modules){
             auto inputs = module->getModuleInputs();
             for (const auto &kv: inputs) {
@@ -188,44 +167,19 @@ void PatchModule::resetPatch() {
 void PatchModule::addPatch(ModuleOutput* from, ModuleInput* to) {
     std::lock_guard<std::mutex> lock(routerMutex);
     if (from != nullptr && to != nullptr) {
-        auto fromModule = from->getModule();
-        auto toModule = to->getModule();
+#ifdef ANDROID
+        ALOGD("PatchModule[%s]::addPatch: from %s:%s to %s:%s",
+              this->getModuleName().c_str(),
+              from->getModule()->getModuleName().c_str(),
+              from->getName().c_str(),
+              to->getModule()->getModuleName().c_str(),
+              to->getName().c_str());
+#endif
         _router.add(from, to);
-        //TODO compute a graph and envelope only modules that are in the graph
-        if (fromModule != nullptr) { //add source module to envelope list if it not in it already
-            if (std::count(_modulesToAlwaysEnvelope.begin(), _modulesToAlwaysEnvelope.end(), fromModule) <= 0) {
-                if (std::count(_modulesToEnvelope.begin(), _modulesToEnvelope.end(), fromModule) <= 0) {
-                    _modulesToEnvelope.push_back(fromModule);
-                    auto inputs = fromModule->getInterpolatedInputs();
-                    for (auto input: inputs) {
-                        if (std::count(_interpolatedInputsToEnvelope.begin(), _interpolatedInputsToEnvelope.end(), input) <= 0) {
-                            if (std::count(_interpolatedInputsToAlwaysEnvelope.begin(), _interpolatedInputsToAlwaysEnvelope.end(), input) <= 0) {
-                                _interpolatedInputsToEnvelope.push_back(input);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (toModule != nullptr) { //add destination module to envelope list if it not in it already
-            if (toModule->needEnvelopeOnInputConnection()) {
-                if (std::count(_modulesToEnvelope.begin(), _modulesToEnvelope.end(), toModule) <= 0) {
-                    _modulesToEnvelope.push_back(toModule);
-                    auto inputs = toModule->getInterpolatedInputs();
-                    for (auto input: inputs) {
-                        if (std::count(_interpolatedInputsToEnvelope.begin(), _interpolatedInputsToEnvelope.end(), input) <= 0) {
-                            if (std::count(_interpolatedInputsToAlwaysEnvelope.begin(), _interpolatedInputsToAlwaysEnvelope.end(), input) <= 0) {
-                                _interpolatedInputsToEnvelope.push_back(input);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
 
-void PatchModule::clonePatches(const Router &router) {
+void PatchModule::clonePatches(const AbstractRouter &router) {
     for (const auto &patch: router.getPatches()) {
         auto originalFrom = patch.first;
         auto originalTo = patch.second;
@@ -246,9 +200,9 @@ ProxyModuleInput* PatchModule::addInput(ModuleInput* input, const std::string& w
 
     std::lock_guard<std::mutex> lock(_mutex);
 
-    addModuleToEnvelope(input->getModule());
     ProxyModuleInput* proxyInput = input->createProxy(withName);
     _proxyModuleInputs.push_back(proxyInput);
+    //TODO update router. its output modules can change here
 
     registerInput(*proxyInput, withName);
     return proxyInput;
@@ -259,9 +213,9 @@ ProxyModuleOutput* PatchModule::addOutput(ModuleOutput* output, const std::strin
 
     std::lock_guard<std::mutex> lock(_mutex);
 
-    addModuleToEnvelope(output->getModule());
     ProxyModuleOutput* proxyOutput = output->createProxy(withName);
     _proxyModuleOutputs.push_back(proxyOutput);
+    //TODO update router. its output modules can change here
 
     registerOutput(*proxyOutput, withName);
     return proxyOutput;
@@ -340,26 +294,6 @@ ModuleOutput *PatchModule::findOutputByClone(const ModuleOutput &output) const {
         }
     }
     return nullptr;
-}
-
-
-void PatchModule::addModuleToEnvelope(Module *module) {
-    std::lock_guard<std::mutex> lock(routerMutex);
-    if (std::count(_modulesToAlwaysEnvelope.begin(), _modulesToAlwaysEnvelope.end(), module) == 0) {
-        _modulesToAlwaysEnvelope.push_back(module);
-    }
-    auto inputs = module->getInterpolatedInputs();
-    for (auto input: inputs) {
-        if (std::count(_interpolatedInputsToAlwaysEnvelope.begin(), _interpolatedInputsToAlwaysEnvelope.end(), input) <= 0) {
-            _interpolatedInputsToAlwaysEnvelope.push_back(input);
-        }
-    }
-}
-
-void PatchModule::clearModulesToEnvelope() {
-    std::lock_guard<std::mutex> lock(routerMutex);
-    _modulesToAlwaysEnvelope.clear();
-    _interpolatedInputsToAlwaysEnvelope.clear();
 }
 
 std::unique_ptr<PolyProxyModule> PatchModule::createPolyModuleProxy(PolyModule* polyModule) const {

@@ -24,5 +24,6 @@
 #include "patchcore/module/output/ProxyModuleOutput.hpp"
 
 ProxyModuleOutput *ModuleOutput::createProxy(const std::string &withName) {
+    hasProxy = true;
     return new ProxyModuleOutput(withName, this);
 }

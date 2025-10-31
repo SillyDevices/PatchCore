@@ -23,37 +23,48 @@
 #ifndef PATCHCORE_ROUTER_HPP
 #define PATCHCORE_ROUTER_HPP
 
-#include "Module.hpp"
+#include "AbstractRouter.hpp"
 #include <vector>
+#include <unordered_set>
 
-class Router {
+class Router: public AbstractRouter {
 public:
-    Router() = default;
+    Router(Module* parentModule);
     virtual ~Router() = default;
 
-    void clearModules();
-    void addModule(Module *module);
+    void clearModules() override;
+    void addModule(Module *module) override;
+    void removeModule(Module *module) override;
 
-    void envelope();
+    void onStartBuffer(int size) override;
+    void envelope() override;
 
-    void reset();
-    void add(ModuleOutput* from, ModuleInput* to);
-    void remove(ModuleOutput* from, ModuleInput* to);
+    void reset() override;
+    void add(ModuleOutput* from, ModuleInput* to) override;
+    void remove(ModuleOutput* from, ModuleInput* to) override;
 
-    const std::vector<std::pair<ModuleOutput*, ModuleInput*>> getPatches() const;
+    [[nodiscard]]
+    std::vector<std::pair<ModuleOutput*, ModuleInput*>> getPatches() const override;
 
 private:
     void makeInputsAndOutputs();
 
 protected:
     std::unordered_map<std::string, ModuleInput *> inputs = {};
-    std::unordered_map<std::string, ModuleOutput *> outputs = {};
+    std::unordered_map<std::string, ModuleOutput *> outputs = {}; //not used
     std::unordered_map<ModuleInput*, std::vector<ModuleOutput *>> matrix = {};
 
     std::vector<Module*> modules;
 
+    std::unordered_set<Module*> outputModules;
+    std::vector<Module*> modulesToEnvelope;
+
     std::vector<ModuleInput*> matrix_inputs;
     std::vector<std::vector<ModuleOutput *>> matrix_outputs;
+
+    std::vector<FloatUserInput*> userInputsToEnvelope;
+
+    Module* parentModule;
 
 };
 
