@@ -32,7 +32,8 @@ open class PolyModule(name: String, val polyphonyCount: Int = 2): PatchModule(na
             throw IllegalStateException("Cannot create PolyModule from another PolyModule")
         }
         val pointer = parentContext.createPolyModule(this)
-        val newContext = parentContext.getContextFactory().createPolyModuleContext(pointer, parentContext)
+        val newPointer = parentContext.addModule(pointer, name = this.name)
+        val newContext = parentContext.getContextFactory().createPolyModuleContext(newPointer, parentContext)
         applyContext(newContext)
     }
 
