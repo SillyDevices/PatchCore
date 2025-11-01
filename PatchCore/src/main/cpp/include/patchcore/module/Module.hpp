@@ -65,6 +65,10 @@ public:
 
     int getSampleRate() const;
 
+public:
+    void onProxyOutputCreated(ModuleOutput* output, const std::string& withName);
+    bool hasProxyOutputs() const;
+
 protected:
 
     virtual void registerInput(ModuleInput& input, const std::string& withName = "") final {
@@ -144,6 +148,9 @@ protected:
 
     int sampleRate;
     std::string name;
+
+private:
+    bool _hasProxyOutputs = false;
 };
 
 #endif //PATCHCORE_MODULE_HPP

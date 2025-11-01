@@ -69,6 +69,14 @@ int Module::getSampleRate() const {
     return sampleRate;
 }
 
+void Module::onProxyOutputCreated(ModuleOutput* output, const std::string& withName) {
+    _hasProxyOutputs = true;
+}
+
+bool Module::hasProxyOutputs() const {
+    return _hasProxyOutputs;
+}
+
 const std::vector<FloatUserInput *> &Module::getInterpolatedInputs() {
     return interpolatedInputs;
 }

@@ -20,10 +20,24 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
+#include "patchcore/module/Module.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
 #include "patchcore/module/output/ProxyModuleOutput.hpp"
 
+ModuleOutput::ModuleOutput(std::string outputName): name(outputName) {
+
+}
+
+void ModuleOutput::setModule(Module* module) {
+    _module = module;
+}
+
 ProxyModuleOutput *ModuleOutput::createProxy(const std::string &withName) {
     hasProxy = true;
+    _module->onProxyOutputCreated(this, withName);
     return new ProxyModuleOutput(withName, this);
+}
+
+bool ModuleOutput::hasProxyOutput() const {
+    return hasProxy;
 }

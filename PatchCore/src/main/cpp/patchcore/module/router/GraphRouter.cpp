@@ -158,15 +158,7 @@ void GraphRouter::updateModuleGraph() {
     std::unordered_set<int> outputModuleIds;
 
     for (auto &module: modules) {
-        bool hasProxyOutput = false;
-        auto moduleOutputs = module->getModuleOutputs();
-        for (auto &kv: moduleOutputs) {
-            if (kv.second->hasProxyOutput()) {
-                hasProxyOutput = true;
-                break;
-            }
-        }
-        if (hasProxyOutput) {
+        if (module->hasProxyOutputs()) {
             byProxyOutputModuleIds.insert(moduleToId[module]);
         }
     }
