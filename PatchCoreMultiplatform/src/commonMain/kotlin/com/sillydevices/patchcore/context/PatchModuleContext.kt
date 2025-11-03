@@ -116,7 +116,6 @@ open class PatchModuleContextImpl(
     }
 
     override fun addPatch(output: ModuleOutput, input: ModuleInput) {
-        println("PatchModuleContextImpl: Adding patch from output ${output.moduleName}:${output.name} to input ${input.moduleName}:${input.name}")
         PlatformPatchModule.addPatch(
             getPointer(),
             output.pointer,

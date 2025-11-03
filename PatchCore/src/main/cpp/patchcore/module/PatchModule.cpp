@@ -36,12 +36,10 @@
 
 
 PatchModule::PatchModule(ModuleFactory *factory, std::string name, int sampleRate): Module(name, sampleRate), _factory(factory){
-    ALOGD("PatchModule[%s]::Constructor _Router address = %p", name.c_str(), &_router);
 
 }
 
 PatchModule::PatchModule(const PatchModule &other): Module(other.name, other.sampleRate), _factory(other._factory) {
-    ALOGD("PatchModule[%s]::CopyConstructor", other.name.c_str());
     //clone modules, includes intialization of
     //_modules and _inputs
     //_modulestoAlwaysEnvelope and _interpolatedInputsToAlwaysEnvelope
@@ -167,14 +165,6 @@ void PatchModule::resetPatch() {
 void PatchModule::addPatch(ModuleOutput* from, ModuleInput* to) {
     std::lock_guard<std::mutex> lock(routerMutex);
     if (from != nullptr && to != nullptr) {
-#ifdef ANDROID
-        ALOGD("PatchModule[%s]::addPatch: from %s:%s to %s:%s",
-              this->getModuleName().c_str(),
-              from->getModule()->getModuleName().c_str(),
-              from->getName().c_str(),
-              to->getModule()->getModuleName().c_str(),
-              to->getName().c_str());
-#endif
         _router.add(from, to);
     }
 }
