@@ -85,9 +85,9 @@ public:
 
     //PatchModule Router specific
 public:
-    virtual void addPatch(ModuleOutput* output, ModuleInput* input);
-    //TODO add method to remove a single patch
     virtual void resetPatch();
+    virtual void addPatch(ModuleOutput* output, ModuleInput* input);
+    virtual void removePatch(ModuleOutput* output, ModuleInput* input);
 private:
     void clonePatches(const AbstractRouter &router);
 

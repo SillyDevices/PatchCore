@@ -110,7 +110,7 @@ void GraphRouter::add(ModuleOutput *from, ModuleInput *to) {
         }
     }
     if (!fromModuleFound) {
-        throw std::runtime_error("TopoRouter::add: trying to add a patch( " +
+        throw std::runtime_error("GraphRouter::add: trying to add a patch( " +
             from->getModule()->getModuleName() + ":"+ from->getName() + " to " +
             to->getModule()->getModuleName() + ":" + to->getName() +
             " ) with modules not managed by this router( "+ parentModule->getModuleName() +" )");

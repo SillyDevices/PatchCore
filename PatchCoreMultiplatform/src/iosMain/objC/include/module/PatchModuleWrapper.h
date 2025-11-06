@@ -39,8 +39,9 @@ uintptr_t patchModuleGetModule(uintptr_t patch_module_pointer, char* module_name
 void patchModuleAddInput(uintptr_t patch_module_pointer, uintptr_t input_pointer, char* input_name);
 void patchModuleAddOutput(uintptr_t patch_module_pointer, uintptr_t output_pointer, char* output_name);
 void patchModuleAddUserInput(uintptr_t patch_module_pointer, uintptr_t user_input_pointer, char* input_name);
-void patchModuleAddPatch(uintptr_t patch_module_pointer, uintptr_t from_output_pointer, uintptr_t to_input_pointer);
 void patchModuleResetPatch(uintptr_t patch_module_pointer);
+void patchModuleAddPatch(uintptr_t patch_module_pointer, uintptr_t from_output_pointer, uintptr_t to_input_pointer);
+void patchModuleRemovePatch(uintptr_t patch_module_pointer, uintptr_t from_output_pointer, uintptr_t to_input_pointer);
 
 
 #ifdef __cplusplus

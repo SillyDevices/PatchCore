@@ -150,6 +150,12 @@ Module *PolyModule::getModule(const std::string &moduleName) const {
     throw std::runtime_error("Module " + moduleName + " not found in PolyModule");
 }
 
+void PolyModule::resetPatch() {
+    for (auto &voice : voices) {
+        voice->resetPatch();
+    }
+}
+
 void PolyModule::addPatch(ModuleOutput *output, ModuleInput *input) {
     auto castedOutput = dynamic_cast<PolyProxyOutput *>(output);
     if (castedOutput == nullptr) throw std::runtime_error("PolyModule::addPatch: output is not a PolyProxyOutput");
@@ -165,9 +171,18 @@ void PolyModule::addPatch(ModuleOutput *output, ModuleInput *input) {
     }
 }
 
-void PolyModule::resetPatch() {
-    for (auto &voice : voices) {
-        voice->resetPatch();
+void PolyModule::removePatch(ModuleOutput* from, ModuleInput* to) {
+    auto castedOutput = dynamic_cast<PolyProxyOutput *>(from);
+    if (castedOutput == nullptr) throw std::runtime_error("PolyModule::addPatch: output is not a PolyProxyOutput");
+    auto castedInput = dynamic_cast<PolyProxyInput *>(to);
+    if (castedInput == nullptr) throw std::runtime_error("PolyModule::addPatch: input is not a PolyProxyInput");
+    for (int i = 0; i < voiceCount; ++i) {
+        auto voiceOutput = castedOutput->getVoice(i);
+        auto voiceInput = castedInput->getVoice(i);
+        if (voiceOutput == nullptr || voiceInput == nullptr) {
+            throw std::runtime_error("PolyModule::addPatch: Voice output or input is null");
+        }
+        voices[i]->removePatch(voiceOutput, voiceInput);
     }
 }
 

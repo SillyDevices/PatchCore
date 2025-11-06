@@ -45,8 +45,11 @@ object PatchModuleJni {
     @JvmName("patchModuleAddUserInput")
     external fun patchModuleAddUserInput(patchModuleManagedPointer: ULong, userInputPointer: ULong, inputName: String)
 
-    @JvmName("patchModuleAddPatch")
-    external fun patchModuleAddPatch(patchModulePointer: ULong, fromOutputPointer: ULong, toInputPointer: ULong)
     @JvmName("patchModuleResetPatch")
     external fun patchModuleResetPatch(patchModulePointer: ULong)
+    @JvmName("patchModuleAddPatch")
+    external fun patchModuleAddPatch(patchModulePointer: ULong, fromOutputPointer: ULong, toInputPointer: ULong)
+
+    @JvmName("patchModuleRemovePatch")
+    external fun patchModuleRemovePatch(patchModulePointer: ULong, fromOutputPointer: ULong, toInputPointer: ULong)
 }

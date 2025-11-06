@@ -10,6 +10,7 @@ import com.sillydevices.patchcore.ios.wrappers.patchModuleAddInput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddModule
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddOutput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddPatch
+import com.sillydevices.patchcore.ios.wrappers.patchModuleRemovePatch
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddUserInput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleCreateModule
 import com.sillydevices.patchcore.ios.wrappers.patchModuleNew
@@ -100,6 +101,10 @@ actual object PlatformPatchModule {
             withName.cstr)
     }
 
+    actual fun resetPatch(patchModulePointer: ModulePointer) {
+        patchModuleResetPatch(patchModulePointer.nativePointer)
+    }
+
     actual fun addPatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer) {
         patchModuleAddPatch(
             patchModulePointer.nativePointer,
@@ -107,7 +112,16 @@ actual object PlatformPatchModule {
             toInputPointer.nativePointer)
     }
 
-    actual fun resetPatch(patchModulePointer: ModulePointer) {
-        patchModuleResetPatch(patchModulePointer.nativePointer)
+    actual fun removePatch(
+        patchModulePointer: ModulePointer,
+        fromOutputPointer: ModuleOutputPointer,
+        toInputPointer: ModuleInputPointer
+    ) {
+        patchModuleRemovePatch(
+            patchModulePointer.nativePointer,
+            fromOutputPointer.nativePointer,
+            toInputPointer.nativePointer)
     }
+
+
 }

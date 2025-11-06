@@ -45,6 +45,7 @@ expect object PlatformPatchModule {
     fun addUserInput(patchModulePointer: ModulePointer, userInputPointer: UserInputPointer, withName: String)
 
 
-    fun addPatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer)
     fun resetPatch(patchModulePointer: ModulePointer)
+    fun addPatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer)
+    fun removePatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer)
 }

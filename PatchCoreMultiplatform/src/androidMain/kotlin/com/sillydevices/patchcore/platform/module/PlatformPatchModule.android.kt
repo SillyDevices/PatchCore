@@ -94,6 +94,10 @@ actual object PlatformPatchModule {
         )
     }
 
+    actual fun resetPatch(patchModulePointer: ModulePointer) {
+        PatchModuleJni.patchModuleResetPatch(patchModulePointer.nativePointer)
+    }
+
     actual fun addPatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer) {
         PatchModuleJni.patchModuleAddPatch(
             patchModulePointer.nativePointer,
@@ -102,7 +106,13 @@ actual object PlatformPatchModule {
         )
     }
 
-    actual fun resetPatch(patchModulePointer: ModulePointer) {
-        PatchModuleJni.patchModuleResetPatch(patchModulePointer.nativePointer)
+    actual fun removePatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer) {
+        PatchModuleJni.patchModuleRemovePatch(
+            patchModulePointer.nativePointer,
+            fromOutputPointer.nativePointer,
+            toInputPointer.nativePointer
+        )
     }
+
+
 }

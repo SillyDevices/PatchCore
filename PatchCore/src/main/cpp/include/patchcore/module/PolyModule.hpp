@@ -59,8 +59,9 @@ public:
     virtual Module* getModule(const std::string& moduleName) const override;
     //PatchModule Router specific
 public:
-    virtual void addPatch(ModuleOutput* output, ModuleInput* input) override;
     virtual void resetPatch() override;
+    virtual void addPatch(ModuleOutput* output, ModuleInput* input) override;
+    virtual void removePatch(ModuleOutput* output, ModuleInput* input) override;
     // polyphony support
 public:
     size_t getVoiceCount() const;

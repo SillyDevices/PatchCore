@@ -57,6 +57,10 @@ class PatchBuilder {
         patch(patch.first, patch.second)
     }
 
+    fun import(other: Patch) {
+        list.addAll(other.connections)
+    }
+
     infix fun ModuleOutput.patchTo(input: ModuleInput) {
         patch(this, input)
     }
@@ -72,6 +76,10 @@ class PatchBuilder {
 
 
 open class PatchModule(name: String): Module(name) {
+
+    protected data class MutablePatch(
+        override val connections: MutableList<Connection> = mutableListOf()
+    ): Patch()
 
     @Suppress("UNCHECKED_CAST")
     class ModuleSettings<T: Module>(val settings: T.() -> Unit) {
@@ -112,6 +120,40 @@ open class PatchModule(name: String): Module(name) {
         builder.invoke(patchBuilder)
         return patchBuilder.build()
     }
+
+    protected val currentPatch: MutablePatch = MutablePatch()
+
+
+    open fun clearPatches() {
+        val context = moduleContext as PatchModuleContext
+        context.resetPatch()
+        currentPatch.connections.clear()
+    }
+
+    open fun applyDefaultPatch() {
+        val context = moduleContext as PatchModuleContext
+        for (connection in defaultPatch.connections) {
+            context.addPatch(connection.output, connection.input)
+            currentPatch.connections.add(connection)
+        }
+    }
+
+    open fun addPatch(connection: Patch.Connection){
+        val context = moduleContext as PatchModuleContext
+        context.addPatch(connection.output, connection.input)
+        currentPatch.connections.add(connection)
+    }
+
+    open fun removePatch(connection: Patch.Connection){
+        val context = moduleContext as PatchModuleContext
+        context.removePatch(connection.output, connection.input)
+        currentPatch.connections.remove(connection)
+    }
+
+    //TODO need something like this to apply changes in batch.
+    // current implementations rebuild all patches each time a patch is added/removed
+//    fun applyPatchChanges(changes: (patch: Patch)-> Patch) {}
+
 
     override fun applyContext(context: ModuleContext) {
         context as? PatchModuleContext ?: throw IllegalArgumentException("Context must be of type PatchModuleContext")
@@ -159,9 +201,8 @@ open class PatchModule(name: String): Module(name) {
         for (settings in modulesSettings) {
             settings.value.invoke(settings.key)
         }
-        for (connection in defaultPatch.connections) {
-            context.addPatch(connection.output, connection.input)
-        }
+        clearPatches()
+        applyDefaultPatch()
     }
 
     override fun createFrom(parentContext: PatchModuleContext) {

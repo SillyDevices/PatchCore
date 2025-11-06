@@ -158,6 +158,16 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleResetPatch(
+        JNIEnv *env, jobject thiz, jlong patch_module_pointer) {
+    auto module = reinterpret_cast<Module *>(patch_module_pointer);
+    auto patchModule = dynamic_cast<PatchModule *>(module);
+    if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
+    patchModule->resetPatch();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddPatch(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong from_output_pointer,
         jlong to_input_pointer) {
@@ -171,12 +181,18 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
     patchModule->addPatch(fromOutput, toInput);
 }
 
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleResetPatch(
-        JNIEnv *env, jobject thiz, jlong patch_module_pointer) {
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleRemovePatch(
+        JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong from_output_pointer,
+        jlong to_input_pointer) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
-    patchModule->resetPatch();
+    auto fromOutput = reinterpret_cast<ModuleOutput *>(from_output_pointer);
+    if (fromOutput == nullptr) throw std::runtime_error("From output pointer is null");
+    auto toInput = reinterpret_cast<ModuleInput *>(to_input_pointer);
+    if (toInput == nullptr) throw std::runtime_error("To input pointer is null");
+    patchModule->removePatch(fromOutput, toInput);
 }

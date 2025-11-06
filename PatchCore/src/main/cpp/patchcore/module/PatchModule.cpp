@@ -169,6 +169,13 @@ void PatchModule::addPatch(ModuleOutput* from, ModuleInput* to) {
     }
 }
 
+void PatchModule::removePatch(ModuleOutput* from, ModuleInput* to) {
+    std::lock_guard<std::mutex> lock(routerMutex);
+    if (from != nullptr && to != nullptr) {
+        _router.remove(from, to);
+    }
+}
+
 void PatchModule::clonePatches(const AbstractRouter &router) {
     for (const auto &patch: router.getPatches()) {
         auto originalFrom = patch.first;
