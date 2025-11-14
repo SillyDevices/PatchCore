@@ -23,9 +23,12 @@
 package com.sillydevices.patchcore.platform.modules
 
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.types.IndicatorBuffer
 import kotlin.jvm.JvmName
 
 expect object PlatformIndicatorModule {
+
+    fun getDirectIndicatorBuffer(modulePointer: ModulePointer, timeScale: Float = 1f): IndicatorBuffer
 
     fun setIndicatorBufferSize(modulePointer: ModulePointer, size: Int)
 

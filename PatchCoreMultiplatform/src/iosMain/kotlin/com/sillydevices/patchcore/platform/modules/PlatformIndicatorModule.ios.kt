@@ -23,6 +23,7 @@
 package com.sillydevices.patchcore.platform.modules
 
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.types.IndicatorBuffer
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.refTo
 import com.sillydevices.patchcore.ios.wrappers.setIndicatorBufferSize as iOSSetIndicatorBufferSize
@@ -30,6 +31,10 @@ import com.sillydevices.patchcore.ios.wrappers.copyIndicatorBuffer as iOSCopyInd
 
 @OptIn(ExperimentalForeignApi::class)
 actual object PlatformIndicatorModule {
+
+    actual fun getDirectIndicatorBuffer(modulePointer: ModulePointer, timeScale: Float): IndicatorBuffer {
+        throw NotImplementedError("Direct Indicator Buffer access is not implemented for iOS yet.")
+    }
 
     actual fun setIndicatorBufferSize(modulePointer: ModulePointer, size: Int) {
         iOSSetIndicatorBufferSize(modulePointer.nativePointer, size)

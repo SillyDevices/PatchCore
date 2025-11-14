@@ -27,11 +27,16 @@ import com.sillydevices.patchcore.context.PatchModuleContext
 import com.sillydevices.patchcore.context.modules.IndicatorModuleContext
 import com.sillydevices.patchcore.module.FactoryModule
 import com.sillydevices.patchcore.module.factory.ModuleType
+import com.sillydevices.patchcore.types.IndicatorBuffer
 
 class IndicatorModule(name: String = "indicator"):
     FactoryModule(name, ModuleType.Indicator)
 {
     val input = registerInput("in")
+
+    fun getBuffer(timeScale: Float = 1f) : IndicatorBuffer {
+        return (moduleContext as IndicatorModuleContext).getDirectBuffer(timeScale)
+    }
 
     fun setSize(newSize: Int) {
         (moduleContext as IndicatorModuleContext).setSize(newSize)

@@ -27,8 +27,11 @@ import com.sillydevices.patchcore.context.ModuleContextImpl
 import com.sillydevices.patchcore.context.factory.ContextFactory
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 import com.sillydevices.patchcore.platform.modules.PlatformIndicatorModule
+import com.sillydevices.patchcore.types.IndicatorBuffer
 
 interface IndicatorModuleContext: ModuleContext {
+
+    fun getDirectBuffer(timeScale: Float = 1f): IndicatorBuffer
     fun setSize(newSize: Int)
     suspend fun copyInto(buffer: FloatArray, desiredCount: Int, startIndex: Int): Int
 }
@@ -38,6 +41,11 @@ class IndicatorModuleContextImpl(pointer: ModulePointer, contextFactory: Context
     IndicatorModuleContext,
     ModuleContextImpl(pointer, contextFactory)
 {
+
+    override fun getDirectBuffer(timeScale: Float): IndicatorBuffer {
+        return PlatformIndicatorModule.getDirectIndicatorBuffer(getPointer(), timeScale)
+    }
+
     override fun setSize(newSize: Int) {
         PlatformIndicatorModule.setIndicatorBufferSize(getPointer(), newSize)
     }

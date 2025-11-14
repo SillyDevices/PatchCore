@@ -28,13 +28,30 @@
 
 
 extern "C"
+JNIEXPORT jobject JNICALL
+Java_com_sillydevices_patchcore_android_jni_modules_IndicatorModuleJni_getDirectIndicatorBuffer(JNIEnv *env, jobject thiz, jlong pointer, jfloat timeScale) {
+    auto *module = reinterpret_cast<Module *>(pointer);
+    if (module == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: Module pointer is null");
+    auto *indicatorModule = dynamic_cast<IndicatorModule *>(module);
+    if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
+    auto sampleRate = module->getSampleRate();
+    auto bufferSize = static_cast<int>(sampleRate * timeScale);
+    float* buf = new float[bufferSize];
+
+    indicatorModule->setBuffer(buf, bufferSize);
+
+    jobject result = env->NewDirectByteBuffer(buf, sizeof(float) * bufferSize);
+    return result;
+}
+
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_sillydevices_patchcore_android_jni_modules_IndicatorModuleJni_setIndicatorBufferSize(JNIEnv *env, jobject thiz, jlong pointer, jint size) {
     auto *module = reinterpret_cast<Module *>(pointer);
     if (module == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: Module pointer is null");
     auto *indicatorModule = dynamic_cast<IndicatorModule *>(module);
     if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
-    indicatorModule->setBufferSize(size);
+    //indicatorModule->setBufferSize(size);
 }
 
 
@@ -47,7 +64,8 @@ Java_com_sillydevices_patchcore_android_jni_modules_IndicatorModuleJni_copyIndic
     auto *indicatorModule = dynamic_cast<IndicatorModule *>(module);
     if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
     auto nativeBuffer = env->GetFloatArrayElements(buffer, nullptr);
-    auto count = indicatorModule->copyIntoBuffer(nativeBuffer, size, startIndex);
+    //auto count = indicatorModule->copyIntoBuffer(nativeBuffer, size, startIndex);
+    auto count = 0;
     env->ReleaseFloatArrayElements(buffer, nativeBuffer, 0);
     return count;
 
