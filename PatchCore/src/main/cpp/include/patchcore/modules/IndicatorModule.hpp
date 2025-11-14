@@ -30,6 +30,14 @@
 #define INDICATOR_INPUT "in"
 
 class IndicatorModule: public Module {
+
+struct BufferDescriptor {
+    int size;
+    int dataSize;
+    float* bufferPtr;
+    float* dataPtr;
+};
+
 public:
     IndicatorModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameter);
     IndicatorModule(std::string name, int sampleRate);
@@ -39,9 +47,9 @@ public:
     virtual ~IndicatorModule() = default;
 
     void envelope() override;
-
+    void onStartBuffer(int size) override;
 public:
-    void setBuffer(float* buffer, int size);
+    float* getBuffer(int requestedDataSize);
 public:
     bool needEnvelopeOnInputConnection() const override;
 
@@ -49,11 +57,15 @@ public:
     ModuleInput input = ModuleInput(INDICATOR_INPUT);
 
 protected:
-    float mockBuffer[100];
-    int size = 100;
-    float* bufferPtr = mockBuffer;
-    int writeIndex = 0;
+    BufferDescriptor* targetBufferDescriptor = nullptr;
+    int size;
+    float* bufferPtr;
+    float* dataPtr; // bufferPtr + 4;
+    int dataSize; // size - 4;
+    int writeIndex;
     bool overflow = false;
+
+    std::mutex getBufferMutex;
 };
 
 #endif //DIGITRON_INDICATORMODULE_HPP

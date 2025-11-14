@@ -22,10 +22,12 @@
 
 #include "patchcore/modules/IndicatorModule.hpp"
 #include <stdexcept>
+#include <atomic>
 #include <android/log_macros.h>
 
 #undef LOG_TAG
 #define LOG_TAG "IndicatorModule"
+
 
 
 IndicatorModule::IndicatorModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameter)
@@ -33,7 +35,15 @@ IndicatorModule::IndicatorModule(std::string name, int sampleRate, std::map<std:
 
 
 IndicatorModule::IndicatorModule(std::string name, int sampleRate)
-    : Module(name, sampleRate), size(100), overflow(false) {
+    : Module(name, sampleRate), overflow(false) {
+
+    size = 104;
+    dataSize = size - 4;
+    bufferPtr = new float[size];
+    dataPtr = bufferPtr + 4;
+
+    writeIndex = 0;
+    overflow = false;
     init();
 }
 
@@ -52,33 +62,65 @@ void IndicatorModule::init() {
     registerInput(input);
 }
 
-int getReadSize(int readIndex, int writeIndex, int size, bool overflow){
-    if (overflow) return size;
-    if (writeIndex > readIndex){
-        //from readIndex to writeIndex
-        return writeIndex - readIndex;
-    } else if ( writeIndex < readIndex) {
-        // from readIndex to the end of the buffer and from the beginning to writeIndex
-        return size - readIndex + writeIndex;
-    }
-    return 0;
-}
-
-
 void IndicatorModule::envelope() {
-    bufferPtr[writeIndex] = input.value;
-    if (writeIndex == 3) {
-        ALOGD("cpp buffer [0] = %f, [1] = %f, [2] = %f",
-               bufferPtr[0], bufferPtr[1], bufferPtr[2]);
-    }
-    writeIndex = (writeIndex + 1) % size;
+    dataPtr[writeIndex] = input.value;
+    writeIndex = (writeIndex + 1) % (dataSize);
 }
 
-void IndicatorModule::setBuffer(float *buffer, int newSize) {
-    this->bufferPtr = buffer;
-    this->size = newSize;
-    this->writeIndex = 0;
-    this->overflow = false;
+void IndicatorModule::onStartBuffer(int bufferSize) {
+    Module::onStartBuffer(bufferSize);
+
+    //swap to new buffer without blocking audio thread
+    if (targetBufferDescriptor != nullptr) {
+        //TODO create global buffer allocator, and here only mark old buffer as free
+        delete[] bufferPtr;
+
+        size = targetBufferDescriptor->size;
+        dataSize = targetBufferDescriptor->dataSize;
+        bufferPtr = targetBufferDescriptor->bufferPtr;
+        dataPtr = targetBufferDescriptor->dataPtr;
+        delete targetBufferDescriptor;
+        targetBufferDescriptor = nullptr;
+
+        writeIndex = 0;
+        overflow = false;
+    }
+
+    uint32_t v = writeIndex;
+    std::atomic_thread_fence(std::memory_order_release);
+    // write writeIndex to header at start of buffer
+    std::memcpy(bufferPtr, &v, sizeof(v));
+
+
+}
+
+float* IndicatorModule::getBuffer(int requestedDataSize) {
+    std::lock_guard<std::mutex> lock(getBufferMutex);
+    if (size == requestedDataSize && targetBufferDescriptor == nullptr) {
+        // requested size matches current buffer size, no need to allocate new buffer
+        return bufferPtr;
+    }
+    if (targetBufferDescriptor != nullptr && targetBufferDescriptor->dataSize == requestedDataSize) {
+        // requested size matches already allocated target buffer size
+        return targetBufferDescriptor->bufferPtr;
+    }
+
+    // allocate new buffer
+    //TODO create global buffer allocator
+    float* buf = new float[requestedDataSize + 4];
+    targetBufferDescriptor = new BufferDescriptor();
+    targetBufferDescriptor->size = requestedDataSize + 4;
+    targetBufferDescriptor->dataSize = requestedDataSize;
+    targetBufferDescriptor->bufferPtr = buf;
+    targetBufferDescriptor->dataPtr = buf + 4;
+
+    // prepare buffer, set writeIndex to 0
+    uint32_t v = 0;
+    std::memcpy(targetBufferDescriptor->bufferPtr, &v, sizeof(v));
+    std::memset(targetBufferDescriptor->dataPtr, 0, targetBufferDescriptor->dataSize * sizeof(float));
+
+    // return new buffer, will be used on next buffer cycle
+    return buf;
 }
 
 bool IndicatorModule::needEnvelopeOnInputConnection() const {
