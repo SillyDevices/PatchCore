@@ -41,12 +41,7 @@ public:
     void envelope() override;
 
 public:
-
-    void setBufferSize(int size);
-    // write to plain buffer, returns the number of samples written( <= destSize)
-    int copyIntoBuffer(float* dest, int destSize, int startIndex);
-    int getAvailable();
-
+    void setBuffer(float* buffer, int size);
 public:
     bool needEnvelopeOnInputConnection() const override;
 
@@ -54,9 +49,9 @@ public:
     ModuleInput input = ModuleInput(INDICATOR_INPUT);
 
 protected:
-    int size;
-    std::vector<float> ringBuffer;
-    int readIndex = 0;
+    float mockBuffer[100];
+    int size = 100;
+    float* bufferPtr = mockBuffer;
     int writeIndex = 0;
     bool overflow = false;
 };

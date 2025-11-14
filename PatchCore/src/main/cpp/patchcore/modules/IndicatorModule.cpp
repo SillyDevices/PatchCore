@@ -21,6 +21,11 @@
  */
 
 #include "patchcore/modules/IndicatorModule.hpp"
+#include <stdexcept>
+#include <android/log_macros.h>
+
+#undef LOG_TAG
+#define LOG_TAG "IndicatorModule"
 
 
 IndicatorModule::IndicatorModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameter)
@@ -28,27 +33,24 @@ IndicatorModule::IndicatorModule(std::string name, int sampleRate, std::map<std:
 
 
 IndicatorModule::IndicatorModule(std::string name, int sampleRate)
-    : Module(name, sampleRate), size(5 * sampleRate / 30), overflow(false) {
-    ringBuffer = std::vector<float>(size);
+    : Module(name, sampleRate), size(100), overflow(false) {
     init();
 }
 
 IndicatorModule::IndicatorModule(const IndicatorModule& other)
     : Module(other.name, other.sampleRate), size(other.size), overflow(other.overflow) {
-    ringBuffer = std::vector<float>(other.size);
     init();
     copyIOs(other);
 }
 
 std::unique_ptr<Module> IndicatorModule::clone() const {
+    throw std::runtime_error("IndicatorModule::clone() is not implemented yet");
     return std::make_unique<IndicatorModule>(*this);
 }
 
 void IndicatorModule::init() {
     registerInput(input);
 }
-
-
 
 int getReadSize(int readIndex, int writeIndex, int size, bool overflow){
     if (overflow) return size;
@@ -64,54 +66,19 @@ int getReadSize(int readIndex, int writeIndex, int size, bool overflow){
 
 
 void IndicatorModule::envelope() {
-    ringBuffer[writeIndex] = input.value;
+    bufferPtr[writeIndex] = input.value;
+    if (writeIndex == 3) {
+        ALOGD("cpp buffer [0] = %f, [1] = %f, [2] = %f",
+               bufferPtr[0], bufferPtr[1], bufferPtr[2]);
+    }
     writeIndex = (writeIndex + 1) % size;
-    if (writeIndex == readIndex) {
-        overflow = true;
-    }
 }
 
-void IndicatorModule::setBufferSize(int newSize) {
-    if (newSize <= 0) return;
-    if (ringBuffer.size() != newSize) {
-        ringBuffer.resize(newSize, 0.0f);
-        writeIndex = 0;
-        readIndex = 0;
-    }
-}
-
-int IndicatorModule::copyIntoBuffer(float *dest, int destSize, int startIndex) {
-    int currentWriteIndex = writeIndex;
-    if (overflow) {
-        //readIndex = writeIndex;
-    }
-    int available = getReadSize(readIndex, currentWriteIndex, size, overflow);
-    overflow = false;
-    int samplesToCopy =
-            available > destSize - startIndex ?
-            destSize - startIndex :
-            available;
-    if (samplesToCopy > 0){
-        if (readIndex + samplesToCopy <= size){
-            memcpy(dest + startIndex, &ringBuffer[readIndex], samplesToCopy * sizeof(float));
-        } else {
-            auto firstChunkSize = size - readIndex;
-            memcpy(dest + startIndex, &ringBuffer[readIndex], firstChunkSize * sizeof(float));
-            memcpy(dest + startIndex + firstChunkSize, &ringBuffer[0], (samplesToCopy - firstChunkSize) * sizeof(float));
-        }
-        readIndex = (readIndex + samplesToCopy) % size;
-        return samplesToCopy;
-    }
-    return 0;
-}
-
-int IndicatorModule::getAvailable() {
-    int currentWriteIndex = writeIndex;
-    if (overflow) {
-        readIndex = writeIndex;
-    }
-    int available = getReadSize(readIndex, currentWriteIndex, size, overflow);
-    return available;
+void IndicatorModule::setBuffer(float *buffer, int newSize) {
+    this->bufferPtr = buffer;
+    this->size = newSize;
+    this->writeIndex = 0;
+    this->overflow = false;
 }
 
 bool IndicatorModule::needEnvelopeOnInputConnection() const {
