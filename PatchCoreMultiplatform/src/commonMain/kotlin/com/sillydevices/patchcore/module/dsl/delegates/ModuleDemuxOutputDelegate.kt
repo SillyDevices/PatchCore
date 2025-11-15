@@ -20,27 +20,16 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
+package com.sillydevices.patchcore.module.dsl.delegates
 
-#ifndef PolyModuleWrapper_h
-#define PolyModuleWrapper_h
+import com.sillydevices.patchcore.module.PatchModule
+import com.sillydevices.patchcore.module.io.output.ModuleDemuxOutput
+import com.sillydevices.patchcore.module.io.output.ModuleOutput
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
-#include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-uintptr_t polyModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate, int polyphony);
-void polyModuleRelease(uintptr_t poly_module_pointer);
-
-void polyModuleSetActiveVoicesCount(uintptr_t poly_module_pointer, int count);
-int polyModuleGetActiveVoicesCount(uintptr_t poly_module_pointer);
-
-void polyModuleAddDemuxOutput(uintptr_t poly_module_pointer, uintptr_t output_pointer, char* output_name, int default_voice);
-
-#ifdef __cplusplus
+class ModuleDemuxOutputDelegate(val output: ModuleDemuxOutput): ReadOnlyProperty<PatchModule, ModuleDemuxOutput> {
+    override fun getValue(thisRef: PatchModule, property: KProperty<*>): ModuleDemuxOutput {
+        return output
+    }
 }
-#endif
-
-#endif /* PolyModuleWrapper_h */

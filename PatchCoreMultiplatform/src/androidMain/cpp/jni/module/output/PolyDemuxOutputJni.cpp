@@ -20,27 +20,17 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-
-#ifndef PolyModuleWrapper_h
-#define PolyModuleWrapper_h
-
-#include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <patchcore/module/output/PolyDemuxOutput.hpp>
+#include <jni.h>
 
 
-uintptr_t polyModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate, int polyphony);
-void polyModuleRelease(uintptr_t poly_module_pointer);
-
-void polyModuleSetActiveVoicesCount(uintptr_t poly_module_pointer, int count);
-int polyModuleGetActiveVoicesCount(uintptr_t poly_module_pointer);
-
-void polyModuleAddDemuxOutput(uintptr_t poly_module_pointer, uintptr_t output_pointer, char* output_name, int default_voice);
-
-#ifdef __cplusplus
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_module_output_PolyDemuxOutputJni_PolyDemuxOutputSetVoiceIndex(
+        JNIEnv *env, jobject thiz, jlong poly_demux_output_pointer, jint voice) {
+    auto moduleOutput = reinterpret_cast<ModuleOutput *>(poly_demux_output_pointer);
+    auto polyProxyOutput = dynamic_cast<PolyProxyOutput *>(moduleOutput);
+    auto castedPolyDemuxOutput = dynamic_cast<PolyDemuxOutput *>(polyProxyOutput);
+    if (castedPolyDemuxOutput == nullptr) throw std::runtime_error("PolyDemuxOutput pointer is null");
+    castedPolyDemuxOutput->setVoiceIndex(voice);
 }
-#endif
-
-#endif /* PolyModuleWrapper_h */

@@ -23,6 +23,7 @@
 package com.sillydevices.patchcore.platform.module
 
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
+import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
 expect object PlatformPolyModule {
@@ -31,4 +32,6 @@ expect object PlatformPolyModule {
 
     fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int)
     fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int
+
+    fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int)
 }

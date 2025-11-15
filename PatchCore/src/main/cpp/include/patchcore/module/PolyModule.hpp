@@ -49,6 +49,7 @@ public:
 public:
     ProxyModuleInput* addInput(ModuleInput* input, const std::string& withName) override;
     ProxyModuleOutput* addOutput(ModuleOutput* output, const std::string& withName) override;
+    virtual ProxyModuleOutput* addDemuxOutput(ModuleOutput* output, const std::string& withName, const int defaultVoiceIndex);
     //don't know in what case this is useful, but it is here for consistency
     UserInput* addUserInput(UserInput* input, const std::string& withName) override;
     //PatchModule specific

@@ -22,6 +22,7 @@
 
 #include "patchcore/module/PolyModule.hpp"
 #include "patchcore/module/PolyProxyModule.hpp"
+#include "patchcore/module/output/PolyDemuxOutput.hpp"
 #include <string>
 #include <stdio.h>
 
@@ -94,6 +95,21 @@ ProxyModuleOutput *PolyModule::addOutput(ModuleOutput *output, const std::string
     }
     registerOutput(*casted, withName);
     proxyOutputs.push_back(casted);
+    return nullptr;
+}
+
+ProxyModuleOutput *PolyModule::addDemuxOutput(ModuleOutput *output, const std::string &withName, const int defaultVoiceIndex) {
+    if (output == nullptr) throw std::invalid_argument("Output cannot be null");
+    auto casted = dynamic_cast<PolyProxyOutput *>(output);
+    if (casted == nullptr) throw std::runtime_error("PolyModule::addDemuxOutput: output is not a PolyProxyOutput");
+    // pass corresponding module output to each voice
+    for (int i = 0; i < voiceCount; ++i) {
+        auto compositeVoiceOutput= voices[i]->addOutput(casted->getVoice(i), withName);
+        casted->setVoiceOutput(i, compositeVoiceOutput);
+    }
+    PolyProxyOutput *demuxOutput = new PolyDemuxOutput(casted, defaultVoiceIndex);
+    registerOutput(*demuxOutput, withName);
+    proxyOutputs.push_back(demuxOutput);
     return nullptr;
 }
 

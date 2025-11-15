@@ -21,26 +21,13 @@
  */
 
 
-#ifndef PolyModuleWrapper_h
-#define PolyModuleWrapper_h
+#import "module/output/PolyDemuxOutputWrapper.h"
+#include <patchcore/module/output/PolyDemuxOutput.hpp>
 
-#include <stdint.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-uintptr_t polyModuleNew(uintptr_t module_factory_pointer, char* name, int sample_rate, int polyphony);
-void polyModuleRelease(uintptr_t poly_module_pointer);
-
-void polyModuleSetActiveVoicesCount(uintptr_t poly_module_pointer, int count);
-int polyModuleGetActiveVoicesCount(uintptr_t poly_module_pointer);
-
-void polyModuleAddDemuxOutput(uintptr_t poly_module_pointer, uintptr_t output_pointer, char* output_name, int default_voice);
-
-#ifdef __cplusplus
+void polyDemuxOutputSetVoiceIndex(uintptr_t output_pointer, int voiceIndex) {
+    auto moduleOutput = reinterpret_cast<ModuleOutput *>(output_pointer);
+    auto polyProxyOutput = dynamic_cast<PolyProxyOutput *>(moduleOutput);
+    auto castedPolyDemuxOutput = dynamic_cast<PolyDemuxOutput *>(polyProxyOutput);
+    if (castedPolyDemuxOutput == nullptr) throw std::runtime_error("PolyDemuxOutput pointer is null");
+    castedPolyDemuxOutput->setVoiceIndex(voiceIndex);
 }
-#endif
-
-#endif /* PolyModuleWrapper_h */

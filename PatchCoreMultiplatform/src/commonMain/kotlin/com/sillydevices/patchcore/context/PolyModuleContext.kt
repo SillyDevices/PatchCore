@@ -25,11 +25,15 @@ package com.sillydevices.patchcore.context
 import com.sillydevices.patchcore.context.factory.ContextFactory
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 import com.sillydevices.patchcore.module.factory.ModuleFactory
+import com.sillydevices.patchcore.module.io.output.ModuleOutput
+import com.sillydevices.patchcore.platform.module.PlatformPatchModule
 import com.sillydevices.patchcore.platform.module.PlatformPolyModule
 
 interface PolyModuleContext: PatchModuleContext {
     fun setActiveVoicesCount(count: Int)
     fun getActiveVoicesCount(): Int
+
+    fun addDemuxOutput(output: ModuleOutput, withName: String, defaultVoice: Int)
 }
 
 open class PolyModuleContextImpl(
@@ -44,6 +48,11 @@ open class PolyModuleContextImpl(
 
     override fun getActiveVoicesCount(): Int {
         return PlatformPolyModule.getActiveVoicesCount(getPointer())
+    }
+
+    override fun addDemuxOutput(output: ModuleOutput, withName: String, defaultVoice: Int) {
+//        PlatformPatchModule.addOutput(getPointer(), output.pointer, withName)
+        PlatformPolyModule.addDemuxOutput(getPointer(), output.pointer, withName, defaultVoice)
     }
 
 }

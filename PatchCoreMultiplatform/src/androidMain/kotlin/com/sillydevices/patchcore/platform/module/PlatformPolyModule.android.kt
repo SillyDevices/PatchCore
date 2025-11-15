@@ -24,6 +24,7 @@ package com.sillydevices.patchcore.platform.module
 
 import com.sillydevices.patchcore.android.jni.module.PolyModuleJni
 import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
+import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
 actual object PlatformPolyModule {
@@ -49,6 +50,15 @@ actual object PlatformPolyModule {
     actual fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int {
         return PolyModuleJni.getActiveVoicesCount(
             polyModulePointer.nativePointer
+        )
+    }
+
+    actual fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int) {
+        return PolyModuleJni.addDemuxOutput(
+            polyModulePointer.nativePointer,
+            outputPointer.nativePointer,
+            withName,
+            defaultVoice
         )
     }
 }
