@@ -30,6 +30,14 @@
 #define INDICATOR_INPUT "in"
 
 class IndicatorModule: public Module {
+
+struct BufferDescriptor {
+    int size;
+    int dataSize;
+    float* bufferPtr;
+    float* dataPtr;
+};
+
 public:
     IndicatorModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameter);
     IndicatorModule(std::string name, int sampleRate);
@@ -38,15 +46,13 @@ public:
     void init();
     virtual ~IndicatorModule() = default;
 
-    void envelope() override;
+    std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule *polyModule) const override;
 
 public:
-
-    void setBufferSize(int size);
-    // write to plain buffer, returns the number of samples written( <= destSize)
-    int copyIntoBuffer(float* dest, int destSize, int startIndex);
-    int getAvailable();
-
+    void envelope() override;
+    void onStartBuffer(int size) override;
+public:
+    float* getBuffer(int requestedDataSize);
 public:
     bool needEnvelopeOnInputConnection() const override;
 
@@ -54,11 +60,15 @@ public:
     ModuleInput input = ModuleInput(INDICATOR_INPUT);
 
 protected:
+    BufferDescriptor* targetBufferDescriptor = nullptr;
     int size;
-    std::vector<float> ringBuffer;
-    int readIndex = 0;
-    int writeIndex = 0;
+    float* bufferPtr;
+    float* dataPtr; // bufferPtr + 4;
+    int dataSize; // size - 4;
+    int writeIndex;
     bool overflow = false;
+
+    std::mutex getBufferMutex;
 };
 
 #endif //DIGITRON_INDICATORMODULE_HPP

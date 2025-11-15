@@ -96,10 +96,9 @@ protected:
             userInputs[input.getName()] = &input;
         }
         if (auto floatInput = dynamic_cast<FloatUserInput *>(&input)) {
-            printf("Registering FloatUserInput: %s\n", floatInput->getName().c_str());
             interpolatedInputs.push_back(floatInput);
         } else {
-            printf("Registering UserInput: %s\n", input.getName().c_str());
+            // Do nothing
         }
         input.setModule(this);
     }

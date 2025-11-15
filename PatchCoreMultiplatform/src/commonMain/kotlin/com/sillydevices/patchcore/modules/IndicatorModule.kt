@@ -27,19 +27,15 @@ import com.sillydevices.patchcore.context.PatchModuleContext
 import com.sillydevices.patchcore.context.modules.IndicatorModuleContext
 import com.sillydevices.patchcore.module.FactoryModule
 import com.sillydevices.patchcore.module.factory.ModuleType
+import com.sillydevices.patchcore.types.IndicatorBuffer
 
 class IndicatorModule(name: String = "indicator"):
     FactoryModule(name, ModuleType.Indicator)
 {
     val input = registerInput("in")
 
-    fun setSize(newSize: Int) {
-        (moduleContext as IndicatorModuleContext).setSize(newSize)
-    }
-
-    suspend fun copyInto(buffer: FloatArray, desiredCount: Int, startIndex: Int): Int {
-        return (moduleContext as IndicatorModuleContext)
-            .copyInto(buffer, desiredCount, startIndex)
+    fun getBuffer(timeScale: Float = 1f) : IndicatorBuffer {
+        return (moduleContext as IndicatorModuleContext).getDirectBuffer(timeScale)
     }
 
     override fun createFrom(parentContext: PatchModuleContext) {

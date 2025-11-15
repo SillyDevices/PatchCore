@@ -65,9 +65,7 @@ std::unique_ptr<Module> PatchModule::clone() const {
 }
 
 //empty constructor for PolyProxyPatchModule
-PatchModule::PatchModule(): Module("", 44100) {
-    ALOGD("PatchModule::EmptyConstructor");
-}
+PatchModule::PatchModule(): Module("", 44100) { }
 
 //TODO add destructor to clear vectors with pointers
 PatchModule::~PatchModule() {
