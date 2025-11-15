@@ -28,8 +28,5 @@ object IndicatorModuleJni {
 
     @JvmName("getDirectIndicatorBuffer")
     external fun getDirectIndicatorBuffer(modulePointer: ULong, timeScale: Float): ByteBuffer
-    @JvmName("setIndicatorBufferSize")
-    external fun setIndicatorBufferSize(modulePointer: ULong, size: Int)
-    @JvmName("copyIndicatorBuffer")
-    external fun copyIndicatorBuffer(modulePointer: ULong, buffer: FloatArray, size: Int, startIndex: Int): Int
+
 }

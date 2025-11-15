@@ -38,15 +38,6 @@ class IndicatorModule(name: String = "indicator"):
         return (moduleContext as IndicatorModuleContext).getDirectBuffer(timeScale)
     }
 
-    fun setSize(newSize: Int) {
-        (moduleContext as IndicatorModuleContext).setSize(newSize)
-    }
-
-    suspend fun copyInto(buffer: FloatArray, desiredCount: Int, startIndex: Int): Int {
-        return (moduleContext as IndicatorModuleContext)
-            .copyInto(buffer, desiredCount, startIndex)
-    }
-
     override fun createFrom(parentContext: PatchModuleContext) {
         val pointer = parentContext.createModule(this)
         val newContext = parentContext.getContextFactory().createModuleContext(

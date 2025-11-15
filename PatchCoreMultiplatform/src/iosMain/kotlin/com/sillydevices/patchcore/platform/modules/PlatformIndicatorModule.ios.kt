@@ -36,11 +36,4 @@ actual object PlatformIndicatorModule {
         throw NotImplementedError("Direct Indicator Buffer access is not implemented for iOS yet.")
     }
 
-    actual fun setIndicatorBufferSize(modulePointer: ModulePointer, size: Int) {
-        iOSSetIndicatorBufferSize(modulePointer.nativePointer, size)
-    }
-
-    actual fun copyIndicatorBuffer(modulePointer: ModulePointer, buffer: FloatArray, size: Int, startIndex: Int): Int {
-        return iOSCopyIndicatorBuffer(modulePointer.nativePointer, buffer.refTo(0), size, startIndex)
-    }
 }

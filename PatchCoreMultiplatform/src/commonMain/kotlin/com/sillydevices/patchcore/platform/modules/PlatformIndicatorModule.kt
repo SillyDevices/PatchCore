@@ -30,7 +30,4 @@ expect object PlatformIndicatorModule {
 
     fun getDirectIndicatorBuffer(modulePointer: ModulePointer, timeScale: Float = 1f): IndicatorBuffer
 
-    fun setIndicatorBufferSize(modulePointer: ModulePointer, size: Int)
-
-    fun copyIndicatorBuffer(modulePointer: ModulePointer, buffer: FloatArray, size: Int, startIndex: Int): Int
 }

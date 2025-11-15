@@ -36,37 +36,9 @@ Java_com_sillydevices_patchcore_android_jni_modules_IndicatorModuleJni_getDirect
     if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
     auto sampleRate = module->getSampleRate();
     auto bufferSize = static_cast<int>(sampleRate * timeScale);
-    float* buf = new float[bufferSize];
 
-    indicatorModule->setBuffer(buf, bufferSize);
+    float* buf = indicatorModule->getBuffer(bufferSize);
 
     jobject result = env->NewDirectByteBuffer(buf, sizeof(float) * bufferSize);
     return result;
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_modules_IndicatorModuleJni_setIndicatorBufferSize(JNIEnv *env, jobject thiz, jlong pointer, jint size) {
-    auto *module = reinterpret_cast<Module *>(pointer);
-    if (module == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: Module pointer is null");
-    auto *indicatorModule = dynamic_cast<IndicatorModule *>(module);
-    if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
-    //indicatorModule->setBufferSize(size);
-}
-
-
-extern "C"
-JNIEXPORT jint JNICALL
-Java_com_sillydevices_patchcore_android_jni_modules_IndicatorModuleJni_copyIndicatorBuffer(
-        JNIEnv *env, jobject thiz, jlong pointer, jfloatArray buffer, jint size, jint startIndex) {
-    auto *module = reinterpret_cast<Module *>(pointer);
-    if (module == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: Module pointer is null");
-    auto *indicatorModule = dynamic_cast<IndicatorModule *>(module);
-    if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
-    auto nativeBuffer = env->GetFloatArrayElements(buffer, nullptr);
-    //auto count = indicatorModule->copyIntoBuffer(nativeBuffer, size, startIndex);
-    auto count = 0;
-    env->ReleaseFloatArrayElements(buffer, nativeBuffer, 0);
-    return count;
-
 }

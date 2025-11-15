@@ -36,8 +36,8 @@ actual object PlatformIndicatorModule {
         val jniBuffer: ByteBuffer
     ): IndicatorBuffer {
 
-        class ListBufferWrapper(private val floatBuffer: FloatBuffer): List<Float> {
-            override val size: Int = floatBuffer.limit()
+        class ListBufferWrapper(private val floatBuffer: FloatBuffer, val dataOffset: Int = 0): List<Float> {
+            override val size: Int = floatBuffer.limit() - dataOffset
 
             override fun isEmpty(): Boolean {
                 return size == 0
@@ -56,7 +56,7 @@ actual object PlatformIndicatorModule {
             }
 
             override fun get(index: Int): Float {
-                return floatBuffer.get(index)
+                return floatBuffer.get(index + dataOffset)
             }
 
             override fun indexOf(element: Float): Int {
@@ -88,9 +88,15 @@ actual object PlatformIndicatorModule {
             jniBuffer.order(ByteOrder.nativeOrder())
         }
         private val buffer = jniBuffer.asFloatBuffer()
-        private val floatList = ListBufferWrapper(buffer)
+        private val floatList = ListBufferWrapper(buffer, 4)
+
+        private val indexBuffer = jniBuffer.asIntBuffer()
 
         override fun getList(): List<Float> = floatList
+
+        override fun getWriteIndex(): Int {
+            return indexBuffer.get(0)
+        }
 
     }
 
@@ -98,14 +104,5 @@ actual object PlatformIndicatorModule {
         val buffer: ByteBuffer = IndicatorModuleJni.getDirectIndicatorBuffer(modulePointer.nativePointer, timeScale)
         return IndicatorBufferImpl(buffer)
     }
-
-    actual fun setIndicatorBufferSize(modulePointer: ModulePointer, size: Int) {
-        IndicatorModuleJni.setIndicatorBufferSize(modulePointer.nativePointer, size)
-    }
-
-    actual fun copyIndicatorBuffer(modulePointer: ModulePointer, buffer: FloatArray, size: Int, startIndex: Int): Int {
-        return IndicatorModuleJni.copyIndicatorBuffer(modulePointer.nativePointer, buffer, size, startIndex)
-    }
-
 
 }
