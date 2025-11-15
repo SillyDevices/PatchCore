@@ -54,12 +54,15 @@ IndicatorModule::IndicatorModule(const IndicatorModule& other)
 }
 
 std::unique_ptr<Module> IndicatorModule::clone() const {
-    throw std::runtime_error("IndicatorModule::clone() is not implemented yet");
-    return std::make_unique<IndicatorModule>(*this);
+    throw std::runtime_error("IndicatorModule::clone() Cloning is not supported for IndicatorModule");
 }
 
 void IndicatorModule::init() {
     registerInput(input);
+}
+
+std::unique_ptr<PolyProxyModule> IndicatorModule::createPolyModuleProxy(PolyModule *polyModule) const {
+    throw std::runtime_error("IndicatorModule::createPolyModuleProxy() This module is not intended for polyphonic use");
 }
 
 void IndicatorModule::envelope() {
