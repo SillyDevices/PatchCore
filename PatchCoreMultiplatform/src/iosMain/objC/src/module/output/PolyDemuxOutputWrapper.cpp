@@ -20,15 +20,14 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform.module.output
 
-import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
-import com.sillydevices.patchcore.ios.wrappers.polyDemuxOutputSetVoiceIndex
-import kotlinx.cinterop.ExperimentalForeignApi
+#import "module/output/PolyDemuxOutputWrapper.h"
+#include <patchcore/module/output/PolyDemuxOutput.hpp>
 
-@OptIn(ExperimentalForeignApi::class)
-actual object PlatformPolyDemuxOutput {
-    actual fun setVoiceIndex(outputPointer: ModuleOutputPointer, count: Int) {
-        polyDemuxOutputSetVoiceIndex(outputPointer.nativePointer, count)
-    }
+void polyDemuxOutputSetVoiceIndex(uintptr_t output_pointer, int voiceIndex) {
+    auto moduleOutput = reinterpret_cast<ModuleOutput *>(output_pointer);
+    auto polyProxyOutput = dynamic_cast<PolyProxyOutput *>(moduleOutput);
+    auto castedPolyDemuxOutput = dynamic_cast<PolyDemuxOutput *>(polyProxyOutput);
+    if (castedPolyDemuxOutput == nullptr) throw std::runtime_error("PolyDemuxOutput pointer is null");
+    castedPolyDemuxOutput->setVoiceIndex(voiceIndex);
 }

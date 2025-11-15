@@ -28,6 +28,7 @@ import com.sillydevices.patchcore.internal.pointers.ModulePointer
 import com.sillydevices.patchcore.ios.wrappers.polyModuleGetActiveVoicesCount
 import com.sillydevices.patchcore.ios.wrappers.polyModuleNew
 import com.sillydevices.patchcore.ios.wrappers.polyModuleSetActiveVoicesCount
+import com.sillydevices.patchcore.ios.wrappers.polyModuleAddDemuxOutput
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.cstr
 
@@ -53,7 +54,7 @@ actual object PlatformPolyModule {
     }
 
     actual fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int) {
-        TODO("Not yet implemented")
+        polyModuleAddDemuxOutput(polyModulePointer.nativePointer, outputPointer.nativePointer, withName.cstr, defaultVoice)
     }
 
 }
