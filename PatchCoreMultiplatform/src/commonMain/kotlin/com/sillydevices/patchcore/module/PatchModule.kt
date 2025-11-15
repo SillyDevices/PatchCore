@@ -158,11 +158,11 @@ open class PatchModule(name: String): Module(name) {
     override fun applyContext(context: ModuleContext) {
         context as? PatchModuleContext ?: throw IllegalArgumentException("Context must be of type PatchModuleContext")
         super.applyContext(context)
-        createModulesAndIO(context)
+        applyContextForIO(context)
         applyContextToChild(context)
     }
 
-    private fun createModulesAndIO(context: PatchModuleContext) {
+    protected open fun applyContextForIO(context: PatchModuleContext) {
         for (module in modules) {
             module.createFrom(context)
         }

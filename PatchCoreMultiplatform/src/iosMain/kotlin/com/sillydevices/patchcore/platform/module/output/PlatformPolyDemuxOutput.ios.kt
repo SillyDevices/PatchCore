@@ -20,18 +20,12 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform.module
+package com.sillydevices.patchcore.platform.module.output
 
-import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
 import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
-import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
-expect object PlatformPolyModule {
-
-    fun new(moduleFactoryPointer: ModuleFactoryPointer, name: String, sampleRate: Int, polyphonyCount: Int): ModulePointer
-
-    fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int)
-    fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int
-
-    fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int)
+actual object PlatformPolyDemuxOutput {
+    actual fun setVoiceIndex(outputPointer: ModuleOutputPointer, count: Int) {
+        TODO("Not yet implemented for iOS")
+    }
 }

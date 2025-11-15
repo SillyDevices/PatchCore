@@ -20,18 +20,11 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform.module
+package com.sillydevices.patchcore.android.jni.module.output
 
-import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
-import com.sillydevices.patchcore.internal.pointers.ModulePointer
+object PolyDemuxOutputJni {
 
-expect object PlatformPolyModule {
+    @JvmName("PolyDemuxOutputSetVoiceIndex")
+    external fun setVoiceIndex(polyDemuxOutputPointer: ULong, voice: Int)
 
-    fun new(moduleFactoryPointer: ModuleFactoryPointer, name: String, sampleRate: Int, polyphonyCount: Int): ModulePointer
-
-    fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int)
-    fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int
-
-    fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int)
 }

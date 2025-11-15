@@ -48,7 +48,7 @@ public:
     void setVoiceOutput(int voiceIndex, ModuleOutput* output) {
         voiceOutputs[voiceIndex] = output;
     }
-    void envelope() {
+    virtual void envelope() {
         value = 0.0f;
         for (auto &voiceOutput : voiceOutputs) {
             value += voiceOutput->value;

@@ -95,8 +95,9 @@ private:
 public:
     virtual std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule* polyModule) const override;
 
-private:
+protected:
     std::mutex _mutex;
+private:
     ModuleFactory* _factory;
 
     std::mutex routerMutex;

@@ -20,18 +20,16 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform.module
+package com.sillydevices.patchcore.module.dsl.delegates
 
-import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
-import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.module.PatchModule
+import com.sillydevices.patchcore.module.io.output.ModuleDemuxOutput
+import com.sillydevices.patchcore.module.io.output.ModuleOutput
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
-expect object PlatformPolyModule {
-
-    fun new(moduleFactoryPointer: ModuleFactoryPointer, name: String, sampleRate: Int, polyphonyCount: Int): ModulePointer
-
-    fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int)
-    fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int
-
-    fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int)
+class ModuleDemuxOutputDelegate(val output: ModuleDemuxOutput): ReadOnlyProperty<PatchModule, ModuleDemuxOutput> {
+    override fun getValue(thisRef: PatchModule, property: KProperty<*>): ModuleDemuxOutput {
+        return output
+    }
 }

@@ -20,18 +20,17 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform.module
+package com.sillydevices.patchcore.module.io.output
 
-import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
-import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.platform.module.output.PlatformPolyDemuxOutput
 
-expect object PlatformPolyModule {
+class ModuleDemuxOutput(
+    createFrom: ProxyModuleOutput,
+    val defaultVoice: Int
+): ProxyModuleOutput(createFrom.moduleName, createFrom.name, createFrom.output) {
 
-    fun new(moduleFactoryPointer: ModuleFactoryPointer, name: String, sampleRate: Int, polyphonyCount: Int): ModulePointer
+    fun setVoiceIndex(voiceIndex: Int) {
+        PlatformPolyDemuxOutput.setVoiceIndex(pointer, voiceIndex)
+    }
 
-    fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int)
-    fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int
-
-    fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int)
 }

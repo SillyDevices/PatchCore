@@ -20,18 +20,17 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.platform.module
+#include <patchcore/module/output/PolyDemuxOutput.hpp>
+#include <jni.h>
 
-import com.sillydevices.patchcore.internal.pointers.ModuleFactoryPointer
-import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
-import com.sillydevices.patchcore.internal.pointers.ModulePointer
 
-expect object PlatformPolyModule {
-
-    fun new(moduleFactoryPointer: ModuleFactoryPointer, name: String, sampleRate: Int, polyphonyCount: Int): ModulePointer
-
-    fun setActiveVoicesCount(polyModulePointer: ModulePointer, count: Int)
-    fun getActiveVoicesCount(polyModulePointer: ModulePointer): Int
-
-    fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int)
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_sillydevices_patchcore_android_jni_module_output_PolyDemuxOutputJni_PolyDemuxOutputSetVoiceIndex(
+        JNIEnv *env, jobject thiz, jlong poly_demux_output_pointer, jint voice) {
+    auto moduleOutput = reinterpret_cast<ModuleOutput *>(poly_demux_output_pointer);
+    auto polyProxyOutput = dynamic_cast<PolyProxyOutput *>(moduleOutput);
+    auto castedPolyDemuxOutput = dynamic_cast<PolyDemuxOutput *>(polyProxyOutput);
+    if (castedPolyDemuxOutput == nullptr) throw std::runtime_error("PolyDemuxOutput pointer is null");
+    castedPolyDemuxOutput->setVoiceIndex(voice);
 }
