@@ -23,7 +23,6 @@
 #include "patchcore/modules/IndicatorModule.hpp"
 #include <stdexcept>
 #include <atomic>
-#include <android/log_macros.h>
 
 #undef LOG_TAG
 #define LOG_TAG "IndicatorModule"
