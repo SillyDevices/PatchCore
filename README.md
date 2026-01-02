@@ -102,13 +102,13 @@ Add the dependency to your build.gradle.kts
 ```kotlin
 // for kotlin multiplatform projects
 commonMain.dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.6")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.7")
 }
 // for android projects
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.6")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.7")
     // or
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.2.6")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.2.7")
 }
 
 ```
@@ -124,8 +124,6 @@ Make sure to strip them in release builds to reduce the size of your app.
 
 By default AGP strip native libraries only if you have ndk installed. Ensure you have it installed on your LOCAL and CI machines. 
 AGP just skips stripReleaseDebugSymbols if ndk is not found.
-
-```kotlin
 
 
 ## Using for development as submodule
@@ -157,7 +155,7 @@ add dependency to app module build.gradle.kts
 ```kotlin
 //build.gradle.kts
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.6")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.2.7")
 }
 ```
 
