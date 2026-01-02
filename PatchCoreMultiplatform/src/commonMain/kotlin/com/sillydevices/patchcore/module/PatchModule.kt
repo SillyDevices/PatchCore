@@ -24,13 +24,16 @@ package com.sillydevices.patchcore.module
 
 import com.sillydevices.patchcore.context.ModuleContext
 import com.sillydevices.patchcore.context.PatchModuleContext
+import com.sillydevices.patchcore.module.dsl.delegates.ModuleDelegate
+import com.sillydevices.patchcore.module.dsl.delegates.ModuleInputDelegate
+import com.sillydevices.patchcore.module.dsl.delegates.ModuleOutputDelegate
+import com.sillydevices.patchcore.module.dsl.delegates.ModuleUserInputDelegate
 import com.sillydevices.patchcore.module.io.input.ModuleInput
 import com.sillydevices.patchcore.module.io.input.ProxyModuleInput
 import com.sillydevices.patchcore.module.io.output.ModuleOutput
 import com.sillydevices.patchcore.module.io.output.ProxyModuleOutput
 import com.sillydevices.patchcore.module.io.user.UserInput
 import com.sillydevices.patchcore.module.io.user.proxy.ProxyUserInput
-import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 open class Patch {
@@ -54,6 +57,10 @@ class PatchBuilder {
         patch(patch.first, patch.second)
     }
 
+    fun import(other: Patch) {
+        list.addAll(other.connections)
+    }
+
     infix fun ModuleOutput.patchTo(input: ModuleInput) {
         patch(this, input)
     }
@@ -70,6 +77,10 @@ class PatchBuilder {
 
 open class PatchModule(name: String): Module(name) {
 
+    protected data class MutablePatch(
+        override val connections: MutableList<Connection> = mutableListOf()
+    ): Patch()
+
     @Suppress("UNCHECKED_CAST")
     class ModuleSettings<T: Module>(val settings: T.() -> Unit) {
         operator fun invoke(module: Module) {
@@ -81,24 +92,11 @@ open class PatchModule(name: String): Module(name) {
     protected val modulesSettings = mutableMapOf<Module, ModuleSettings<*>>()
     val sampleRate: Int = 44100 //TODO: make it configurable
 
-    //TODO make proxy input and float user input
-    protected val inputs = mutableListOf<ProxyModuleInput>()
-    protected val outputs = mutableListOf<ProxyModuleOutput>()
-    protected val userInputs = mutableListOf<ProxyUserInput>()
+    protected val proxyInputs = mutableListOf<ProxyModuleInput>()
+    protected val proxyOutputs = mutableListOf<ProxyModuleOutput>()
+    protected val proxyUserInputs = mutableListOf<ProxyUserInput>()
 
-//    fun <T:Module> createModule(module: T): T {
-//        return registeredModuleInternal(module, null)
-//    }
-
-    class ModuleDelegate<T : Module>(patchModule: PatchModule, module: T, settings: ModuleSettings<T>? = null):kotlin.properties.ReadOnlyProperty<PatchModule, T> {
-        val result: T = patchModule.registeredModuleInternal(module, settings)
-
-        override fun getValue(patchModule: PatchModule, property: KProperty<*>): T {
-            return result
-        }
-    }
-
-    fun <T:Module> registeredModuleInternal(module: T, settings: ModuleSettings<T>?): T {
+    protected fun <T:Module> registeredModuleInternal(module: T, settings: ModuleSettings<T>?): T {
         modules.add(module)
         if (settings != null){
             modulesSettings.put(module, settings)
@@ -106,52 +104,14 @@ open class PatchModule(name: String): Module(name) {
         return module
     }
 
-    protected fun <T : Module> module(module: T, initialSettings: (T.()-> Unit)? = null): ModuleDelegate<T> {
-        return ModuleDelegate(this, module, initialSettings?.let { ModuleSettings(it) })
-    }
+    fun exposeInput(input: ModuleInput, name: String = input.name): ModuleInput =
+        input.createProxy(moduleName = this.name, withName = name).also { proxyInputs.add(it) }
 
-    protected fun <T: Module> create(module: T, initialSettings: (T.()-> Unit)? = null): ModuleDelegate<T> {
-        return ModuleDelegate(this, module, initialSettings?.let { ModuleSettings(it) })
-    }
+    fun exposeOutput(output: ModuleOutput, name: String = output.name): ModuleOutput =
+        output.createProxy(moduleName = this.name, withName = name).also { proxyOutputs.add(it) }
 
-    protected  fun <T : Module> moduleCreate( factory : ()-> T): ModuleDelegate<T> {
-        return ModuleDelegate(this, factory(), null)
-    }
-
-    inline fun <reified T : PatchModule> moduleTest(
-        noinline factory: () -> T, noinline initialSettings: (T.()-> Unit)? = null
-    ): ReadOnlyProperty<PatchModule, T> {
-        return object : ReadOnlyProperty<PatchModule, T> {
-            private var instance: T? = null
-            override fun getValue(thisRef: PatchModule, property: KProperty<*>): T {
-                if (instance != null) return instance!!
-
-                val name = property.name
-                val mod = factory()
-                thisRef.registeredModuleInternal(mod, null)
-                instance = mod
-                return mod
-            }
-        }
-    }
-
-    fun createInput(input: ModuleInput, name: String = input.name): ModuleInput {
-        val proxy = input.createProxy(moduleName = this.name, withName = name)
-        inputs.add(proxy)
-        return proxy
-    }
-
-    fun createOutput(output: ModuleOutput, name: String = output.name): ModuleOutput {
-        val proxy = output.createProxy(moduleName = this.name, withName = name)
-        outputs.add(proxy)
-        return proxy
-    }
-
-    fun <T: UserInput> createUserInput(userInput: T, name: String = userInput.name): T {
-        val proxy: T = userInput.createProxy(moduleName = this.name, withName = name)
-        userInputs.add(proxy as ProxyUserInput)
-        return proxy
-    }
+    fun <T: UserInput> exposeUserInput(userInput: T, name: String = userInput.name): T =
+        userInput.createProxy<T>(moduleName = this.name, withName = name).also { proxyUserInputs.add(it as ProxyUserInput) }
 
     open val defaultPatch: Patch = Patch()
 
@@ -161,14 +121,66 @@ open class PatchModule(name: String): Module(name) {
         return patchBuilder.build()
     }
 
+    protected val currentPatch: MutablePatch = MutablePatch()
+
+
+    open fun clearPatches() {
+        val context = moduleContext as PatchModuleContext
+        context.resetPatch()
+        currentPatch.connections.clear()
+    }
+
+    open fun applyDefaultPatch() {
+        val context = moduleContext as PatchModuleContext
+        for (connection in defaultPatch.connections) {
+            context.addPatch(connection.output, connection.input)
+            currentPatch.connections.add(connection)
+        }
+    }
+
+    open fun addPatch(connection: Patch.Connection){
+        val context = moduleContext as PatchModuleContext
+        context.addPatch(connection.output, connection.input)
+        currentPatch.connections.add(connection)
+    }
+
+    open fun removePatch(connection: Patch.Connection){
+        val context = moduleContext as PatchModuleContext
+        context.removePatch(connection.output, connection.input)
+        currentPatch.connections.remove(connection)
+    }
+
+    //TODO need something like this to apply changes in batch.
+    // current implementations rebuild all patches each time a patch is added/removed
+//    fun applyPatchChanges(changes: (patch: Patch)-> Patch) {}
+
+
     override fun applyContext(context: ModuleContext) {
         context as? PatchModuleContext ?: throw IllegalArgumentException("Context must be of type PatchModuleContext")
         super.applyContext(context)
+        applyContextForIO(context)
+        applyContextToChild(context)
+    }
 
+    protected open fun applyContextForIO(context: PatchModuleContext) {
         for (module in modules) {
             module.createFrom(context)
         }
-
+        for (input in proxyInputs) {
+            context.addInput(input.input, input.name)
+            val pointer = context.getModuleInputPointer(input)
+            input.setPointer(pointer)
+        }
+        for (output in proxyOutputs) {
+            context.addOutput(output.output, output.name)
+            val pointer = context.getModuleOutputPointer(output)
+            output.setPointer(pointer)
+        }
+        for (userInput in proxyUserInputs) {
+            context.addUserInput(userInput.userInput, userInput.name)
+            val pointer = context.getUserInputPointer(userInput)
+            userInput.applyParentContext(pointer, context)
+        }
         //this is here only for ModularSynth's outputs
         for (input in registeredInputs) {
             val pointer = context.getModuleInputPointer(input)
@@ -183,40 +195,97 @@ open class PatchModule(name: String): Module(name) {
             userInput.applyParentContext(pointer, context)
         }
         //maybe it can be useful for later
+    }
 
-        for (input in inputs) {
-            context.addInput(input.input, input.name)
-            val pointer = context.getModuleInputPointer(input)
-            input.setPointer(pointer)
-        }
-        for (output in outputs) {
-            context.addOutput(output.output, output.name)
-            val pointer = context.getModuleOutputPointer(output)
-            output.setPointer(pointer)
-        }
-        for (userInput in userInputs) {
-            context.addUserInput(userInput.userInput, userInput.name)
-
-            val pointer = context.getUserInputPointer(userInput)
-            userInput.applyParentContext(pointer, context)
-//            context.addUserInput(userInput.userInput, userInput.name)
-//            context.updateUserInput(userInput)
-        }
-
+    private fun applyContextToChild(context: PatchModuleContext) {
         for (settings in modulesSettings) {
             settings.value.invoke(settings.key)
         }
+        clearPatches()
+        applyDefaultPatch()
+    }
 
-        for (connection in defaultPatch.connections) {
-            context.addPatch(connection.output, connection.input)
+    override fun createFrom(parentContext: PatchModuleContext) {
+        //can be called only from PatchModuleContext or PolyModuleContext
+        val pointer = parentContext.createPatchModule(newPatchModule = this)
+        val newPointer = parentContext.addModule(pointer , this.name)
+        val newContext = parentContext.getContextFactory().createPatchModuleContext(newPointer, parentContext)
+        applyContext(newContext)
+    }
+
+    // DSL
+
+    class CreateModuleContext<T:Module>(moduleName: String){
+        val auto: String = moduleName
+        private var settings: ModuleSettings<T>? = null
+
+        infix fun T.with( initialSettings: T.()->Unit ): T {
+            settings = ModuleSettings(initialSettings)
+            return this
+        }
+
+        internal fun getSettings(): ModuleSettings<T>? {
+            return settings
         }
     }
 
+    protected fun <T : Module> module(createModule: CreateModuleContext<T>.()->T): CreateModuleDelegateProvider<T> {
+        return CreateModuleDelegateProvider(createModule)
+    }
 
-    override fun createFrom(parentContext: PatchModuleContext) {
-        val pointer = parentContext.createPatchModule(newPatchModule = this)
-        val newContext = parentContext.getContextFactory().createPatchModuleContext(pointer, parentContext)
-        applyContext(newContext)
+    protected fun <T : Module> module(module: T, initialSettings: (T.()-> Unit)? = null): ModuleDelegateProvider<T> {
+        return ModuleDelegateProvider(module, initialSettings?.let { ModuleSettings(it) })
+    }
+
+    protected fun expose(input: ModuleInput, withName: String? = null): ModuleInputDelegateProvider {
+        return ModuleInputDelegateProvider(input, withName)
+    }
+
+    protected fun expose(output: ModuleOutput, withName: String? = null): ModuleOutputDelegateProvider {
+        return ModuleOutputDelegateProvider(output, withName)
+    }
+
+    protected fun <T: UserInput> expose(userInput: T, withName: String? = null): ModuleUserInputDelegateProvider<T> {
+        return ModuleUserInputDelegateProvider(userInput, withName)
+    }
+
+    // DSL delegates providers
+
+    protected class ModuleDelegateProvider<T: Module>(private val module: T, private val settings: ModuleSettings<T>? = null) {
+        operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleDelegate<T> {
+            val result = thisRef.registeredModuleInternal(module, settings)
+            return ModuleDelegate(result)
+        }
+    }
+
+    protected class CreateModuleDelegateProvider<T: Module>(private val createModule: CreateModuleContext<T>.()->T) {
+        operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleDelegate<T> {
+            val context = CreateModuleContext<T>(property.name)
+            val module = context.createModule()
+            val result = thisRef.registeredModuleInternal(module, context.getSettings())
+            return ModuleDelegate(result)
+        }
+    }
+
+    protected class ModuleInputDelegateProvider(private val moduleInput: ModuleInput, private val withName: String? = null) {
+        operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleInputDelegate {
+            val proxy = thisRef.exposeInput(moduleInput, withName ?: property.name)
+            return ModuleInputDelegate(proxy)
+        }
+    }
+
+    protected class ModuleOutputDelegateProvider(private val moduleO: ModuleOutput, private val withName: String? = null) {
+        operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleOutputDelegate {
+            val proxy = thisRef.exposeOutput(moduleO, withName ?: property.name)
+            return ModuleOutputDelegate(proxy)
+        }
+    }
+
+    protected class ModuleUserInputDelegateProvider<T: UserInput>(private val userInput: T, private val withName: String? = null) {
+        operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleUserInputDelegate<T> {
+            val proxy = thisRef.exposeUserInput(userInput, withName ?: property.name)
+            return ModuleUserInputDelegate(proxy)
+        }
     }
 
 }

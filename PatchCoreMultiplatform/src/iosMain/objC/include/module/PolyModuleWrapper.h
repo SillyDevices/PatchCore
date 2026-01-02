@@ -37,6 +37,7 @@ void polyModuleRelease(uintptr_t poly_module_pointer);
 void polyModuleSetActiveVoicesCount(uintptr_t poly_module_pointer, int count);
 int polyModuleGetActiveVoicesCount(uintptr_t poly_module_pointer);
 
+void polyModuleAddDemuxOutput(uintptr_t poly_module_pointer, uintptr_t output_pointer, char* output_name, int default_voice);
 
 #ifdef __cplusplus
 }

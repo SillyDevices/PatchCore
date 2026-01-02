@@ -21,10 +21,13 @@
  */
 
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
+#include <patchcore/dsp/wavetable/DefaultWaveTableProvider.hpp>
 #include <gtest/gtest.h>
 
 TEST(BasicTest, factoryCreation) {
-    auto factory = new DefaultModuleFactory(44100);
+    auto waveTableProvider = new DefaultWaveTableProvider(44100);
+    auto factory = new DefaultModuleFactory(waveTableProvider, nullptr);
     ASSERT_NE(factory, nullptr);
     delete factory;
+    delete waveTableProvider;
 }

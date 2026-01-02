@@ -57,3 +57,14 @@ int polyModuleGetActiveVoicesCount(uintptr_t poly_module_pointer) {
     if (polyModule == nullptr) throw std::runtime_error("PolyModule pointer is null");
     return polyModule->getActiveVoiceCount();
 }
+
+void polyModuleAddDemuxOutput(uintptr_t poly_module_pointer, uintptr_t output_pointer, char* output_name, int default_voice) {
+    auto module = reinterpret_cast<Module *>(poly_module_pointer);
+    auto *patchModule = dynamic_cast<PatchModule *>(module);
+    auto *polyModule = dynamic_cast<PolyModule *>(patchModule);
+    if (polyModule == nullptr) throw std::runtime_error("PolyModule pointer is null");
+    auto output = reinterpret_cast<ModuleOutput *>(output_pointer);
+    if (output == nullptr) throw std::runtime_error("Output pointer is null");
+    std::string outputNameString(output_name);
+    polyModule->addDemuxOutput(output, outputNameString, default_voice);
+}

@@ -25,7 +25,8 @@
 #include <patchcore/modules/ConstModule.hpp>
 
 TEST(CopyModuleTest, constModuleCopyTest) {
-    auto factory = new DefaultModuleFactory(44100);
+    auto waveTableProvider = new DefaultWaveTableProvider(44100);
+    auto factory = new DefaultModuleFactory(waveTableProvider, nullptr);
     ASSERT_NE(factory, nullptr);
 
     auto constModule = factory->createModule(CONST_MODULE_TYPE_NAME, "testConst", 44100, {{CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.5f) } } );
@@ -60,4 +61,5 @@ TEST(CopyModuleTest, constModuleCopyTest) {
     ASSERT_FLOAT_EQ(resultOfClone, 0.5f);
 
     delete factory;
+    delete waveTableProvider;
 }

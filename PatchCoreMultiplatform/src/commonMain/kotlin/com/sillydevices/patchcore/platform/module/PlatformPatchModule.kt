@@ -37,14 +37,15 @@ expect object PlatformPatchModule {
 
 
     fun createModule(patchModulePointer: ModulePointer, moduleType: String, moduleName: String, parameters: List<ModuleParameter>): ModulePointer
-    //fun AddModule(patchModulePointer: ModulePointer, modulePointer: ModulePointer)
-    //fun GetModule(patchModulePointer: ModulePointer, moduleName: String): ULong
+    fun addModule(patchModulePointer: ModulePointer, modulePointer: ModulePointer): ModulePointer
+    fun getModule(patchModulePointer: ModulePointer, moduleName: String): ModulePointer
 
     fun addInput(patchModulePointer: ModulePointer, inputPointer: ModuleInputPointer, withName: String)
     fun addOutput(patchModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String)
     fun addUserInput(patchModulePointer: ModulePointer, userInputPointer: UserInputPointer, withName: String)
 
 
-    fun addPatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer)
     fun resetPatch(patchModulePointer: ModulePointer)
+    fun addPatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer)
+    fun removePatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer)
 }

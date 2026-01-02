@@ -31,4 +31,7 @@ object PolyModuleJni {
     external fun setActiveVoicesCount(polyModulePointer: ULong, count: Int)
     @JvmName("getActiveVoicesCount")
     external fun getActiveVoicesCount(polyModulePointer: ULong): Int
+
+    @JvmName("addDemuxOutput")
+    external fun addDemuxOutput(polyModulePointer: ULong, outputPointer: ULong, outputName: String, defaultVoice: Int)
 }

@@ -28,6 +28,8 @@ add_library( # Sets the name of the library.
         jni/module/PolyModuleJni.cpp
         jni/module/UserInputJni.cpp
 
+        jni/module/output/PolyDemuxOutputJni.cpp
+
         jni/modules/KeyboardModuleJni.cpp
         jni/modules/IndicatorModuleJni.cpp
 

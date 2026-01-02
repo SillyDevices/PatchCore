@@ -44,6 +44,10 @@ public:
     }
     virtual ~PolyProxyInput() = default;
 public:
+    //TODO this is a hack to update voiceOutput from PolyModule::addInput
+    void setVoiceInput(int voiceIndex, ModuleInput *voiceInput) {
+        voiceInputs[voiceIndex] = voiceInput;
+    }
     void setCompositeVoiceInput(int voiceIndex, ProxyModuleInput *compositeInput) {
         voiceProxyInputs[voiceIndex] = compositeInput;
     }

@@ -54,9 +54,13 @@ class NativeInstrumentedTest {
     @Test
     fun runSingleNativeTest() {
         loadLibrary()
+
 //        val testName = "PatchModuleTest.PatchModuleBasicTest"
 //        val testName = "PatchModuleTest.interolatedUserInputTest"
-        val testName = "PolyModuleTest.PatchModuleToPolyUserInputTest"
+//        val testName = "KeyboardTest.monoKeyboardTwoKeysCvTest1"
+//        val testName = "PerformanceTest.PatchModulePerformanceTest"
+        val testName = "GraphRouterTest.*"
+
         if (runSingleNativeTest(testName) != 0) {
             throw RuntimeException("Native test '$testName' failed")
         }

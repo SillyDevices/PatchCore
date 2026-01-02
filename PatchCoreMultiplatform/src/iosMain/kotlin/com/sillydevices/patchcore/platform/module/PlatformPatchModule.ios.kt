@@ -7,12 +7,15 @@ import com.sillydevices.patchcore.internal.pointers.ModulePointer
 import com.sillydevices.patchcore.internal.pointers.UserInputPointer
 import com.sillydevices.patchcore.ios.wrappers.ModuleParameterWrapper
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddInput
+import com.sillydevices.patchcore.ios.wrappers.patchModuleAddModule
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddOutput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddPatch
+import com.sillydevices.patchcore.ios.wrappers.patchModuleRemovePatch
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddUserInput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleCreateModule
 import com.sillydevices.patchcore.ios.wrappers.patchModuleNew
 import com.sillydevices.patchcore.ios.wrappers.patchModuleDelete
+import com.sillydevices.patchcore.ios.wrappers.patchModuleGetModule
 import com.sillydevices.patchcore.ios.wrappers.patchModuleResetPatch
 import com.sillydevices.patchcore.module.factory.ModuleParameter
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -61,6 +64,22 @@ actual object PlatformPatchModule {
         }
     }
 
+    actual fun addModule(patchModulePointer: ModulePointer, modulePointer: ModulePointer): ModulePointer{
+        return ModulePointer(
+            patchModuleAddModule(
+                patchModulePointer.nativePointer,
+                modulePointer.nativePointer
+        ))
+    }
+
+    actual fun getModule(patchModulePointer: ModulePointer, moduleName: String): ModulePointer {
+        return ModulePointer(
+            patchModuleGetModule(
+                patchModulePointer.nativePointer,
+                moduleName.cstr
+        ))
+    }
+
     actual fun addInput(patchModulePointer: ModulePointer, inputPointer: ModuleInputPointer, withName: String) {
         patchModuleAddInput(
             patchModulePointer.nativePointer,
@@ -82,6 +101,10 @@ actual object PlatformPatchModule {
             withName.cstr)
     }
 
+    actual fun resetPatch(patchModulePointer: ModulePointer) {
+        patchModuleResetPatch(patchModulePointer.nativePointer)
+    }
+
     actual fun addPatch(patchModulePointer: ModulePointer, fromOutputPointer: ModuleOutputPointer, toInputPointer: ModuleInputPointer) {
         patchModuleAddPatch(
             patchModulePointer.nativePointer,
@@ -89,7 +112,16 @@ actual object PlatformPatchModule {
             toInputPointer.nativePointer)
     }
 
-    actual fun resetPatch(patchModulePointer: ModulePointer) {
-        patchModuleResetPatch(patchModulePointer.nativePointer)
+    actual fun removePatch(
+        patchModulePointer: ModulePointer,
+        fromOutputPointer: ModuleOutputPointer,
+        toInputPointer: ModuleInputPointer
+    ) {
+        patchModuleRemovePatch(
+            patchModulePointer.nativePointer,
+            fromOutputPointer.nativePointer,
+            toInputPointer.nativePointer)
     }
+
+
 }

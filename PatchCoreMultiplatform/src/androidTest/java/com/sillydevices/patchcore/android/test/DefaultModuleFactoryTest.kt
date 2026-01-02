@@ -24,8 +24,6 @@ package com.sillydevices.patchcore.android.test
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.sillydevices.patchcore.PatchCore
-import com.sillydevices.patchcore.android.context.AndroidPatchCoreContext
-import com.sillydevices.patchcore.android.context.factory.DefaultAndroidContextFactory
 import org.junit.Test
 import org.junit.runner.RunWith
 

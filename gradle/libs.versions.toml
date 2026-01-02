@@ -1,4 +1,7 @@
 [versions]
+artifacts-patchCore = "0.1.6"
+artifacts-patchCoreMultiplatform = "0.2.7"
+
 kotlin = "2.2.20"
 jetbrainsKotlinJvm = "2.2.20"
 androidGradlePlugin = "8.13.0"

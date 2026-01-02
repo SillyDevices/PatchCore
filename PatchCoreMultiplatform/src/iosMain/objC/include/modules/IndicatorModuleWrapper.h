@@ -30,9 +30,14 @@
 extern "C" {
 #endif
 
+typedef struct {
+    float* data;
+    int size;
+} NativeBuffer;
 
-void setIndicatorBufferSize(uintptr_t pointer, int size);
-int copyIndicatorBuffer(uintptr_t pointer, float* buffer, int size, int startIndex);
+
+
+NativeBuffer getDirectIndicatorBuffer(uintptr_t pointer, float timeScale);
 
 
 #ifdef __cplusplus

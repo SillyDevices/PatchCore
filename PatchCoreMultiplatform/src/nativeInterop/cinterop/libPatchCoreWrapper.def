@@ -10,6 +10,7 @@ headers =   factory/DefaultModuleFactoryWrapper.h \
             module/PatchModuleWrapper.h \
             module/PolyModuleWrapper.h \
             module/UserInputWrapper.h \
+            module/output/PolyDemuxOutputWrapper.h \
             \
             modules/IndicatorModuleWrapper.h \
             modules/KeyboardModuleWrapper.h \

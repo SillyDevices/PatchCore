@@ -65,6 +65,10 @@ public:
 
     int getSampleRate() const;
 
+public:
+    void onProxyOutputCreated(ModuleOutput* output, const std::string& withName);
+    bool hasProxyOutputs() const;
+
 protected:
 
     virtual void registerInput(ModuleInput& input, const std::string& withName = "") final {
@@ -92,10 +96,9 @@ protected:
             userInputs[input.getName()] = &input;
         }
         if (auto floatInput = dynamic_cast<FloatUserInput *>(&input)) {
-            printf("Registering FloatUserInput: %s\n", floatInput->getName().c_str());
             interpolatedInputs.push_back(floatInput);
         } else {
-            printf("Registering UserInput: %s\n", input.getName().c_str());
+            // Do nothing
         }
         input.setModule(this);
     }
@@ -144,6 +147,9 @@ protected:
 
     int sampleRate;
     std::string name;
+
+private:
+    bool _hasProxyOutputs = false;
 };
 
 #endif //PATCHCORE_MODULE_HPP

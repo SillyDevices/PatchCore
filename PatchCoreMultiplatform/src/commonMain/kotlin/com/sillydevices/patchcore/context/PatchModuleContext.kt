@@ -39,12 +39,19 @@ interface PatchModuleContext: ModuleContext {
     fun createPatchModule(newPatchModule: PatchModule): ModulePointer
     fun createPolyModule(newPolyModule: PolyModule): ModulePointer
 
+    fun addModule(pointer: ModulePointer, name: String): ModulePointer
+    fun getModule(name: String): ModulePointer
+
     fun addInput(input: ModuleInput, withName: String)
     fun addOutput(output: ModuleOutput, withName: String)
     fun addUserInput(userInput: UserInput, withName: String)
 
-    fun addPatch(output: ModuleOutput, input: ModuleInput)
+
     fun resetPatch()
+    fun addPatch(output: ModuleOutput, input: ModuleInput)
+
+    fun removePatch(output: ModuleOutput, input: ModuleInput)
+
 
     fun release()
 }
@@ -82,6 +89,15 @@ open class PatchModuleContextImpl(
        )
     }
 
+    override fun addModule(pointer: ModulePointer, name: String): ModulePointer {
+        return PlatformPatchModule.addModule(getPointer(), pointer)
+    }
+
+    override fun getModule(name: String): ModulePointer {
+        return PlatformPatchModule.getModule(getPointer(), name)
+    }
+
+
     override fun addInput(input: ModuleInput, withName: String) {
         PlatformPatchModule.addInput(
             getPointer(),
@@ -103,6 +119,10 @@ open class PatchModuleContextImpl(
             withName)
     }
 
+    override fun resetPatch() {
+        PlatformPatchModule.resetPatch(getPointer())
+    }
+
     override fun addPatch(output: ModuleOutput, input: ModuleInput) {
         PlatformPatchModule.addPatch(
             getPointer(),
@@ -110,9 +130,14 @@ open class PatchModuleContextImpl(
             input.pointer)
     }
 
-    override fun resetPatch() {
-        PlatformPatchModule.resetPatch(getPointer())
+    override fun removePatch(output: ModuleOutput, input: ModuleInput) {
+        PlatformPatchModule.removePatch(
+            getPointer(),
+            output.pointer,
+            input.pointer)
     }
+
+
 
     //TODO move release to parent class
     override fun release() {

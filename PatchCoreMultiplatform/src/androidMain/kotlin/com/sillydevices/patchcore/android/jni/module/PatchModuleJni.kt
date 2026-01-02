@@ -33,8 +33,10 @@ object PatchModuleJni {
 
     @JvmName("patchModuleCreateModule")
     external fun patchModuleCreateModule(patchModuleManagedPointer: ULong, moduleType: String, moduleName: String, parameters: List<ModuleParameter>): ULong
-//    external fun patchModuleAddModule(patchModuleManagedPointer: ULong, managedModulePointer: ULong)
-//    external fun patchModuleGetModule(patchModulePointer: ULong, moduleName: String): ULong
+    @JvmName("patchModuleAddModule")
+    external fun patchModuleAddModule(patchModuleManagedPointer: ULong, managedModulePointer: ULong): ULong
+    @JvmName("patchModuleGetModule")
+    external fun patchModuleGetModule(patchModulePointer: ULong, moduleName: String): ULong
 
     @JvmName("patchModuleAddInput")
     external fun patchModuleAddInput(patchModuleManagedPointer: ULong, inputPointer: ULong, inputName: String)
@@ -43,8 +45,11 @@ object PatchModuleJni {
     @JvmName("patchModuleAddUserInput")
     external fun patchModuleAddUserInput(patchModuleManagedPointer: ULong, userInputPointer: ULong, inputName: String)
 
-    @JvmName("patchModuleAddPatch")
-    external fun patchModuleAddPatch(patchModulePointer: ULong, fromOutputPointer: ULong, toInputPointer: ULong)
     @JvmName("patchModuleResetPatch")
     external fun patchModuleResetPatch(patchModulePointer: ULong)
+    @JvmName("patchModuleAddPatch")
+    external fun patchModuleAddPatch(patchModulePointer: ULong, fromOutputPointer: ULong, toInputPointer: ULong)
+
+    @JvmName("patchModuleRemovePatch")
+    external fun patchModuleRemovePatch(patchModulePointer: ULong, fromOutputPointer: ULong, toInputPointer: ULong)
 }

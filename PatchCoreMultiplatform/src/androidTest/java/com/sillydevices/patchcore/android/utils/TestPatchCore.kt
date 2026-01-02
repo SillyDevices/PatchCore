@@ -27,8 +27,20 @@ import com.sillydevices.patchcore.context.factory.createDefaultModuleContextFact
 import com.sillydevices.patchcore.module.factory.builder.createDefaultModuleFactory
 import com.sillydevices.patchcore.module.factory.builder.createDefaultWaveTableProvider
 
+
 val TestPatchCore by lazy {
     PatchCore(
+        moduleFactory = {
+            val waveTableProvider = createDefaultWaveTableProvider(44100)
+            createDefaultModuleFactory(waveTableProvider, null)
+        }, moduleContextFactory = {
+            createDefaultModuleContextFactory()
+        }
+    )
+}
+
+fun createPatchCoreForTest(): PatchCore {
+    return PatchCore(
         moduleFactory = {
             val waveTableProvider = createDefaultWaveTableProvider(44100)
             createDefaultModuleFactory(waveTableProvider, null)

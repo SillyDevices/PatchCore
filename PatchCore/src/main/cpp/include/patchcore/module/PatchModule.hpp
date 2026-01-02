@@ -25,7 +25,8 @@
 
 #include "patchcore/module/factory/ModuleFactory.hpp"
 #include "patchcore/module/Module.hpp"
-#include "patchcore/module/Router.hpp"
+#include "patchcore/module/router/Router.hpp"
+#include "patchcore/module/router/GraphRouter.hpp"
 #include "patchcore/module/output/ProxyModuleOutput.hpp"
 #include "patchcore/module/input/ProxyModuleInput.hpp"
 #include "patchcore/module/input/ProxyModuleUserInput.hpp"
@@ -33,29 +34,31 @@
 #include <string>
 #include <vector>
 
-// PatchModule can be used to create subModule with multiple modules inside, connections between them and inputs/outputs
-// outward facing inputs/outputs should be exposed manually by calling addInput/addOutput
-// userInputs are available througth getModule("module_name")->getUserInput("input_name") or
-// exposed by addUserInput
-// the main usecase is to create a module dynamically
+/*
+ * PatchModule can be used to create subModule with multiple modules inside, connections between them and inputs/outputs
+ * outward facing inputs/outputs should be exposed manually by calling addInput/addOutput
+ * userInputs are available througth getModule("module_name")->getUserInput("input_name") or
+ * exposed by addUserInput
+ * the main usecase is to create a module dynamically
+ */
 
 class PatchModule : public Module {
 public:
     PatchModule(ModuleFactory *factory, std::string name, int sampleRate);
-    PatchModule(const PatchModule &other);
+    PatchModule(const PatchModule &other); // copy constructor for clone
+public:
     std::unique_ptr<Module> clone() const override;
     virtual ~PatchModule() override;
-
+protected:
+    PatchModule();
     //Module interface
 public:
     void onStartBuffer(int size) override;
     void envelope() override;
-protected:
-    void envelopeModules();
-
     //PatchModule specific
     //creates a new input/output from existing ModuleInput/ModuleOutput
 public:
+    //TODO rename to createProxyInput/Output/UserInput
     virtual ProxyModuleInput* addInput(ModuleInput* input, const std::string& withName);
     virtual ProxyModuleOutput* addOutput(ModuleOutput* output, const std::string& withName);
     virtual UserInput* addUserInput(UserInput* input, const std::string& withName);
@@ -66,9 +69,6 @@ private:
 private:
     ModuleInput* findInputByClone(const ModuleInput &input) const;
     ModuleOutput* findOutputByClone(const ModuleOutput &output) const;
-protected:
-    void addModuleToEnvelope(Module* module);
-    void clearModulesToEnvelope();
 
     //PatchModule specific
 public:
@@ -85,34 +85,26 @@ public:
 
     //PatchModule Router specific
 public:
-    virtual void addPatch(ModuleOutput* output, ModuleInput* input);
-    //TODO add method to remove a single patch
     virtual void resetPatch();
+    virtual void addPatch(ModuleOutput* output, ModuleInput* input);
+    virtual void removePatch(ModuleOutput* output, ModuleInput* input);
 private:
-    void clonePatches(const Router &router);
+    void clonePatches(const AbstractRouter &router);
 
     //Module copy and poly module creation
 public:
     virtual std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule* polyModule) const override;
 
-private:
+protected:
     std::mutex _mutex;
+private:
     ModuleFactory* _factory;
 
     std::mutex routerMutex;
-    Router _router = Router();
+//    Router _router = Router(this);
+    GraphRouter _router = GraphRouter(this);
 
     std::vector<std::unique_ptr<Module>> _modules  = std::vector<std::unique_ptr<Module>>();
-    //all FloatUserInputs of all modules in this PatchModule
-    std::vector<FloatUserInput *> _inputs = std::vector<FloatUserInput *>();
-
-    //TODO make a better name for this
-    // this is used to envelope modules that are not connected to the router
-    std::vector<Module *> _modulesToAlwaysEnvelope = std::vector<Module *>();
-    std::vector<Module *> _modulesToEnvelope = std::vector<Module *>();
-
-    std::vector<FloatUserInput *> _interpolatedInputsToAlwaysEnvelope = std::vector<FloatUserInput *>();
-    std::vector<FloatUserInput *> _interpolatedInputsToEnvelope = std::vector<FloatUserInput *>();
 
     std::vector<ProxyModuleOutput *> _proxyModuleOutputs;
     std::vector<ProxyModuleInput *> _proxyModuleInputs;

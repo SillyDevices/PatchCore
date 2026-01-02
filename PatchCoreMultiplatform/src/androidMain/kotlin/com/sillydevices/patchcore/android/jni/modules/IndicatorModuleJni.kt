@@ -22,9 +22,11 @@
 
 package com.sillydevices.patchcore.android.jni.modules
 
+import java.nio.ByteBuffer
+
 object IndicatorModuleJni {
-    @JvmName("setIndicatorBufferSize")
-    external fun setIndicatorBufferSize(modulePointer: ULong, size: Int)
-    @JvmName("copyIndicatorBuffer")
-    external fun copyIndicatorBuffer(modulePointer: ULong, buffer: FloatArray, size: Int, startIndex: Int): Int
+
+    @JvmName("getDirectIndicatorBuffer")
+    external fun getDirectIndicatorBuffer(modulePointer: ULong, timeScale: Float): ByteBuffer
+
 }

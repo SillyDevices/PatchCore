@@ -27,21 +27,18 @@
 #include <patchcore/modules/IndicatorModule.hpp>
 
 
-void setIndicatorBufferSize(uintptr_t pointer, int size) {
+NativeBuffer getDirectIndicatorBuffer(uintptr_t pointer, float timeScale) {
     auto *module = reinterpret_cast<Module *>(pointer);
-    if (module == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: Module pointer is null");
+    if (module == nullptr) throw std::runtime_error("IndicatorModuleWrapper: Module pointer is null");
     auto *indicatorModule = dynamic_cast<IndicatorModule *>(module);
-    if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
-    indicatorModule->setBufferSize(size);
-}
-
-
-int copyIndicatorBuffer(uintptr_t pointer, float* buffer, int size, int startIndex) {
-    auto *module = reinterpret_cast<Module *>(pointer);
-    if (module == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: Module pointer is null");
-    auto *indicatorModule = dynamic_cast<IndicatorModule *>(module);
-    if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleJni.cpp: IndicatorModule pointer is null or invalid");
-    auto count = indicatorModule->copyIntoBuffer(buffer, size, startIndex);
-    return count;
-
+    if (indicatorModule == nullptr) throw std::runtime_error("IndicatorModuleWrapper: IndicatorModule pointer is null or invalid");
+    auto sampleRate = module->getSampleRate();
+    auto bufferSize = static_cast<int>(sampleRate * timeScale);
+    float* buf = indicatorModule->getBuffer(bufferSize);
+    printf("[getDirectIndicatorBuffer] buffer pointer: %p, size: %d\n", buf, bufferSize);
+    NativeBuffer nativeBuffer = {
+        .data = buf,
+        .size = bufferSize
+    };
+    return nativeBuffer;
 }

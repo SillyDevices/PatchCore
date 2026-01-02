@@ -61,3 +61,22 @@ PolyProxyModule::PolyProxyModule(const Module* module, PolyModule* polyModule)
 
 }
 
+PolyProxyModule::PolyProxyModule(const Module* module): Module(module->getModuleName(), module->getSampleRate()) {
+    //empty constructor for derived classes
+}
+
+std::unique_ptr<Module> PolyProxyModule::clone() const {
+    throw std::runtime_error("PolyProxyModule does not implement clone method");
+}
+
+void PolyProxyModule::envelope() {
+    throw std::runtime_error("PolyProxyModule does not implement envelope method");
+}
+
+void PolyProxyModule::onStartBuffer(int size) {
+    throw std::runtime_error("PolyProxyModule does not implement onStartBuffer method");
+}
+
+std::unique_ptr<PolyProxyModule> PolyProxyModule::createPolyModuleProxy(PolyModule *polyModule) const {
+    throw std::runtime_error("PolyProxyModule does not implement createPolyModuleProxy method");
+}

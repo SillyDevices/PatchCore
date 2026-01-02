@@ -49,6 +49,11 @@ public:
     }
     virtual ~PolyProxyBoolUserInput() = default;
 public:
+    void setVoiceInput(int voiceIndex, ProxyModuleUserInput *voiceInput) override {
+        auto casted = dynamic_cast<ProxyModuleBoolUserInput *>(voiceInput);
+        if (casted == nullptr) throw std::runtime_error("PolyProxyBoolUserInput: Composite input is not a CompositeModuleBoolUserInput");
+        voiceInputs[voiceIndex] = casted;
+    }
     void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput *compositeInput) override {
         auto casted = dynamic_cast<ProxyModuleBoolUserInput *>(compositeInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyBoolUserInput: Composite input is not a CompositeModuleBoolUserInput");

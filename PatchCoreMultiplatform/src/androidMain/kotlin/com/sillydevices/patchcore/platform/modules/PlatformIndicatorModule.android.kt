@@ -24,14 +24,85 @@ package com.sillydevices.patchcore.platform.modules
 
 import com.sillydevices.patchcore.android.jni.modules.IndicatorModuleJni
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
+import com.sillydevices.patchcore.modules.IndicatorModule
+import com.sillydevices.patchcore.types.IndicatorBuffer
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.FloatBuffer
 
 actual object PlatformIndicatorModule {
 
-    actual fun setIndicatorBufferSize(modulePointer: ModulePointer, size: Int) {
-        IndicatorModuleJni.setIndicatorBufferSize(modulePointer.nativePointer, size)
+    class IndicatorBufferImpl(
+        val jniBuffer: ByteBuffer
+    ): IndicatorBuffer {
+
+        class ListBufferWrapper(private val floatBuffer: FloatBuffer, val dataOffset: Int = 0): List<Float> {
+            override val size: Int = floatBuffer.limit() - dataOffset
+
+            override fun isEmpty(): Boolean {
+                return size == 0
+            }
+
+            override fun contains(element: Float): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun iterator(): Iterator<Float> {
+                TODO("Not yet implemented")
+            }
+
+            override fun containsAll(elements: Collection<Float>): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override fun get(index: Int): Float {
+                return floatBuffer.get(index + dataOffset)
+            }
+
+            override fun indexOf(element: Float): Int {
+                TODO("Not yet implemented")
+            }
+
+            override fun lastIndexOf(element: Float): Int {
+                TODO("Not yet implemented")
+            }
+
+            override fun listIterator(): ListIterator<Float> {
+                TODO("Not yet implemented")
+            }
+
+            override fun listIterator(index: Int): ListIterator<Float> {
+                TODO("Not yet implemented")
+            }
+
+            override fun subList(
+                fromIndex: Int,
+                toIndex: Int
+            ): List<Float> {
+                TODO("Not yet implemented")
+            }
+
+        }
+
+        init {
+            jniBuffer.order(ByteOrder.nativeOrder())
+        }
+        private val buffer = jniBuffer.asFloatBuffer()
+        private val floatList = ListBufferWrapper(buffer, 4)
+
+        private val indexBuffer = jniBuffer.asIntBuffer()
+
+        override fun getList(): List<Float> = floatList
+
+        override fun getWriteIndex(): Int {
+            return indexBuffer.get(0)
+        }
+
     }
 
-    actual fun copyIndicatorBuffer(modulePointer: ModulePointer, buffer: FloatArray, size: Int, startIndex: Int): Int {
-        return IndicatorModuleJni.copyIndicatorBuffer(modulePointer.nativePointer, buffer, size, startIndex)
+    actual fun getDirectIndicatorBuffer(modulePointer: ModulePointer, timeScale: Float): IndicatorBuffer {
+        val buffer: ByteBuffer = IndicatorModuleJni.getDirectIndicatorBuffer(modulePointer.nativePointer, timeScale)
+        return IndicatorBufferImpl(buffer)
     }
+
 }

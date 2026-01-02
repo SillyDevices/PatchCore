@@ -33,28 +33,35 @@ class ModuleOutput: Output {
 
 public:
 
-    ModuleOutput(std::string outputName): name(outputName) {};
+    explicit ModuleOutput(std::string outputName);
     virtual ~ModuleOutput() = default;
 
-    inline const std::string getName() const {
+    [[nodiscard]]
+    inline std::string getName() const {
         return name;
     };
 
 public:
-    void setModule(Module* module) {
-        _module = module;
-    };
 
-    Module* getModule() const {
+    void setModule(Module* module);
+
+    //TODO do i really need to inline this? it not called from audio thread anyway
+    [[nodiscard]]
+    inline Module* getModule() const {
         return _module;
-    };
+    }
 
     virtual ProxyModuleOutput* createProxy(const std::string& withName);
+
+    [[nodiscard]]
+    bool hasProxyOutput() const;
 
 
 private:
     std::string name;
-    Module* _module;
+    Module* _module = nullptr;
+
+    bool hasProxy = false;
 
 public:
     float value = 0.0f;

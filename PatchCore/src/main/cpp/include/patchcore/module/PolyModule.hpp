@@ -29,9 +29,11 @@
 #include <string>
 
 
-//the main idea behind this class is to provide an PatchModule interface for polyphonic modules
-//it's acts like a container for multiple PatchModule instances, each representing a voice and proxies
-//methods to all voices
+/*
+ * The main idea behind this class is to provide an PatchModule interface for polyphonic modules
+ * it's acts like a container for multiple PatchModule instances, each representing a voice and proxies
+ * methods to all voices
+ */
 class PolyModule : public PatchModule {
 public:
     PolyModule(ModuleFactory *factory, std::string name, int sampleRate, int voiceCount);
@@ -47,6 +49,7 @@ public:
 public:
     ProxyModuleInput* addInput(ModuleInput* input, const std::string& withName) override;
     ProxyModuleOutput* addOutput(ModuleOutput* output, const std::string& withName) override;
+    virtual ProxyModuleOutput* addDemuxOutput(ModuleOutput* output, const std::string& withName, const int defaultVoiceIndex);
     //don't know in what case this is useful, but it is here for consistency
     UserInput* addUserInput(UserInput* input, const std::string& withName) override;
     //PatchModule specific
@@ -57,26 +60,22 @@ public:
     virtual Module* getModule(const std::string& moduleName) const override;
     //PatchModule Router specific
 public:
-    virtual void addPatch(ModuleOutput* output, ModuleInput* input) override;
     virtual void resetPatch() override;
-
-
+    virtual void addPatch(ModuleOutput* output, ModuleInput* input) override;
+    virtual void removePatch(ModuleOutput* output, ModuleInput* input) override;
     // polyphony support
+public:
     size_t getVoiceCount() const;
-
     PatchModule* getVoice(size_t index);
 
     size_t getActiveVoiceCount() const;
     void setActiveVoiceCount(size_t count);
 
 protected:
-    std::vector<std::unique_ptr<PatchModule>> voices;
+    std::vector<std::unique_ptr<PatchModule>> _voices;
+    std::vector<PatchModule*> voices;
     size_t voiceCount;
     size_t activeVoiceCount;
-
-//    std::unordered_map<std::string, ModuleInput *> inputs;
-//    std::unordered_map<std::string, ModuleOutput *> outputs;
-//    std::unordered_map<std::string, UserInput *> userInputs;
 
    std::vector<std::unique_ptr<PolyProxyModule>> polyProxies;
    std::vector<PolyProxyOutput *> proxyOutputs;

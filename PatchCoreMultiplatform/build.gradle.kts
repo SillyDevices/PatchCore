@@ -107,7 +107,7 @@ android {
     }
 }
 
-val artifactVersion = "0.2.6"
+val artifactVersion = libs.versions.artifacts.patchCoreMultiplatform.get()
 
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)

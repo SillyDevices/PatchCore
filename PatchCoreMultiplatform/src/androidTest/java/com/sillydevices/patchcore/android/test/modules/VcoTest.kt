@@ -23,7 +23,6 @@
 package com.sillydevices.patchcore.android.test.modules
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.sillydevices.patchcore.android.context.AndroidPatchCoreContext
 import com.sillydevices.patchcore.android.utils.SynthTester
 import com.sillydevices.patchcore.android.utils.TestPatchCore
 import com.sillydevices.patchcore.module.Patch
