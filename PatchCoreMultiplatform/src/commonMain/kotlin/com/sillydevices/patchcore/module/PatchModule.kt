@@ -75,7 +75,7 @@ class PatchBuilder {
 }
 
 
-open class PatchModule(name: String): Module(name) {
+open class PatchModule(name: String, protected val moduleNamePrefix: String? = null): Module(name) {
 
     protected data class MutablePatch(
         override val connections: MutableList<Connection> = mutableListOf()
@@ -104,13 +104,13 @@ open class PatchModule(name: String): Module(name) {
         return module
     }
 
-    fun exposeInput(input: ModuleInput, name: String = input.name): ModuleInput =
+    private fun exposeInput(input: ModuleInput, name: String = input.name): ModuleInput =
         input.createProxy(moduleName = this.name, withName = name).also { proxyInputs.add(it) }
 
-    fun exposeOutput(output: ModuleOutput, name: String = output.name): ModuleOutput =
+    private fun exposeOutput(output: ModuleOutput, name: String = output.name): ModuleOutput =
         output.createProxy(moduleName = this.name, withName = name).also { proxyOutputs.add(it) }
 
-    fun <T: UserInput> exposeUserInput(userInput: T, name: String = userInput.name): T =
+    private fun <T: UserInput> exposeUserInput(userInput: T, name: String = userInput.name): T =
         userInput.createProxy<T>(moduleName = this.name, withName = name).also { proxyUserInputs.add(it as ProxyUserInput) }
 
     open val defaultPatch: Patch = Patch()
@@ -158,8 +158,14 @@ open class PatchModule(name: String): Module(name) {
     override fun applyContext(context: ModuleContext) {
         context as? PatchModuleContext ?: throw IllegalArgumentException("Context must be of type PatchModuleContext")
         super.applyContext(context)
+        applyPatchModuleContext(context)
+    }
+
+    open fun applyPatchModuleContext(context: PatchModuleContext) {
+        clearPatches()
         applyContextForIO(context)
-        applyContextToChild(context)
+        applyChildrenSettings()
+        applyDefaultPatch()
     }
 
     protected open fun applyContextForIO(context: PatchModuleContext) {
@@ -197,12 +203,10 @@ open class PatchModule(name: String): Module(name) {
         //maybe it can be useful for later
     }
 
-    private fun applyContextToChild(context: PatchModuleContext) {
+    protected fun applyChildrenSettings() {
         for (settings in modulesSettings) {
             settings.value.invoke(settings.key)
         }
-        clearPatches()
-        applyDefaultPatch()
     }
 
     override fun createFrom(parentContext: PatchModuleContext) {
@@ -233,6 +237,7 @@ open class PatchModule(name: String): Module(name) {
         return CreateModuleDelegateProvider(createModule)
     }
 
+    @Deprecated("Use module(createModule: CreateModuleContext<T>.()->T) instead", ReplaceWith("module { module.applySettings() }"))
     protected fun <T : Module> module(module: T, initialSettings: (T.()-> Unit)? = null): ModuleDelegateProvider<T> {
         return ModuleDelegateProvider(module, initialSettings?.let { ModuleSettings(it) })
     }
@@ -260,7 +265,8 @@ open class PatchModule(name: String): Module(name) {
 
     protected class CreateModuleDelegateProvider<T: Module>(private val createModule: CreateModuleContext<T>.()->T) {
         operator fun provideDelegate(thisRef: PatchModule, property: KProperty<*>): ModuleDelegate<T> {
-            val context = CreateModuleContext<T>(property.name)
+            val moduleName = thisRef.moduleNamePrefix?.let { "${it}${property.name}" } ?: property.name
+            val context = CreateModuleContext<T>(moduleName)
             val module = context.createModule()
             val result = thisRef.registeredModuleInternal(module, context.getSettings())
             return ModuleDelegate(result)
