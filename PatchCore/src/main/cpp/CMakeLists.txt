@@ -70,6 +70,8 @@ add_library(
         patchcore/modules/input/event/keyboard/poly/AbstractRouterKeyboard.cpp
         patchcore/modules/input/event/keyboard/poly/RouterKeyboard.cpp
 
+        patchcore/modules/FixedHardClipModule.cpp
+
         patchcore/dsp/wavetable/DefaultWaveTableProvider.cpp
         patchcore/dsp/wavetable/mipmap/MipmapWaveTable.cpp
         patchcore/dsp/wavetable/mipmap/SawWaveTable.cpp

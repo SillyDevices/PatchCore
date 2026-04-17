@@ -53,6 +53,7 @@
 #include "patchcore/modules/VCAModule.hpp"
 #include "patchcore/modules/input/event/keyboard/KeyboardModule.hpp"
 #include "patchcore/modules/input/event/keyboard/SingleKeyboardModule.hpp"
+#include "patchcore/modules/FixedHardClipModule.hpp"
 
 
 #define ADSR_ENVELOPE_MODULE_TYPE_NAME          "ADSR"
@@ -83,6 +84,7 @@
 #define PAN_CROSSFADE_MODULE_TYPE_NAME          "PAN_CROSSFADE"
 #define SAMPLE_AND_HOLD_MODULE_TYPE_NAME        "SAMPLE_AND_HOLD"
 #define VCA_MODULE_TYPE_NAME                    "VCA"
+#define FIXED_HARD_CLIP_MODULE_TYPE_NAME        "FIXED_HARD_CLIP"
 
 
 class DefaultModuleFactory: public ModuleFactory {
