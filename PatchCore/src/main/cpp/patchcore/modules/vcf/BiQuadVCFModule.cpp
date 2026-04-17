@@ -23,16 +23,24 @@
 #include "patchcore/modules/vcf/BiQuadVCFModule.hpp"
 
 #include "patchcore/dsp/dsp.h"
+#include <android/log.h>
 
 BiQuadVCFModule::BiQuadVCFModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameters)
-    : BiQuadVCFModule(name, sampleRate) {
+    : BiQuadVCFModule(
+            name,
+            ModuleParameter::getFloatOrDefault(parameters, BIQUAD_VCF_PARAMETER_OUTPUT_GAIN, 0.5f),
+            sampleRate) {
+
 }
 
-BiQuadVCFModule::BiQuadVCFModule(std::string name, int sampleRate)
+BiQuadVCFModule::BiQuadVCFModule(std::string name, float outputGain, int sampleRate)
     : VCF(name, sampleRate) {
     init();
     typeInput.setValue(LOWPASS);
     type = LOWPASS;
+    this->outputGain = outputGain;
+    userGain.setValue(0.f);
+
 }
 
 BiQuadVCFModule::BiQuadVCFModule(const BiQuadVCFModule& other)
@@ -43,6 +51,7 @@ BiQuadVCFModule::BiQuadVCFModule(const BiQuadVCFModule& other)
     for (int i = 0; i < 2; ++i) x[i] = other.x[i];
     for (int i = 0; i < 2; ++i) y[i] = other.y[i];
     type = other.type;
+    outputGain = other.outputGain;
     //typeInput.setValue(other.type);
     copyIOs(other);
 }
@@ -52,12 +61,14 @@ std::unique_ptr<Module> BiQuadVCFModule::clone() const {
 }
 
 void BiQuadVCFModule::init() {
+    registerUserInput(userGain);
 }
 
 void BiQuadVCFModule::envelope() {
     float inputValue = input.value;
     float cutoffValue = cutoff.value + userCutoff.value;
     float resonanceValue = resonance.value + userResonance.value;
+    float gainValue = userGain.value;
 
     float cutoffHz = dsp::voltToHz(dsp::tune_C0, cutoffValue);
     //temp fix for old xcode
@@ -69,7 +80,7 @@ void BiQuadVCFModule::envelope() {
         cutoffNorm = 0.499f;
     }
 
-    computeFilter(cutoffNorm, 0.1 + resonanceValue * 3.9);
+    computeFilter(cutoffNorm, 0.1f + resonanceValue * 3.9f, gainValue);
 
     float outputValue =
             (b[0] * inputValue) +
@@ -88,10 +99,10 @@ void BiQuadVCFModule::envelope() {
     y[1] = y[0];
     y[0] = outputValue;
 
-    output.value = outputValue * 0.5f;
+    output.value = outputValue * outputGain;
 }
 
-void BiQuadVCFModule::computeFilter(float cutoff, float resonance) {
+void BiQuadVCFModule::computeFilter(float cutoff, float resonance, float gainDb) {
     Type newType = static_cast<Type>(typeInput.getValue());
     if (newType != type) {
         reset();
@@ -157,6 +168,105 @@ void BiQuadVCFModule::computeFilter(float cutoff, float resonance) {
             b[2] = 1.0f * norm;
             a[0] = -2.0f * std::cos(omega) * norm;
             a[1] = (1.0f - alpha) * norm;
+        } break;
+        case LOWSHELF: {
+            // A = 10^(dB/40) - коэффициент усиления амплитуды
+            float A = std::pow(10.0f, gainDb / 40.0f);
+            float omega = 2.0f * M_PI * cutoff;
+            float sn = std::sin(omega);
+            float cs = std::cos(omega);
+            // Q обычно фиксирован для полки (например, 0.707), но можно использовать resonance
+            // beta = sqrt(A+A) для Q=0.707. Если хочешь управлять Q, формула: beta = sn / (2.0f * resonance) * sqrt((A*A + 1)/slope - ...)
+            // Для упрощения возьмем "Slope = 1" (стандартная полка):
+            float beta = sn * std::sqrt((A * A + 1.0f) / 1.0f - (std::pow(A - 1.0f, 2.0f)));
+
+            float b0 = A * ((A + 1.0f) - (A - 1.0f) * cs + beta);
+            float b1 = 2.0f * A * ((A - 1.0f) - (A + 1.0f) * cs);
+            float b2 = A * ((A + 1.0f) - (A - 1.0f) * cs - beta);
+            float a0 = (A + 1.0f) + (A - 1.0f) * cs + beta;
+            float a1 = -2.0f * ((A - 1.0f) + (A + 1.0f) * cs);
+            float a2 = (A + 1.0f) + (A - 1.0f) * cs - beta;
+
+            // Нормализация сразу
+            float norm = 1.0f / a0;
+            this->b[0] = b0 * norm;
+            this->b[1] = b1 * norm;
+            this->b[2] = b2 * norm;
+            this->a[0] = a1 * norm; // Внимание: в твоей реализации a[0] и a[1] используются с минусом в envelope
+            this->a[1] = a2 * norm;
+        } break;
+
+        case HIGHSHELF: {
+            // A = 10^(dB/40)
+            float A = std::pow(10.0f, gainDb / 40.0f);
+            float omega = 2.0f * M_PI * cutoff;
+            float sn = std::sin(omega);
+            float cs = std::cos(omega);
+            // Используем fixed Q = 0.707 или берем из resonance
+            // beta = sn * std::sqrt((A * A + 1.0f) / 1.0f - (std::pow(A - 1.0f, 2.0f)));
+            // Упрощенная beta для slope=1 (Q=0.707):
+            float beta = sn * std::sqrt(A);
+
+            // Формулы High Shelf (зеркальны Low Shelf)
+            float b0 = A * ((A + 1.0f) + (A - 1.0f) * cs + beta);
+            float b1 = -2.0f * A * ((A - 1.0f) + (A + 1.0f) * cs);
+            float b2 = A * ((A + 1.0f) + (A - 1.0f) * cs - beta);
+            float a0 = (A + 1.0f) - (A - 1.0f) * cs + beta;
+            float a1 = 2.0f * ((A - 1.0f) - (A + 1.0f) * cs);
+            float a2 = (A + 1.0f) - (A - 1.0f) * cs - beta;
+
+            float norm = 1.0f / a0;
+            this->b[0] = b0 * norm;
+            this->b[1] = b1 * norm;
+            this->b[2] = b2 * norm;
+            this->a[0] = a1 * norm;
+            this->a[1] = a2 * norm;
+        } break;
+
+        case PEAKING: {
+            float A = std::pow(10.0f, gainDb / 40.0f);
+            float omega = 2.0f * M_PI * cutoff;
+            float sn = std::sin(omega);
+            float cs = std::cos(omega);
+            // alpha = sin(w) / (2 * Q)
+            float alpha = sn / (2.0f * resonance);
+
+            float b0 = 1.0f + alpha * A;
+            float b1 = -2.0f * cs;
+            float b2 = 1.0f - alpha * A;
+            float a0 = 1.0f + alpha / A;
+            float a1 = -2.0f * cs;
+            float a2 = 1.0f - alpha / A;
+
+            float norm = 1.0f / a0;
+            this->b[0] = b0 * norm;
+            this->b[1] = b1 * norm;
+            this->b[2] = b2 * norm;
+            this->a[0] = a1 * norm;
+            this->a[1] = a2 * norm;
+        } break;
+
+        case ALLPASS: {
+            // 2-Pole AllPass (Gain игнорируется)
+            float omega = 2.0f * M_PI * cutoff;
+            float sn = std::sin(omega);
+            float cs = std::cos(omega);
+            float alpha = sn / (2.0f * resonance); // resonance здесь это Q
+
+            // У AllPass числитель "зеркален" знаменателю
+            float b0 = 1.0f - alpha;
+            float b1 = -2.0f * cs;
+            float b2 = 1.0f + alpha;
+            float a0 = 1.0f + alpha;
+            float a1 = -2.0f * cs;
+            float a2 = 1.0f - alpha;
+
+            float norm = 1.0f / a0;
+            this->b[0] = b0 * norm;
+            this->b[1] = b1 * norm;
+            this->b[2] = b2 * norm;
+            this->a[0] = a1 * norm;
+            this->a[1] = a2 * norm;
         } break;
     }
 }
