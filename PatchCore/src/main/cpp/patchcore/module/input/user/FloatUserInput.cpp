@@ -25,9 +25,16 @@
 #include "patchcore/module/input/user/poly/PolyProxyFloatUserInput.hpp"
 
 FloatUserInput::FloatUserInput(std::string name): UserInput(name, UserInputType::FLOAT) {};
-FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, UserInputType::FLOAT), speed(speed) {};
+FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, UserInputType::FLOAT), speed(speed) {
+    if (speed < 5.0f) {
+        throw std::invalid_argument("speed must be at least 5.0f");
+    }
+};
 
 void FloatUserInput::onStartBuffer(int bufferSize) {
+    if (!isfinite(value)) {
+        value = 0.0f;
+    }
     startValue = value;
     if (isLocked) {
         targetValue = lastSetParameterLockValue;
