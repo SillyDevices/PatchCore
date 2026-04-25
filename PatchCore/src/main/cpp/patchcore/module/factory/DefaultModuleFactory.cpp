@@ -117,6 +117,8 @@ std::unique_ptr<Module> DefaultModuleFactory::createModule(const std::string& mo
         return std::make_unique<SampleAndHoldModule>(moduleName, sampleRate, parameters);
     } else if (moduleTypeName == VCA_MODULE_TYPE_NAME) {
         return std::make_unique<VCAModule>(moduleName, sampleRate, parameters);
+    } else if (moduleTypeName == FIXED_HARD_CLIP_MODULE_TYPE_NAME) {
+        return std::make_unique<FixedHardClipModule>(moduleName, sampleRate, parameters);
     }
     return nullptr;
 }

@@ -47,6 +47,7 @@ public open class ModuleType(val value: String) {
     object PanCrossFade: ModuleType("PAN_CROSSFADE")
     object SampleAndHold: ModuleType("SAMPLE_AND_HOLD")
     object VCA: ModuleType("VCA")
+    object FixedHardClip: ModuleType("FIXED_HARD_CLIP")
 
     object Keyboard: ModuleType("KEYBOARD")
     object MultiKeyboard: ModuleType("MULTI_KEYBOARD")

@@ -223,7 +223,18 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
         val auto: String = moduleName
         private var settings: ModuleSettings<T>? = null
 
+        @Deprecated(message = "Use config(initialSettings) instead", replaceWith = ReplaceWith("config(initialSettings)"))
         infix fun T.with( initialSettings: T.()->Unit ): T {
+            settings = ModuleSettings(initialSettings)
+            return this
+        }
+
+        infix fun T.config( initialSettings: T.()->Unit ): T {
+            settings = ModuleSettings(initialSettings)
+            return this
+        }
+
+        infix fun T.init( initialSettings: T.()->Unit ): T {
             settings = ModuleSettings(initialSettings)
             return this
         }
@@ -242,15 +253,15 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
         return ModuleDelegateProvider(module, initialSettings?.let { ModuleSettings(it) })
     }
 
-    protected fun expose(input: ModuleInput, withName: String? = null): ModuleInputDelegateProvider {
+    protected open fun expose(input: ModuleInput, withName: String? = null): ModuleInputDelegateProvider {
         return ModuleInputDelegateProvider(input, withName)
     }
 
-    protected fun expose(output: ModuleOutput, withName: String? = null): ModuleOutputDelegateProvider {
+    protected open fun expose(output: ModuleOutput, withName: String? = null): ModuleOutputDelegateProvider {
         return ModuleOutputDelegateProvider(output, withName)
     }
 
-    protected fun <T: UserInput> expose(userInput: T, withName: String? = null): ModuleUserInputDelegateProvider<T> {
+    protected open fun <T: UserInput> expose(userInput: T, withName: String? = null): ModuleUserInputDelegateProvider<T> {
         return ModuleUserInputDelegateProvider(userInput, withName)
     }
 

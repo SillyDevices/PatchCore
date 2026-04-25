@@ -20,36 +20,34 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/modules/VCAModule.hpp"
-#include <algorithm>
+#include "patchcore/modules/FixedHardClipModule.hpp"
 
-VCAModule::VCAModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameters)
-        : VCAModule(name) {
+
+FixedHardClipModule::FixedHardClipModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameters)
+    : FixedHardClipModule(name,
+            ModuleParameter::getFloatOrDefault(parameters, FIXED_HARD_CLIP_MODULE_PARAMETER_THRESHOLD, 1.0f)) {
 }
 
-VCAModule::VCAModule(std::string name) : Module(name, 0) {
+FixedHardClipModule::FixedHardClipModule(std::string name, float threshold): Module(name, 0), threshold(threshold) {
     init();
 }
 
-VCAModule::VCAModule(const VCAModule& other)
+FixedHardClipModule::FixedHardClipModule(const FixedHardClipModule& other)
     : Module(other.name, other.sampleRate) {
     init();
+    threshold = other.threshold;
     copyIOs(other);
 }
 
-[[nodiscard]] std::unique_ptr<Module> VCAModule::clone() const {
-    return std::make_unique<VCAModule>(*this);
+[[nodiscard]] std::unique_ptr<Module> FixedHardClipModule::clone() const {
+    return std::make_unique<FixedHardClipModule>(*this);
 }
 
-void VCAModule::init() {
+void FixedHardClipModule::init() {
     registerInput(input);
-    registerInput(cv);
     registerOutput(output);
 }
 
-
-void VCAModule::envelope() {
-    auto val = input.value * cv.value;
-    output.value = val;
-//    output.value = std::max(-1.0f, std::min(1.0f, val));
+void FixedHardClipModule::envelope() {
+    output.value = std::max(-threshold, std::min(threshold, input.value));
 }

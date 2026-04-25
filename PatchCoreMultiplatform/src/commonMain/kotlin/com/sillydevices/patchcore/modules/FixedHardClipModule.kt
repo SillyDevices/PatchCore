@@ -20,36 +20,18 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/modules/VCAModule.hpp"
-#include <algorithm>
+package com.sillydevices.patchcore.modules
 
-VCAModule::VCAModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameters)
-        : VCAModule(name) {
-}
-
-VCAModule::VCAModule(std::string name) : Module(name, 0) {
-    init();
-}
-
-VCAModule::VCAModule(const VCAModule& other)
-    : Module(other.name, other.sampleRate) {
-    init();
-    copyIOs(other);
-}
-
-[[nodiscard]] std::unique_ptr<Module> VCAModule::clone() const {
-    return std::make_unique<VCAModule>(*this);
-}
-
-void VCAModule::init() {
-    registerInput(input);
-    registerInput(cv);
-    registerOutput(output);
-}
+import com.sillydevices.patchcore.module.FactoryModule
+import com.sillydevices.patchcore.module.factory.ModuleParameter
+import com.sillydevices.patchcore.module.factory.ModuleType
 
 
-void VCAModule::envelope() {
-    auto val = input.value * cv.value;
-    output.value = val;
-//    output.value = std::max(-1.0f, std::min(1.0f, val));
+class FixedHardClipModule(name: String = "hardclip", threshold: Float = 1f): FactoryModule(name, ModuleType.FixedHardClip) {
+
+    override val parameters = listOf(
+        ModuleParameter("threshold", threshold)
+    )
+    val input = registerInput("in")
+    val output = registerOutput("out")
 }

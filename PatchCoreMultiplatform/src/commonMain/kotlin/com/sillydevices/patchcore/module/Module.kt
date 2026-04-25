@@ -74,7 +74,7 @@ abstract class Module(val name: String) {
     }
 
     //Context and so on
-    abstract fun createFrom(context: PatchModuleContext)
+    internal abstract fun createFrom(context: PatchModuleContext)
 
     open val pointer: ModulePointer
         get() = moduleContext.getPointer()

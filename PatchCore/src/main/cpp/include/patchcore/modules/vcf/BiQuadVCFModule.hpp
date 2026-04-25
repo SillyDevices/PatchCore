@@ -26,6 +26,11 @@
 #include "VCF.hpp"
 #include "patchcore/module/ModuleParameter.hpp"
 
+#define BIQUAD_VCF_PARAMETER_OUTPUT_GAIN "output_gain"
+
+#define BIQUAD_VCF_INPUT_GAIN "gain"
+
+
 //TODO add parameters to setup default cuttof, resonance and type
 
 class BiQuadVCFModule: public VCF {
@@ -37,11 +42,15 @@ public:
         LOWPASS,
         HIGHPASS,
         BANDPASS,
-        NOTCH
+        NOTCH,
+        LOWSHELF,
+        PEAKING,
+        HIGHSHELF,
+        ALLPASS
     };
 public:
     BiQuadVCFModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameters);
-    BiQuadVCFModule(std::string name, int sampleRate);
+    BiQuadVCFModule(std::string name, float outputGain, int sampleRate);
     BiQuadVCFModule(const BiQuadVCFModule& other);
     std::unique_ptr<Module> clone() const override;
     virtual ~BiQuadVCFModule() = default;
@@ -49,7 +58,7 @@ public:
 public:
     void envelope() override;
 protected:
-    void computeFilter(float cutoff, float resonance);
+    void computeFilter(float cutoff, float resonance, float gainDB = 0.f);
     void reset();
 protected:
     float b[3] = {0, 0 ,0};
@@ -58,6 +67,9 @@ protected:
     float y[2] = {0, 0};
 protected:
     Type type = LOWPASS;
+    float outputGain = 0.5f;
+
+    FloatUserInput userGain = FloatUserInput(BIQUAD_VCF_INPUT_GAIN);
 };
 
 #endif //PATCHCORE_BIQUADVCF_MODULE_HPP
