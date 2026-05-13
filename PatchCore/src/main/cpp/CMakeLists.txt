@@ -87,7 +87,6 @@ add_library(
         patchcore/dsp/osc/BandLimitedSimpleSquare.cpp
         patchcore/dsp/waveshaper/SimpleWaveShaper.cpp
 
-        patchcore/synth/BufferedSynth.cpp
         patchcore/synth/ModularSynth.cpp
         patchcore/test/ModularSynthTester.cpp
 

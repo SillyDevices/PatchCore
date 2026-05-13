@@ -25,8 +25,7 @@
 
 #include "patchcore/callback/OnStartBuffer.hpp"
 #include "patchcore/callback/OnEndBuffer.hpp"
-
-#include <vector>
+#include "patchcore/synth/StereoBlock.hpp"
 
 //TODO remove? not needed
 #include <utility>
@@ -38,6 +37,14 @@ public:
     virtual ~AbstractSynth() = default;
 
     virtual std::pair<float, float> computeSample() = 0;
+
+    virtual void computeBlock(StereoBlock& out) {
+        for (int index = 0; index < PATCHCORE_BLOCK_SIZE; ++index) {
+            auto sample = computeSample();
+            out.left[index] = sample.first;
+            out.right[index] = sample.second;
+        }
+    }
 };
 
 // }

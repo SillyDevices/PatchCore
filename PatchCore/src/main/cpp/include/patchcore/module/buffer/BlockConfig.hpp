@@ -20,25 +20,14 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/synth/BufferedSynth.hpp"
 
-void BufferedSynth::computeSamples(int count) {
-    if (_bufferSize != count) {
-        _leftOutputBuffer = std::vector<float>(count);
-        _rightOutputBuffer = std::vector<float>(count);
-    }
-    for (auto step = 0; step < count; step++){
-        auto sample = computeSample();
-        _leftOutputBuffer[step] = sample.first;
-        _rightOutputBuffer[step] = sample.second;
-    }
-}
+#ifndef PATCHCORE_BLOCKCONFIG_HPP
+#define PATCHCORE_BLOCKCONFIG_HPP
 
-std::vector<float>* BufferedSynth::getLeftChannelSamples() {
-    return &_leftOutputBuffer;
-}
+#ifndef PATCHCORE_PROCESS_BLOCK_SIZE
+#define PATCHCORE_PROCESS_BLOCK_SIZE 64
+#endif
 
-std::vector<float>* BufferedSynth::getRightChannelSamples() {
-    return &_rightOutputBuffer;
-}
+static constexpr int PATCHCORE_BLOCK_SIZE = PATCHCORE_PROCESS_BLOCK_SIZE;
 
+#endif //PATCHCORE_BLOCKCONFIG_HPP
