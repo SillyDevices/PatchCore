@@ -26,6 +26,7 @@
 
 #include <mutex>
 #include <oboe/Oboe.h>
+#include <patchcore/module/buffer/BlockConfig.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
 #include <oboe/StabilizedCallback.h>
 #include "utils/CpuLoadCounter.hpp"
@@ -116,6 +117,8 @@ private:
     int lastCpuId = -1;
     int currentCpuId = -1;
     int preferredCpuId = -1;
+    StereoBlock pendingBlock;
+    int pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
 
     bool mIsStarted = false;
 };

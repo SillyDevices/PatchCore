@@ -25,8 +25,11 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import "CommonAudioInterface.h"
+#import <patchcore/module/buffer/BlockConfig.hpp>
 #import <patchcore/synth/ModularSynth.hpp>
 #import <patchcore/module/PatchModule.hpp>
+
+#include <algorithm>
 
 
 @implementation CommonAudioInterface {
@@ -41,6 +44,8 @@
     float _sampleRate;
     
     ModularSynth* _modularSynth;
+    StereoBlock _pendingBlock;
+    int _pendingBlockIndex;
 }
 
 - (instancetype)init {
@@ -69,6 +74,7 @@
                                              name:AVAudioEngineConfigurationChangeNotification
                                              object:_audioEngine];
         _modularSynth = nullptr;
+        _pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
         
     }
     return self;
@@ -88,10 +94,12 @@
     if (synth == nullptr) throw std::runtime_error("modularSynthPointer is not PatchModule");
     _modularSynth = dynamic_cast<ModularSynth*>(synth);
     if (_modularSynth == nullptr) throw std::runtime_error("modularSynthPointer is not ModularSynth");
+    _pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
 }
 
 - (bool)internalStart {
     __weak __typeof(self) weakSelf = self;
+    _pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
     _srcNode = [[AVAudioSourceNode alloc] initWithRenderBlock:
         ^OSStatus(BOOL *isSilence, const AudioTimeStamp *timestamp, AVAudioFrameCount frameCount, AudioBufferList *audioBufferList) {
             __strong __typeof(weakSelf) strongSelf = weakSelf;
@@ -124,6 +132,7 @@
 }
 
 - (void)internalStop {
+    _pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
     if (_srcNode) {
         [_audioEngine disconnectNodeInput:_mainMixer];
         [_audioEngine detachNode:_srcNode];
@@ -139,10 +148,23 @@
 
     if (_modularSynth != nullptr) {
         _modularSynth->onStartBuffer(frameCount);
-        for (auto i = 0; i < frameCount; ++i) {
-            auto result = _modularSynth->computeSample();
-            left[i] = result.first;
-            right[i] = result.second;
+        int frameIndex = 0;
+        while (frameIndex < frameCount) {
+            if (_pendingBlockIndex >= PATCHCORE_BLOCK_SIZE) {
+                _modularSynth->computeBlock(_pendingBlock);
+                _pendingBlockIndex = 0;
+            }
+
+            auto framesToCopy = std::min(frameCount - frameIndex, PATCHCORE_BLOCK_SIZE - _pendingBlockIndex);
+            for (int offset = 0; offset < framesToCopy; ++offset) {
+                auto sampleIndex = _pendingBlockIndex + offset;
+                auto outputIndex = frameIndex + offset;
+                left[outputIndex] = _pendingBlock.left[sampleIndex];
+                right[outputIndex] = _pendingBlock.right[sampleIndex];
+            }
+
+            frameIndex += framesToCopy;
+            _pendingBlockIndex += framesToCopy;
         }
     }
 }

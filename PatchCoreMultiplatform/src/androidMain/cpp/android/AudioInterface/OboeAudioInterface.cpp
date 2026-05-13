@@ -25,6 +25,7 @@
 #include <android/log_macros.h>
 #include <stdexcept>
 #include <string>
+#include <algorithm>
 #include <oboe/StabilizedCallback.h>
 #include <thread>
 #include "unistd.h"
@@ -53,6 +54,7 @@ void OboeAudioInterface::setOptions(OboeAudioInterface::PlayerOptions options) {
 
 void OboeAudioInterface::setSynth(ModularSynth *synth) {
     mSynth = synth;
+    pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
 }
 
 void OboeAudioInterface::setBufferSizeMultiplayer(int multiplayer) {
@@ -75,6 +77,7 @@ int32_t OboeAudioInterface::startAudio() {
     waitAffinityFramesCounter = 0;
     isAffinitySet = false;
     preferredCpuId = -1;
+    pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
     oboe::Usage usage;
     if (options.useGameMode) {
         usage = oboe::Usage::Game;
@@ -114,6 +117,7 @@ int32_t OboeAudioInterface::startAudio() {
 
 void OboeAudioInterface::stopAudio() {
     std::lock_guard<std::mutex> lock(mLock);
+    pendingBlockIndex = PATCHCORE_BLOCK_SIZE;
     if (mStream) {
         mStream->stop();
         mStream->close();
@@ -201,10 +205,27 @@ oboe::DataCallbackResult OboeAudioInterface::onAudioReady(oboe::AudioStream *obo
     auto floatData = (float *) audioData;
     if (mSynth != nullptr) {
         mSynth->onStartBuffer(numFrames);
-        for (auto i = 0; i < numFrames; ++i) {
-            auto result = mSynth->computeSample();
-            floatData[i* kChannelCount + 0] = result.first;
-            floatData[i* kChannelCount + 1] = result.second;
+        int32_t frameIndex = 0;
+        while (frameIndex < numFrames) {
+            if (pendingBlockIndex >= PATCHCORE_BLOCK_SIZE) {
+                mSynth->computeBlock(pendingBlock);
+                pendingBlockIndex = 0;
+            }
+
+            auto framesToCopy = std::min(
+                    numFrames - frameIndex,
+                    static_cast<int32_t>(PATCHCORE_BLOCK_SIZE - pendingBlockIndex)
+            );
+
+            for (int32_t offset = 0; offset < framesToCopy; ++offset) {
+                auto sampleIndex = pendingBlockIndex + offset;
+                auto outputIndex = frameIndex + offset;
+                floatData[outputIndex * kChannelCount + 0] = pendingBlock.left[sampleIndex];
+                floatData[outputIndex * kChannelCount + 1] = pendingBlock.right[sampleIndex];
+            }
+
+            frameIndex += framesToCopy;
+            pendingBlockIndex += framesToCopy;
         }
 //        mSynth->onEndBuffer();
     }
