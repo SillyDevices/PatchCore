@@ -24,6 +24,7 @@
 #define PATCHCORE_FLOATUSERINPUT_HPP
 
 #include "patchcore/module/input/UserInput.hpp"
+#include "patchcore/module/buffer/BufferedValue.hpp"
 #include "patchcore/callback/OnStartBuffer.hpp"
 #include <string>
 
@@ -43,6 +44,13 @@ public:
     void onStartBuffer(int bufferSize) override;
 
     virtual void envelope();
+    void advanceSample() {
+        value.advanceSample();
+    }
+
+    const std::vector<float>& getBuffer() const {
+        return value.getBuffer();
+    }
 
 public:
     void copyFrom(UserInput &other) {
@@ -81,7 +89,7 @@ protected:
 
     float speed = 5.0f;
 public:
-    float value = .0f;
+    BufferedValue value = BufferedValue(.0f);
 };
 
 inline void FloatUserInput::setValue(float newValue) {

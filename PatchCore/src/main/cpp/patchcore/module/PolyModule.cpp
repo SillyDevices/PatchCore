@@ -70,6 +70,7 @@ PolyModule::~PolyModule() {
 }
 
 void PolyModule::onStartBuffer(int size) {
+    Module::onStartBuffer(size);
     for (const auto &voice: voices) {
         voice->onStartBuffer(size);
     }

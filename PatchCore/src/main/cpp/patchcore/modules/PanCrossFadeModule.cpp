@@ -51,7 +51,7 @@ void PanCrossFadeModule::init() {
 
 void PanCrossFadeModule::envelope() {
     // equal power panning
-    auto limitedCv = std::max(-1.0f, std::min(1.0f, inputCv.value + userInputCv.value));
+    auto limitedCv = std::max(-1.0f, std::min(1.0f, static_cast<float>(inputCv.value + userInputCv.value)));
     auto cv = 0.5 * (limitedCv + 1);
     auto angle = cv * M_PI_2; // M_PI_2 is π/2
     auto amountLeft = std::cos(angle);

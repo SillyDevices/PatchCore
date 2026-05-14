@@ -89,6 +89,17 @@ public:
 //    };
 
     virtual ExposedModuleInput *createExposed(const std::string &withName);
+    void onStartBuffer(int size) {
+        value.onStartBuffer(size);
+    }
+
+    void advanceSample() {
+        value.advanceSample();
+    }
+
+    const std::vector<float>& getBuffer() const {
+        return value.getBuffer();
+    }
 
 public:
 
@@ -112,7 +123,7 @@ private:
     Module* _module;
 
 public:
-    float value = 0.0f;
+    BufferedValue value = BufferedValue(0.0f);
     bool _isConnected = false;
     std::vector<ModuleOutput*> outputs = {};
 

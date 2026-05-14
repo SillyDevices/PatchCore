@@ -23,6 +23,7 @@
 #ifndef PATCHCORE_MODULE_HPP
 #define PATCHCORE_MODULE_HPP
 
+#include "patchcore/module/buffer/BlockConfig.hpp"
 #include "patchcore/module/input/ModuleInput.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
 #include "patchcore/module/input/UserInput.hpp"
@@ -31,6 +32,7 @@
 #include "patchcore/module/input/user/EnumUserInput.hpp"
 
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <vector>
 
@@ -44,6 +46,8 @@ public:
     virtual ~Module() = default;
 
     virtual void envelope() = 0;
+    virtual void processSample(int sampleIndex);
+    virtual void processBlock();
 
     const std::string& getModuleName() const;
 
@@ -70,6 +74,7 @@ public:
     bool hasProxyOutputs() const;
 
 protected:
+    void advanceSampleCursors();
 
     virtual void registerInput(ModuleInput& input, const std::string& withName = "") final {
         if (!withName.empty()) {

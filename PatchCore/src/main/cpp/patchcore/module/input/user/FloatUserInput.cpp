@@ -32,7 +32,7 @@ FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, U
 };
 
 void FloatUserInput::onStartBuffer(int bufferSize) {
-    if (!isfinite(value)) {
+    if (!isfinite(static_cast<float>(value))) {
         value = 0.0f;
     }
     startValue = value;
@@ -42,6 +42,7 @@ void FloatUserInput::onStartBuffer(int bufferSize) {
         targetValue = lastSetValue;
     }
     value = startValue;
+    value.onStartBuffer(bufferSize);
     //TODO make it linear and not depend on buffer size
     auto ratio = (sampleRate/441) * speed;
     delta = (targetValue - startValue) / ratio;

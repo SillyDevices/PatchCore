@@ -85,6 +85,7 @@ PatchModule::~PatchModule() {
 };
 
 void PatchModule::onStartBuffer(int size) {
+    Module::onStartBuffer(size);
     std::lock_guard<std::mutex> lock(routerMutex);
     _router.onStartBuffer(size);
 }

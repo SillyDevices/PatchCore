@@ -26,6 +26,18 @@
 
 Module::Module(std::string name, int sampleRate) : sampleRate(sampleRate), name(name) {};
 
+void Module::processSample(int sampleIndex) {
+    (void) sampleIndex;
+    envelope();
+    advanceSampleCursors();
+}
+
+void Module::processBlock() {
+    for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+        processSample(sampleIndex);
+    }
+}
+
 
 const std::string& Module::getModuleName() const {
     return name;
@@ -60,6 +72,20 @@ UserInput *Module::getUserInput(const std::string& inputName) {
 }
 
 void Module::onStartBuffer(int size) {
+    std::unordered_set<ModuleInput*> uniqueInputs;
+    for (const auto &inputKV : inputs) {
+        if (uniqueInputs.insert(inputKV.second).second) {
+            inputKV.second->onStartBuffer(size);
+        }
+    }
+
+    std::unordered_set<ModuleOutput*> uniqueOutputs;
+    for (const auto &outputKV : outputs) {
+        if (uniqueOutputs.insert(outputKV.second).second) {
+            outputKV.second->onStartBuffer(size);
+        }
+    }
+
     for (auto &input : interpolatedInputs) {
         input->onStartBuffer(size);
     }
@@ -83,4 +109,24 @@ const std::vector<FloatUserInput *> &Module::getInterpolatedInputs() {
 
 std::unique_ptr<PolyProxyModule> Module::createPolyModuleProxy(PolyModule* polyModule) const {
     return std::make_unique<PolyProxyModule>(this, polyModule);
+}
+
+void Module::advanceSampleCursors() {
+    std::unordered_set<ModuleInput*> uniqueInputs;
+    for (const auto &inputKV : inputs) {
+        if (uniqueInputs.insert(inputKV.second).second) {
+            inputKV.second->advanceSample();
+        }
+    }
+
+    std::unordered_set<ModuleOutput*> uniqueOutputs;
+    for (const auto &outputKV : outputs) {
+        if (uniqueOutputs.insert(outputKV.second).second) {
+            outputKV.second->advanceSample();
+        }
+    }
+
+    for (auto &input : interpolatedInputs) {
+        input->advanceSample();
+    }
 }

@@ -49,5 +49,5 @@ void FixedHardClipModule::init() {
 }
 
 void FixedHardClipModule::envelope() {
-    output.value = std::max(-threshold, std::min(threshold, input.value));
+    output.value = std::max(-threshold, std::min(threshold, static_cast<float>(input.value)));
 }

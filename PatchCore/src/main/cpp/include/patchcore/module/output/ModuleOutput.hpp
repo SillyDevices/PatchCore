@@ -52,6 +52,17 @@ public:
     }
 
     virtual ExposedModuleOutput* createExposed(const std::string& withName);
+    void onStartBuffer(int size) {
+        value.onStartBuffer(size);
+    }
+
+    void advanceSample() {
+        value.advanceSample();
+    }
+
+    const std::vector<float>& getBuffer() const {
+        return value.getBuffer();
+    }
 
     [[nodiscard]]
     bool hasProxyOutput() const;
@@ -64,7 +75,7 @@ private:
     bool hasProxy = false;
 
 public:
-    float value = 0.0f;
+    BufferedValue value = BufferedValue(0.0f);
 
 };
 

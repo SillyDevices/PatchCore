@@ -40,6 +40,7 @@ void ExposedFloatUserInput::envelope() {
 }
 
 void ExposedFloatUserInput::onStartBuffer(int size) {
+    FloatUserInput::onStartBuffer(size);
     for (int i = 0; i < count; i++) {
         inputs[i]->onStartBuffer(size);
     }

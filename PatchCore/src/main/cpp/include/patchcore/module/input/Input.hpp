@@ -23,13 +23,15 @@
 #ifndef PATCHCORE_IINPUT_HPP
 #define PATCHCORE_IINPUT_HPP
 
+#include "patchcore/module/buffer/BufferedValue.hpp"
+
 class Input
 {
 public:
     virtual ~Input() = default;
 //    virtual void setValue(float value) = 0;
 public:
-    float value = 0.0f;
+    BufferedValue value = BufferedValue(0.0f);
 };
 
 #endif //PATCHCORE_IINPUT_HPP
