@@ -25,6 +25,7 @@
 
 #include "AbstractRouter.hpp"
 
+#include <mutex>
 #include <vector>
 #include <unordered_map>
 
@@ -51,6 +52,7 @@ public:
     std::vector<std::pair<ModuleOutput*, ModuleInput*>> getPatches() const override;
 
     bool containLoops() const { return _containLoops; }
+    void logModuleGraph(const char* operationName = "logModuleGraph") const;
 
 protected:
     void updateModuleGraph();
@@ -79,6 +81,7 @@ protected:
     std::vector<EnvelopeStage> envelopeStages;
 
     bool _containLoops = false;
+    std::mutex updateModuleGraphMutex;
 
 };
 

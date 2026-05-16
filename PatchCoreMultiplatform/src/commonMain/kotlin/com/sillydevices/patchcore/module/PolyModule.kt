@@ -51,7 +51,7 @@ open class PolyModule(name: String, val polyphonyCount: Int = 2): PatchModule(na
         val context = context as? PolyModuleContext ?: throw IllegalStateException("PolyModule requires PolyModuleContext")
         // Apply context for demux outputs
         demuxOutputs.forEach { output ->
-            context.addDemuxOutput(output.output, output.name, output.defaultVoice)
+            context.exposeDemuxOutput(output.output, output.name, output.defaultVoice)
             val pointer = context.getModuleOutputPointer(output)
             output.setPointer(pointer)
         }
@@ -73,9 +73,17 @@ open class PolyModule(name: String, val polyphonyCount: Int = 2): PatchModule(na
 
     @Deprecated("Use delegate exposeDemux instead", ReplaceWith("exposeDemuxOutput(output, name, defaultVoice)"))
     fun exposeDemuxOutput(output: ModuleOutput, name: String = output.name, defaultVoice: Int): ModuleDemuxOutput =
-        ModuleDemuxOutput(output.createProxy(moduleName = this.name, withName = name), defaultVoice = defaultVoice).also { demuxOutputs.add(it) }
+        ModuleDemuxOutput(output.createExposed(moduleName = this.name, withName = name), defaultVoice = defaultVoice).also { demuxOutputs.add(it) }
 
-
+    /**
+     * Delegate provider for exposing demux outputs. Usage:
+     *
+     * val lfoLedAOutput by exposeDemux(voiceA.lfoLedOutput, "*lfoLedAOutput")
+     *
+     * This method creates a ModuleDemuxOutput
+     * PolyModule calls native PolyModule::exposeDemuxOutput() on create
+     * DemuxOutput like regular ProxyOutput, but it exposes only one voice
+     */
     protected fun exposeDemux(output: ModuleOutput, withName: String? = null, defaultVoice: Int = 0): ModuleDemuxOutputDelegateProvider {
         return ModuleDemuxOutputDelegateProvider(output, withName, defaultVoice)
     }

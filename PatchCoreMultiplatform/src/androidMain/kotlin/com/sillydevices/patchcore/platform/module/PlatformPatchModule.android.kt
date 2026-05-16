@@ -70,24 +70,24 @@ actual object PlatformPatchModule {
         )
     }
 
-    actual fun addInput(patchModulePointer: ModulePointer, inputPointer: ModuleInputPointer, withName: String) {
-        PatchModuleJni.patchModuleAddInput(
+    actual fun exposeInput(patchModulePointer: ModulePointer, inputPointer: ModuleInputPointer, withName: String) {
+        PatchModuleJni.patchModuleExposeInput(
             patchModulePointer.nativePointer,
             inputPointer.nativePointer,
             withName
         )
     }
 
-    actual fun addOutput(patchModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String) {
-        PatchModuleJni.patchModuleAddOutput(
+    actual fun exposeOutput(patchModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String) {
+        PatchModuleJni.patchModuleExposeOutput(
             patchModulePointer.nativePointer,
             outputPointer.nativePointer,
             withName
         )
     }
 
-    actual fun addUserInput(patchModulePointer: ModulePointer, userInputPointer: UserInputPointer, withName: String) {
-        PatchModuleJni.patchModuleAddUserInput(
+    actual fun exposeUserInput(patchModulePointer: ModulePointer, userInputPointer: UserInputPointer, withName: String) {
+        PatchModuleJni.patchModuleExposeUserInput(
             patchModulePointer.nativePointer,
             userInputPointer.nativePointer,
             withName

@@ -37,7 +37,7 @@
 class PolyModule : public PatchModule {
 public:
     PolyModule(ModuleFactory *factory, std::string name, int sampleRate, int voiceCount);
-    virtual ~PolyModule() = default;
+    ~PolyModule() override;
 
     //Module interface
 public:
@@ -47,11 +47,11 @@ public:
     //PatchModule specific
     //creates a new input/output from existing ModuleInput/ModuleOutput
 public:
-    ProxyModuleInput* addInput(ModuleInput* input, const std::string& withName) override;
-    ProxyModuleOutput* addOutput(ModuleOutput* output, const std::string& withName) override;
-    virtual ProxyModuleOutput* addDemuxOutput(ModuleOutput* output, const std::string& withName, const int defaultVoiceIndex);
+    ExposedModuleInput* exposeInput(ModuleInput* input, const std::string& withName) override;
+    ExposedModuleOutput* exposeOutput(ModuleOutput* output, const std::string& withName) override;
+    virtual ExposedModuleOutput* exposeDemuxOutput(ModuleOutput* output, const std::string& withName, const int defaultVoiceIndex);
     //don't know in what case this is useful, but it is here for consistency
-    UserInput* addUserInput(UserInput* input, const std::string& withName) override;
+    UserInput* exposeUserInput(UserInput* input, const std::string& withName) override;
     //PatchModule specific
 public:
     virtual Module* createModule(const std::string& moduleTypeName, const std::string& moduleName, const std::map<std::string, ModuleParameter>& parameters) override;
@@ -81,6 +81,10 @@ protected:
    std::vector<PolyProxyOutput *> proxyOutputs;
    std::vector<PolyProxyInput *> proxyInputs;
    std::vector<PolyProxyUserInput *> proxyUserInputs;
+   std::vector<ExposedModuleOutput *> exposedOutputs;
+   std::vector<ExposedModuleInput *> exposedInputs;
+   std::vector<ExposedModuleUserInput *> exposedUserInputs;
+   std::vector<PolyProxyOutput *> ownedProxyOutputs;
 
 };
 

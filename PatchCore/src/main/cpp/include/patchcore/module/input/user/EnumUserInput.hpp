@@ -50,7 +50,7 @@ public:
         currentWaveForm = static_cast<EnumUserInput&>(other).currentWaveForm;
     }
 
-    virtual ProxyModuleUserInput * createProxy(const std::string &withName) override;
+    virtual ExposedModuleUserInput * createExposed(const std::string &withName) override;
     virtual std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override;
 
 private:

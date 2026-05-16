@@ -25,35 +25,35 @@
 
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/input/user/EnumUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleEnumUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleEnumUserInput.hpp"
 #include "patchcore/module/input/PolyProxyUserInput.hpp"
 
 class PolyProxyEnumUserInput : public PolyProxyUserInput, public EnumUserInput {
 public:
     PolyProxyEnumUserInput(EnumUserInput *input, std::vector<Module *> modulesToProxy)
         : PolyProxyUserInput(), EnumUserInput(input->getName(), input->getValue()) {
-        voiceProxyUserInputs.reserve(modulesToProxy.size());
+        voiceExposedModuleUserInputs.reserve(modulesToProxy.size());
         for (auto &module : modulesToProxy) {
             auto rawVoiceInput = module->getUserInput(input->getName());
             auto voiceInput = dynamic_cast<EnumUserInput *>(rawVoiceInput);
             if (voiceInput == nullptr) {
                 throw std::runtime_error("PolyProxyEnumUserInput: Input is not a EnumUserInput");
             }
-            voiceProxyUserInputs.push_back(nullptr);
+            voiceExposedModuleUserInputs.push_back(nullptr);
             voiceInputs.push_back(voiceInput);
         }
     }
     virtual ~PolyProxyEnumUserInput() = default;
 public:
-    void setVoiceInput(int voiceIndex, ProxyModuleUserInput *voiceInput) override {
-        auto casted = dynamic_cast<ProxyModuleEnumUserInput *>(voiceInput);
+    void setVoiceInput(int voiceIndex, ExposedModuleUserInput *voiceInput) override {
+        auto casted = dynamic_cast<ExposedModuleEnumUserInput *>(voiceInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyEnumUserInput: Composite input is not a CompositeModuleEnumUserInput");
         voiceInputs[voiceIndex] = casted;
     }
-    void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput *compositeInput) override {
-        auto casted = dynamic_cast<ProxyModuleEnumUserInput *>(compositeInput);
+    void setProxyVoiceInput(int voiceIndex, ExposedModuleUserInput *compositeInput) override {
+        auto casted = dynamic_cast<ExposedModuleEnumUserInput *>(compositeInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyEnumUserInput: Composite input is not a CompositeModuleEnumUserInput");
-        voiceProxyUserInputs[voiceIndex] = casted;
+        voiceExposedModuleUserInputs[voiceIndex] = casted;
         proxyVoicesSet = true;
     }
 public:
@@ -62,7 +62,7 @@ public:
     }
     void setValue(int newValue) override {
         if (proxyVoicesSet) {
-            for (auto &voiceInput : voiceProxyUserInputs) {
+            for (auto &voiceInput : voiceExposedModuleUserInputs) {
                 voiceInput->setValue(newValue);
             }
         } else {
@@ -72,8 +72,8 @@ public:
         }
     }
 
-    ProxyModuleUserInput * createProxy(const std::string &withName) override {
-        return new ProxyModuleEnumUserInput(withName, this);
+    ExposedModuleUserInput * createExposed(const std::string &withName) override {
+        return new ExposedModuleEnumUserInput(withName, this);
     }
 
     std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override {
@@ -82,7 +82,7 @@ public:
 
 protected:
     std::vector<EnumUserInput*> voiceInputs;
-    std::vector<ProxyModuleEnumUserInput*> voiceProxyUserInputs;
+    std::vector<ExposedModuleEnumUserInput*> voiceExposedModuleUserInputs;
 };
 
 #endif //PATCHCORE_POLYPROXYENUMUSERINPUT_HPP

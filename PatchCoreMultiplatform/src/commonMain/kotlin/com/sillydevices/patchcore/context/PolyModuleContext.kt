@@ -33,14 +33,15 @@ interface PolyModuleContext: PatchModuleContext {
     fun setActiveVoicesCount(count: Int)
     fun getActiveVoicesCount(): Int
 
-    fun addDemuxOutput(output: ModuleOutput, withName: String, defaultVoice: Int)
+    fun exposeDemuxOutput(output: ModuleOutput, withName: String, defaultVoice: Int)
 }
 
 open class PolyModuleContextImpl(
     pointer: ModulePointer,
     moduleFactory: ModuleFactory,
     contextFactory: ContextFactory,
-): PatchModuleContextImpl(pointer, moduleFactory, contextFactory), PolyModuleContext {
+    exposedIoAlreadyExists: Boolean = false,
+): PatchModuleContextImpl(pointer, moduleFactory, contextFactory, exposedIoAlreadyExists), PolyModuleContext {
 
     override fun setActiveVoicesCount(count: Int) {
         PlatformPolyModule.setActiveVoicesCount(getPointer(), count)
@@ -50,9 +51,9 @@ open class PolyModuleContextImpl(
         return PlatformPolyModule.getActiveVoicesCount(getPointer())
     }
 
-    override fun addDemuxOutput(output: ModuleOutput, withName: String, defaultVoice: Int) {
-//        PlatformPatchModule.addOutput(getPointer(), output.pointer, withName)
-        PlatformPolyModule.addDemuxOutput(getPointer(), output.pointer, withName, defaultVoice)
+    override fun exposeDemuxOutput(output: ModuleOutput, withName: String, defaultVoice: Int) {
+//        PlatformPatchModule.exposeOutput(getPointer(), output.pointer, withName)
+        PlatformPolyModule.exposeDemuxOutput(getPointer(), output.pointer, withName, defaultVoice)
     }
 
 }

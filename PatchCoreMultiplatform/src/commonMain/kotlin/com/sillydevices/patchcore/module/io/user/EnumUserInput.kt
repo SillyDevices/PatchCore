@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.module.io.user
 
-import com.sillydevices.patchcore.module.io.user.proxy.ProxyEnumUserInput
+import com.sillydevices.patchcore.module.io.user.proxy.ExposedModuleEnumUserInput
 
 open class EnumUserInput<T : Enum<T>>(moduleName: String, name: String): UserInputImpl(moduleName, name) {
 
@@ -34,7 +34,7 @@ open class EnumUserInput<T : Enum<T>>(moduleName: String, name: String): UserInp
         setValue(value)
     }
 
-    override fun <R: UserInput> createProxy(moduleName: String, withName: String): R {
-        return ProxyEnumUserInput(moduleName, withName, this) as R
+    override fun <R: UserInput> createExposed(moduleName: String, withName: String): R {
+        return ExposedModuleEnumUserInput(moduleName, withName, this) as R
     }
 }

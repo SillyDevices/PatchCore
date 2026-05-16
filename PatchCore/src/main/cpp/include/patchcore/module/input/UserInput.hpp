@@ -27,7 +27,7 @@
 
 
 class Module;
-class ProxyModuleUserInput;
+class ExposedModuleUserInput;
 class PolyProxyUserInput;
 
 enum class UserInputType {
@@ -56,7 +56,7 @@ public:
 
 
 public:
-    virtual ProxyModuleUserInput* createProxy(const std::string &withName) = 0;
+    virtual ExposedModuleUserInput* createExposed(const std::string &withName) = 0;
     virtual std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) = 0;
 
 private:

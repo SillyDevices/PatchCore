@@ -20,10 +20,10 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.io.input
+package com.sillydevices.patchcore.module.io.output
 
-open class ProxyModuleInput(
+open class ExposedModuleOutput(
     moduleName: String,
     name: String,
-    val input: ModuleInput
-): ModuleInput(moduleName, name)
+    val output: ModuleOutput
+): ModuleOutput(moduleName, name)

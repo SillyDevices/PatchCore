@@ -35,7 +35,7 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicOutputTest) {
     auto patchModule = std::make_unique<PolyModule>(&factory, "voice", 44100, 2);
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.1f)}});
-    patchModule->addOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
+    patchModule->exposeOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
     synth->addModule(std::move(patchModule));
     synth->addPatch(synth->getModule("voice")->getModuleOutput("voiceOutput"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
@@ -64,7 +64,7 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicOutputInlineTest) {
             );
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.1f)}});
-    patchModule->addOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
+    patchModule->exposeOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
 
     synth->addPatch(synth->getModule("voice")->getModuleOutput("voiceOutput"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
@@ -98,14 +98,14 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicIOTest) {
             std::make_unique<PatchModule>(&factory, "const_wrapper", 44100)));
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const_input", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f)}});
-    patchModule->addOutput(patchModule->getModule("const_input")->getModuleOutput(CONST_MODULE_OUTPUT), "constOutput");
+    patchModule->exposeOutput(patchModule->getModule("const_input")->getModuleOutput(CONST_MODULE_OUTPUT), "constOutput");
 
     polyModule->addPatch(
             polyModule->getModule("const_wrapper")->getModuleOutput("constOutput"),
             polyModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_INPUT));
 
-    polyModule->addInput(polyModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_CV), "voiceCV");
-    polyModule->addOutput(polyModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "voiceOutput");
+    polyModule->exposeInput(polyModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_CV), "voiceCV");
+    polyModule->exposeOutput(polyModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "voiceOutput");
 
     synth->createModule(CONST_MODULE_TYPE_NAME, "const_cv", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.5f) }} );
 
@@ -144,7 +144,7 @@ TEST(PolyModuleTest, PatchModuleToPolyUserInputTest) {
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) } } );
     patchModule->createModule(ATTENUVERTER_MODULE_TYPE_NAME, "mod", { } );
-    patchModule->addOutput(patchModule->getModule("mod")->getModuleOutput(ATTENUVERTER_MODULE_OUTPUT_OUTPUT), "voiceOutput");
+    patchModule->exposeOutput(patchModule->getModule("mod")->getModuleOutput(ATTENUVERTER_MODULE_OUTPUT_OUTPUT), "voiceOutput");
     patchModule->addPatch(
             patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT),
             patchModule->getModule("mod")->getModuleInput(ATTENUVERTER_MODULE_INPUT_INPUT));
@@ -153,7 +153,7 @@ TEST(PolyModuleTest, PatchModuleToPolyUserInputTest) {
     //auto input = dynamic_cast<FloatUserInput*>(patchModule->getModule("mod")->getUserInput(MODULATION_INPUT_VALUE));
     //input->setValue(1.0f);
 
-    patchModule->addUserInput(patchModule->getModule("mod")->getUserInput(ATTENUVERTER_MODULE_INPUT_VALUE), "modulationInput");
+    patchModule->exposeUserInput(patchModule->getModule("mod")->getUserInput(ATTENUVERTER_MODULE_INPUT_VALUE), "modulationInput");
     auto input = dynamic_cast<FloatUserInput*>(patchModule->getUserInput("modulationInput"));
     input->setValue(1.0f);
 

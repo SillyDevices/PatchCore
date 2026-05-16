@@ -21,9 +21,9 @@
  */
 
 #include "patchcore/module/PatchModule.hpp"
-#include "patchcore/module/input/user/ProxyModuleBoolUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleEnumUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleFloatUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleBoolUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleEnumUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleFloatUserInput.hpp"
 #include "patchcore/module/PolyModule.hpp"
 #include "patchcore/module/PolyProxyPatchModule.hpp"
 #include <stdexcept>
@@ -47,14 +47,14 @@ PatchModule::PatchModule(const PatchModule &other): Module(other.name, other.sam
         addModule(module->clone());
     }
     //clone _compositeModuleInputs and _compositeModuleOutputs
-    for (auto &input: other._proxyModuleInputs) {
-        cloneProxyInput(input);
+    for (auto &input: other._exposedInputs) {
+        cloneExposedInput(input);
     }
-    for (auto &output: other._proxyModuleOutputs){
-        cloneProxyOutput(output);
+    for (auto &output: other._exposedOutputs){
+        cloneExposedOutput(output);
     }
-    for (auto &input: other._proxyModuleUserInputs) {
-        cloneProxyUserInput(input);
+    for (auto &input: other._exposedUserInputs) {
+        cloneExposedUserInput(input);
     }
     //clone router patches and _modulesToEnvelope and _interpolatedInputsToEnvelope
     clonePatches(other._router);
@@ -70,18 +70,18 @@ PatchModule::PatchModule(): Module("", 44100) { }
 //TODO add destructor to clear vectors with pointers
 PatchModule::~PatchModule() {
     //clear proxy inputs and outputs
-    for (auto &input: _proxyModuleInputs) {
+    for (auto &input: _exposedInputs) {
         delete input;
     }
-    _proxyModuleInputs.clear();
-    for (auto &output: _proxyModuleOutputs) {
+    _exposedInputs.clear();
+    for (auto &output: _exposedOutputs) {
         delete output;
     }
-    _proxyModuleOutputs.clear();
-    for (auto &userInput: _proxyModuleUserInputs) {
+    _exposedOutputs.clear();
+    for (auto &userInput: _exposedUserInputs) {
         delete userInput;
     }
-    _proxyModuleUserInputs.clear();
+    _exposedUserInputs.clear();
 };
 
 void PatchModule::onStartBuffer(int size) {
@@ -94,15 +94,15 @@ void PatchModule::envelope() {
     //it's not a best option to do that
     std::lock_guard<std::mutex> lock(routerMutex);
 
-    // What about _proxyModuleUserInputs? who envelope them? maybe parrent Module does it?
+    // What about _exposedUserInputs? who envelope them? maybe parrent Module does it?
 
-    for (const auto input: _proxyModuleInputs) {
+    for (const auto input: _exposedInputs) {
         input->envelope();
     }
 
     _router.envelope();
 
-    for (auto output: _proxyModuleOutputs) {
+    for (auto output: _exposedOutputs) {
         output->envelope();
     }
 }
@@ -190,64 +190,69 @@ void PatchModule::clonePatches(const AbstractRouter &router) {
 }
 
 
-ProxyModuleInput* PatchModule::addInput(ModuleInput* input, const std::string& withName) {
+ExposedModuleInput* PatchModule::exposeInput(ModuleInput* input, const std::string& withName) {
     if (input == nullptr) throw std::invalid_argument("Input cannot be null");
 
     std::lock_guard<std::mutex> lock(_mutex);
 
-    ProxyModuleInput* proxyInput = input->createProxy(withName);
-    _proxyModuleInputs.push_back(proxyInput);
+    ExposedModuleInput* exposedInput = input->createExposed(withName);
+    _exposedInputs.push_back(exposedInput);
     //TODO check if router needs update
 
-    registerInput(*proxyInput, withName);
-    return proxyInput;
+    registerInput(*exposedInput, withName);
+    return exposedInput;
 }
 
-ProxyModuleOutput* PatchModule::addOutput(ModuleOutput* output, const std::string& withName) {
+ExposedModuleOutput* PatchModule::exposeOutput(ModuleOutput* output, const std::string& withName) {
     if (output == nullptr) throw std::invalid_argument("Output cannot be null");
 
     std::lock_guard<std::mutex> lock(_mutex);
 
-    ProxyModuleOutput* proxyOutput = output->createProxy(withName);
-    _proxyModuleOutputs.push_back(proxyOutput);
-    registerOutput(*proxyOutput, withName);
-    _router.moduleInputChanged(output->getModule());
-    return proxyOutput;
+    Module* outputOwner = output->getModule();
+    Module* directOwnedModule = outputOwner != nullptr ? findDirectOwnedModule(outputOwner) : nullptr;
+    ExposedModuleOutput* exposedOutput = output->createExposed(withName);
+    if (directOwnedModule != nullptr && directOwnedModule != outputOwner) {
+        directOwnedModule->onProxyOutputCreated(output, withName);
+    }
+    _exposedOutputs.push_back(exposedOutput);
+    registerOutput(*exposedOutput, withName);
+    _router.moduleInputChanged(directOwnedModule != nullptr ? directOwnedModule : outputOwner);
+    return exposedOutput;
 }
 
-UserInput* PatchModule::addUserInput(UserInput* input, const std::string& withName) {
+UserInput* PatchModule::exposeUserInput(UserInput* input, const std::string& withName) {
     if (input == nullptr) throw std::invalid_argument("UserInput cannot be null");
-    ProxyModuleUserInput *proxyUserInput = input->createProxy(withName);
-    _proxyModuleUserInputs.push_back(proxyUserInput);
-    auto userInput = dynamic_cast<UserInput *>(proxyUserInput);
-    if (userInput == nullptr) throw std::runtime_error("PolyModule::addUserInput: casted input is not a UserInput");
+    ExposedModuleUserInput *exposedUserInput = input->createExposed(withName);
+    _exposedUserInputs.push_back(exposedUserInput);
+    auto userInput = dynamic_cast<UserInput *>(exposedUserInput);
+    if (userInput == nullptr) throw std::runtime_error("PolyModule::exposeUserInput: casted input is not a UserInput");
     registerUserInput(*userInput, withName);
     return userInput;
 }
 
-void PatchModule::cloneProxyInput(const ProxyModuleInput* input) {
+void PatchModule::cloneExposedInput(const ExposedModuleInput* input) {
     auto withName = input->getName();
     auto realInput = input->getModuleInput();
     auto newInput = findInputByClone(*realInput);
     if (newInput == nullptr) {
         throw std::runtime_error("Input " + realInput->getName() + " not found in module " + realInput->getModule()->getModuleName());
     }
-    addInput(newInput, withName);
+    exposeInput(newInput, withName);
 }
 
-void PatchModule::cloneProxyOutput(const ProxyModuleOutput* output) {
+void PatchModule::cloneExposedOutput(const ExposedModuleOutput* output) {
     auto withName = output->getName();
     auto realOutput = output->getModuleOutput();
     auto newOutput = findOutputByClone(*realOutput);
     if (newOutput == nullptr) {
         throw std::runtime_error("Output " + realOutput->getName() + " not found in module " + realOutput->getModule()->getModuleName());
     }
-    addOutput(newOutput, withName);
+    exposeOutput(newOutput, withName);
 }
 
-void PatchModule::cloneProxyUserInput(const ProxyModuleUserInput* input) {
+void PatchModule::cloneExposedUserInput(const ExposedModuleUserInput* input) {
     //TODO
-    auto casted = dynamic_cast<const ProxyModuleUserInput*>(input);
+    auto casted = dynamic_cast<const ExposedModuleUserInput*>(input);
     auto realInput = casted->getUserInput();
     auto realInputModuleName = realInput->getModule()->getModuleName();
     auto realInputName = realInput->getName();
@@ -261,7 +266,7 @@ void PatchModule::cloneProxyUserInput(const ProxyModuleUserInput* input) {
     if (newInput == nullptr) {
         throw std::runtime_error("User Input " + realInputName + " not found in module " + realInputModuleName);
     }
-    addUserInput(newInput, name);
+    exposeUserInput(newInput, name);
 }
 
 ModuleInput* PatchModule::findInputByClone(const ModuleInput &input) const {
@@ -285,6 +290,32 @@ ModuleOutput *PatchModule::findOutputByClone(const ModuleOutput &output) const {
         auto found = module->getModuleOutput(outputName);
         if (found != nullptr) {
             return found;
+        }
+    }
+    return nullptr;
+}
+
+bool PatchModule::containsModuleRecursive(const PatchModule& patch, const Module* target) const {
+    for (const auto& module : patch._modules) {
+        if (module.get() == target) {
+            return true;
+        }
+        auto childPatch = dynamic_cast<PatchModule*>(module.get());
+        if (childPatch != nullptr && containsModuleRecursive(*childPatch, target)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+Module* PatchModule::findDirectOwnedModule(const Module* module) const {
+    for (const auto& ownedModule : _modules) {
+        if (ownedModule.get() == module) {
+            return ownedModule.get();
+        }
+        auto childPatch = dynamic_cast<PatchModule*>(ownedModule.get());
+        if (childPatch != nullptr && containsModuleRecursive(*childPatch, module)) {
+            return ownedModule.get();
         }
     }
     return nullptr;

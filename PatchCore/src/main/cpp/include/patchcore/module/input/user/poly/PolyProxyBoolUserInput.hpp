@@ -25,21 +25,21 @@
 
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/input/user/BoolUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleBoolUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleBoolUserInput.hpp"
 #include "patchcore/module/input/PolyProxyUserInput.hpp"
 
 class PolyProxyBoolUserInput : public PolyProxyUserInput, public BoolUserInput {
 public:
     PolyProxyBoolUserInput(BoolUserInput *input, std::vector<Module *> modulesToProxy)
         : PolyProxyUserInput(), BoolUserInput(input->getName()) {
-        voiceProxyUserInputs.reserve(modulesToProxy.size());
+        voiceExposedModuleUserInputs.reserve(modulesToProxy.size());
         for (auto &module : modulesToProxy) {
             auto rawVoiceInput = module->getUserInput(input->getName());
             auto voiceInput = dynamic_cast<BoolUserInput *>(rawVoiceInput);
             if (voiceInput == nullptr) {
                 throw std::runtime_error("PolyProxyBoolUserInput: Input is not a BoolUserInput");
             }
-            voiceProxyUserInputs.push_back(nullptr);
+            voiceExposedModuleUserInputs.push_back(nullptr);
             if (voiceInput) {
                 voiceInputs.push_back(voiceInput);
             } else {
@@ -49,15 +49,15 @@ public:
     }
     virtual ~PolyProxyBoolUserInput() = default;
 public:
-    void setVoiceInput(int voiceIndex, ProxyModuleUserInput *voiceInput) override {
-        auto casted = dynamic_cast<ProxyModuleBoolUserInput *>(voiceInput);
+    void setVoiceInput(int voiceIndex, ExposedModuleUserInput *voiceInput) override {
+        auto casted = dynamic_cast<ExposedModuleBoolUserInput *>(voiceInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyBoolUserInput: Composite input is not a CompositeModuleBoolUserInput");
         voiceInputs[voiceIndex] = casted;
     }
-    void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput *compositeInput) override {
-        auto casted = dynamic_cast<ProxyModuleBoolUserInput *>(compositeInput);
+    void setProxyVoiceInput(int voiceIndex, ExposedModuleUserInput *compositeInput) override {
+        auto casted = dynamic_cast<ExposedModuleBoolUserInput *>(compositeInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyBoolUserInput: Composite input is not a CompositeModuleBoolUserInput");
-        voiceProxyUserInputs[voiceIndex] = casted;
+        voiceExposedModuleUserInputs[voiceIndex] = casted;
         proxyVoicesSet = true;
     }
 public:
@@ -66,7 +66,7 @@ public:
     }
     void setValue(bool newValue) override {
         if (proxyVoicesSet) {
-            for (auto &voiceInput: voiceProxyUserInputs) {
+            for (auto &voiceInput: voiceExposedModuleUserInputs) {
                 voiceInput->setValue(newValue);
             }
         } else {
@@ -76,8 +76,8 @@ public:
         }
     }
 
-    ProxyModuleUserInput * createProxy(const std::string &withName) override {
-        return new ProxyModuleBoolUserInput(withName, this);
+    ExposedModuleUserInput * createExposed(const std::string &withName) override {
+        return new ExposedModuleBoolUserInput(withName, this);
     }
 
     std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override {
@@ -85,7 +85,7 @@ public:
     }
 protected:
     std::vector<BoolUserInput*> voiceInputs;
-    std::vector<ProxyModuleBoolUserInput*> voiceProxyUserInputs;
+    std::vector<ExposedModuleBoolUserInput*> voiceExposedModuleUserInputs;
 };
 
 #endif //PATCHCORE_POLYPROXYBOOLUSERINPUT_HPP

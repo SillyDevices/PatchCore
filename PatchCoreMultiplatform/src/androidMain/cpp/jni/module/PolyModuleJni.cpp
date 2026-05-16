@@ -71,7 +71,7 @@ Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_getActiveVoices
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_addDemuxOutput(
+Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_exposeDemuxOutput(
         JNIEnv *env, jobject thiz, jlong poly_module_pointer, jlong output_pointer,
         jstring output_name, jint default_voice) {
     auto module = reinterpret_cast<Module *>(poly_module_pointer);
@@ -82,6 +82,6 @@ Java_com_sillydevices_patchcore_android_jni_module_PolyModuleJni_addDemuxOutput(
     if (output == nullptr) throw std::runtime_error("Output pointer is null");
     const char *outputNameChars = env->GetStringUTFChars(output_name, nullptr);
     std::string outputNameString(outputNameChars);
-    polyModule->addDemuxOutput(output, outputNameString, default_voice);
+    polyModule->exposeDemuxOutput(output, outputNameString, default_voice);
     env->ReleaseStringUTFChars(output_name, outputNameChars);
 }

@@ -20,12 +20,27 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.io.user.proxy
+#ifndef PATCHCORE_PROXYMODULEUSERINPUT_HPP
+#define PATCHCORE_PROXYMODULEUSERINPUT_HPP
 
-import com.sillydevices.patchcore.module.io.user.EnumUserInput
+#include "patchcore/module/input/UserInput.hpp"
 
-class ProxyEnumUserInput<T : Enum<T>>(
-    moduleName: String,
-    name: String,
-    override val userInput: EnumUserInput<T>):
-    EnumUserInput<T>(moduleName, name), ProxyUserInput
+// Note: Descendants of this class should inherit from UserInput
+class ExposedModuleUserInput {
+public:
+    ExposedModuleUserInput(UserInput* userInput):  _userInput(userInput) {
+
+    };
+    virtual ~ExposedModuleUserInput() = default;
+
+public:
+    [[nodiscard]]
+    virtual UserInput* getUserInput() const {
+        return _userInput;
+    };
+
+private:
+    UserInput* _userInput;
+};
+
+#endif //PATCHCORE_PROXYMODULEUSERINPUT_HPP

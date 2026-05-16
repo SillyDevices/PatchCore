@@ -39,7 +39,7 @@ TEST(PatchModuleTest, PatchModuleBasicOutputTest) {
             );
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.8f) } } );
-    patchModule->addOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
+    patchModule->exposeOutput(patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), "voiceOutput");
 
     synth->addPatch(synth->getModule("voice")->getModuleOutput("voiceOutput"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
@@ -69,8 +69,8 @@ TEST(PatchModuleTest, PatchModuleBasicInputTest) {
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const_p_one", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) } } );
     patchModule->createModule(VCA_MODULE_TYPE_NAME, "vca", {  } );
-    patchModule->addInput(patchModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
-    patchModule->addOutput(patchModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
+    patchModule->exposeInput(patchModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
+    patchModule->exposeOutput(patchModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
     patchModule->addPatch(
             patchModule->getModule("const_p_one")->getModuleOutput(CONST_MODULE_OUTPUT),
             patchModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_CV));
@@ -103,8 +103,8 @@ TEST(PatchModuleTest, PatchModuleBasicCopyInputTest) {
     patchModule->addPatch(
             patchModule->getModule("const_p_one")->getModuleOutput(CONST_MODULE_OUTPUT),
             patchModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_CV));
-    patchModule->addInput(patchModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
-    patchModule->addOutput(patchModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
+    patchModule->exposeInput(patchModule->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
+    patchModule->exposeOutput(patchModule->getModule("vca")->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
 
     auto clone = patchModule->clone();
     patchModule.reset();
@@ -136,7 +136,7 @@ TEST(PatchModuleTest, interolatedUserInputTest) {
 
     patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) } } );
     patchModule->createModule(ATTENUVERTER_MODULE_TYPE_NAME, "mod", { } );
-    patchModule->addOutput(patchModule->getModule("mod")->getModuleOutput(ATTENUVERTER_MODULE_OUTPUT_OUTPUT), "voiceOutput");
+    patchModule->exposeOutput(patchModule->getModule("mod")->getModuleOutput(ATTENUVERTER_MODULE_OUTPUT_OUTPUT), "voiceOutput");
     patchModule->addPatch(
             patchModule->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT),
             patchModule->getModule("mod")->getModuleInput(ATTENUVERTER_MODULE_INPUT_INPUT));

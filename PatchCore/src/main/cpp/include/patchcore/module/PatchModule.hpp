@@ -27,18 +27,18 @@
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/router/Router.hpp"
 #include "patchcore/module/router/GraphRouter.hpp"
-#include "patchcore/module/output/ProxyModuleOutput.hpp"
-#include "patchcore/module/input/ProxyModuleInput.hpp"
-#include "patchcore/module/input/ProxyModuleUserInput.hpp"
+#include "patchcore/module/output/ExposedModuleOutput.hpp"
+#include "patchcore/module/input/ExposedModuleInput.hpp"
+#include "patchcore/module/input/ExposedModuleUserInput.hpp"
 
 #include <string>
 #include <vector>
 
 /*
  * PatchModule can be used to create subModule with multiple modules inside, connections between them and inputs/outputs
- * outward facing inputs/outputs should be exposed manually by calling addInput/addOutput
+ * outward facing inputs/outputs should be exposed manually by calling exposeInput/exposeOutput
  * userInputs are available througth getModule("module_name")->getUserInput("input_name") or
- * exposed by addUserInput
+ * exposed by exposeUserInput
  * the main usecase is to create a module dynamically
  */
 
@@ -59,16 +59,18 @@ public:
     //creates a new input/output from existing ModuleInput/ModuleOutput
 public:
     //TODO rename to createProxyInput/Output/UserInput
-    virtual ProxyModuleInput* addInput(ModuleInput* input, const std::string& withName);
-    virtual ProxyModuleOutput* addOutput(ModuleOutput* output, const std::string& withName);
-    virtual UserInput* addUserInput(UserInput* input, const std::string& withName);
+    virtual ExposedModuleInput* exposeInput(ModuleInput* input, const std::string& withName);
+    virtual ExposedModuleOutput* exposeOutput(ModuleOutput* output, const std::string& withName);
+    virtual UserInput* exposeUserInput(UserInput* input, const std::string& withName);
 private:
-    void cloneProxyInput(const ProxyModuleInput* input);
-    void cloneProxyOutput(const ProxyModuleOutput* output);
-    void cloneProxyUserInput(const ProxyModuleUserInput* input);
+    void cloneExposedInput(const ExposedModuleInput* input);
+    void cloneExposedOutput(const ExposedModuleOutput* output);
+    void cloneExposedUserInput(const ExposedModuleUserInput* input);
 private:
     ModuleInput* findInputByClone(const ModuleInput &input) const;
     ModuleOutput* findOutputByClone(const ModuleOutput &output) const;
+    Module* findDirectOwnedModule(const Module* module) const;
+    bool containsModuleRecursive(const PatchModule& patch, const Module* target) const;
 
     //PatchModule specific
 public:
@@ -106,9 +108,9 @@ private:
 
     std::vector<std::unique_ptr<Module>> _modules  = std::vector<std::unique_ptr<Module>>();
 
-    std::vector<ProxyModuleOutput *> _proxyModuleOutputs;
-    std::vector<ProxyModuleInput *> _proxyModuleInputs;
-    std::vector<ProxyModuleUserInput *> _proxyModuleUserInputs;
+    std::vector<ExposedModuleOutput *> _exposedOutputs;
+    std::vector<ExposedModuleInput *> _exposedInputs;
+    std::vector<ExposedModuleUserInput *> _exposedUserInputs;
 
 };
 

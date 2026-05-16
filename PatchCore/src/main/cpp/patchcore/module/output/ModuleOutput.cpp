@@ -22,7 +22,7 @@
 
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
-#include "patchcore/module/output/ProxyModuleOutput.hpp"
+#include "patchcore/module/output/ExposedModuleOutput.hpp"
 
 ModuleOutput::ModuleOutput(std::string outputName): name(outputName) {
 
@@ -32,10 +32,10 @@ void ModuleOutput::setModule(Module* module) {
     _module = module;
 }
 
-ProxyModuleOutput *ModuleOutput::createProxy(const std::string &withName) {
+ExposedModuleOutput *ModuleOutput::createExposed(const std::string &withName) {
     hasProxy = true;
     _module->onProxyOutputCreated(this, withName);
-    return new ProxyModuleOutput(withName, this);
+    return new ExposedModuleOutput(withName, this);
 }
 
 bool ModuleOutput::hasProxyOutput() const {

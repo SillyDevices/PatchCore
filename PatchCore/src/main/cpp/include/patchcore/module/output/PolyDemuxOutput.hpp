@@ -24,12 +24,14 @@
 #define PATCHCORE_POLYDEMUXOUTPUT_HPP
 
 #include "patchcore/module/Module.hpp"
+#include "patchcore/module/output/ExposedModuleOutput.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
 #include "patchcore/module/output/PolyProxyOutput.hpp"
 
-class PolyDemuxOutput : public PolyProxyOutput {
+class PolyDemuxOutput : public PolyProxyOutput, public ExposedModuleOutput {
 public:
-    PolyDemuxOutput(PolyProxyOutput *output, int defaultVoiceIndex): PolyProxyOutput(*output), _voiceIndex(defaultVoiceIndex) { }
+    PolyDemuxOutput(PolyProxyOutput *output, const std::string& withName, int defaultVoiceIndex)
+        : ModuleOutput(withName), PolyProxyOutput(*output), ExposedModuleOutput(withName, output), _voiceIndex(defaultVoiceIndex) { }
     ~PolyDemuxOutput() override = default;
 public:
     void envelope() override{

@@ -27,7 +27,7 @@ add_library(
         patchcore/module/input/user/EnumUserInput.cpp
         patchcore/module/input/user/BoolUserInput.cpp
         patchcore/module/input/user/special/PassFloatUserInput.cpp
-        patchcore/module/input/user/special/ProxyFloatUserInput.cpp
+        patchcore/module/input/user/special/ExposedFloatUserInput.cpp
         patchcore/module/input/user/special/OnStartBufferCallbackUserInput.cpp
         patchcore/module/input/user/special/CallbackFloatUserInput.cpp
         patchcore/module/input/user/special/CallbackBooleanUserInput.cpp
@@ -91,6 +91,7 @@ add_library(
         patchcore/test/ModularSynthTester.cpp
 
         utils/timeUtils.cpp
+        utils/PatchCoreLogger.cpp
 )
 
 target_include_directories(PatchCore PUBLIC include)

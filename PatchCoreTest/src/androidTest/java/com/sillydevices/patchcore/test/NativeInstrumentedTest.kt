@@ -59,7 +59,8 @@ class NativeInstrumentedTest {
 //        val testName = "PatchModuleTest.interolatedUserInputTest"
 //        val testName = "KeyboardTest.monoKeyboardTwoKeysCvTest1"
 //        val testName = "PerformanceTest.PatchModulePerformanceTest"
-        val testName = "GraphRouterTest.*"
+//        val testName = "GraphRouterTest.*"
+        val testName = "GraphRouterTest.Test"
 
         if (runSingleNativeTest(testName) != 0) {
             throw RuntimeException("Native test '$testName' failed")

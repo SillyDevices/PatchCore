@@ -20,10 +20,24 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.io.user.proxy
+#ifndef PATCHCORE_EXPOSEDFLOATUSERINPUT_HPP
+#define PATCHCORE_EXPOSEDFLOATUSERINPUT_HPP
 
-import com.sillydevices.patchcore.module.io.user.UserInput
+#include "patchcore/module/input/user/FloatUserInput.hpp"
+#include <string>
+#include <vector>
 
-interface ProxyUserInput: UserInput {
-    val userInput: UserInput
-}
+class ExposedFloatUserInput: public FloatUserInput {
+public:
+    ExposedFloatUserInput(std::string name, std::vector<FloatUserInput*> inputs);
+    virtual ~ExposedFloatUserInput() = default;
+public:
+    void onStartBuffer(int size) override;
+    void envelope() override;
+    void setValue(float value) override;
+private:
+    std::vector<FloatUserInput*> inputs;
+    int count = 0;
+};
+
+#endif //PATCHCORE_EXPOSEDFLOATUSERINPUT_HPP

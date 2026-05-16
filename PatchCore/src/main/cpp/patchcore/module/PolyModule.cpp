@@ -22,7 +22,9 @@
 
 #include "patchcore/module/PolyModule.hpp"
 #include "patchcore/module/PolyProxyModule.hpp"
+#include "patchcore/module/input/ExposedModuleUserInput.hpp"
 #include "patchcore/module/output/PolyDemuxOutput.hpp"
+#include "patchcore/module/output/PolyExposedOutput.hpp"
 #include <string>
 #include <stdio.h>
 
@@ -45,6 +47,28 @@ PolyModule::PolyModule(ModuleFactory *factory, std::string name, int sampleRate,
     setActiveVoiceCount(voiceCount);
 }
 
+PolyModule::~PolyModule() {
+    for (auto* input : exposedInputs) {
+        delete input;
+    }
+    exposedInputs.clear();
+
+    for (auto* output : exposedOutputs) {
+        delete output;
+    }
+    exposedOutputs.clear();
+
+    for (auto* input : exposedUserInputs) {
+        delete input;
+    }
+    exposedUserInputs.clear();
+
+    for (auto* output : ownedProxyOutputs) {
+        delete output;
+    }
+    ownedProxyOutputs.clear();
+}
+
 void PolyModule::onStartBuffer(int size) {
     for (const auto &voice: voices) {
         voice->onStartBuffer(size);
@@ -52,6 +76,9 @@ void PolyModule::onStartBuffer(int size) {
 }
 
 void PolyModule::envelope() {
+    for (const auto &exposedInput : exposedInputs) {
+        exposedInput->envelope();
+    }
     for (const auto &proxyInput : proxyInputs) {
         proxyInput->envelope();
     }
@@ -62,71 +89,74 @@ void PolyModule::envelope() {
     for (const auto &proxyOutput : proxyOutputs) {
         proxyOutput->envelope();
     }
+    for (const auto &exposedOutput : exposedOutputs) {
+        exposedOutput->envelope();
+    }
 }
 
-ProxyModuleInput *PolyModule::addInput(ModuleInput *input, const std::string &withName) {
+ExposedModuleInput *PolyModule::exposeInput(ModuleInput *input, const std::string &withName) {
     auto casted = dynamic_cast<PolyProxyInput *>(input);
-    if (casted == nullptr) throw std::runtime_error("PolyModule::addInput: input is not a PolyProxyInput");
-    // pass corresponding module input to each voice
-//    for (int i = 0; i < voiceCount; ++i) {
-//        auto compositeVoiceInput = voices[i]->addInput(casted->getVoice(i), withName);
-//        casted->setCompositeVoiceInput(i, compositeVoiceInput);
-//    }
+    if (casted == nullptr) throw std::runtime_error("PolyModule::exposeInput: input is not a PolyProxyInput");
     for (int i = 0; i < voiceCount; ++i) {
-        auto compositeVoiceInput = voices[i]->addInput(casted->getVoice(i), withName);
+        auto compositeVoiceInput = voices[i]->exposeInput(casted->getVoice(i), withName);
         casted->setCompositeVoiceInput(i, compositeVoiceInput);
         casted->setVoiceInput(i, compositeVoiceInput);
     }
-    registerInput(*casted, withName);
+    auto* exposedInput = casted->createExposed(withName);
+    exposedInputs.push_back(exposedInput);
+    registerInput(*exposedInput, withName);
     proxyInputs.push_back(casted);
-    return nullptr;
+    return exposedInput;
 }
 
-ProxyModuleOutput *PolyModule::addOutput(ModuleOutput *output, const std::string &withName) {
+ExposedModuleOutput *PolyModule::exposeOutput(ModuleOutput *output, const std::string &withName) {
     auto casted = dynamic_cast<PolyProxyOutput *>(output);
-    if (casted == nullptr) throw std::runtime_error("PolyModule::addOutput: output is not a PolyProxyOutput");
-    // pass corresponding module output to each voice
-//    for (int i = 0; i < voiceCount; ++i) {
-//        voices[i]->addOutput(casted->getVoice(i), withName);
-//    }
+    if (casted == nullptr) throw std::runtime_error("PolyModule::exposeOutput: output is not a PolyProxyOutput");
+    auto* exposedOutput = new PolyExposedOutput(casted, withName);
+    // Expose each voice output so nested voice graphs keep their output path reachable.
     for (int i = 0; i < voiceCount; ++i) {
-        auto compositeVoiceOutput= voices[i]->addOutput(casted->getVoice(i), withName);
-        casted->setVoiceOutput(i, compositeVoiceOutput);
+        auto compositeVoiceOutput = voices[i]->exposeOutput(casted->getVoice(i), withName);
+        exposedOutput->setVoiceOutput(i, compositeVoiceOutput);
     }
-    registerOutput(*casted, withName);
-    proxyOutputs.push_back(casted);
-    return nullptr;
+    registerOutput(*exposedOutput, withName);
+    ownedProxyOutputs.push_back(exposedOutput);
+    proxyOutputs.push_back(exposedOutput);
+    return exposedOutput;
 }
 
-ProxyModuleOutput *PolyModule::addDemuxOutput(ModuleOutput *output, const std::string &withName, const int defaultVoiceIndex) {
+ExposedModuleOutput *PolyModule::exposeDemuxOutput(ModuleOutput *output, const std::string &withName, const int defaultVoiceIndex) {
     if (output == nullptr) throw std::invalid_argument("Output cannot be null");
     auto casted = dynamic_cast<PolyProxyOutput *>(output);
-    if (casted == nullptr) throw std::runtime_error("PolyModule::addDemuxOutput: output is not a PolyProxyOutput");
+    if (casted == nullptr) throw std::runtime_error("PolyModule::exposeDemuxOutput: output is not a PolyProxyOutput");
+    auto* demuxOutput = new PolyDemuxOutput(casted, withName, defaultVoiceIndex);
     // pass corresponding module output to each voice
     for (int i = 0; i < voiceCount; ++i) {
-        auto compositeVoiceOutput= voices[i]->addOutput(casted->getVoice(i), withName);
-        casted->setVoiceOutput(i, compositeVoiceOutput);
+        auto compositeVoiceOutput = voices[i]->exposeOutput(casted->getVoice(i), withName);
+        demuxOutput->setVoiceOutput(i, compositeVoiceOutput);
     }
-    PolyProxyOutput *demuxOutput = new PolyDemuxOutput(casted, defaultVoiceIndex);
     registerOutput(*demuxOutput, withName);
+    ownedProxyOutputs.push_back(demuxOutput);
     proxyOutputs.push_back(demuxOutput);
-    return nullptr;
+    return demuxOutput;
 }
 
-UserInput *PolyModule::addUserInput(UserInput *input, const std::string &withName) {
+UserInput *PolyModule::exposeUserInput(UserInput *input, const std::string &withName) {
     auto casted = dynamic_cast<PolyProxyUserInput *>(input);
-    if (casted == nullptr) throw std::runtime_error("PolyModule::addUserInput: input is not a PolyProxyUserInput");
+    if (casted == nullptr) throw std::runtime_error("PolyModule::exposeUserInput: input is not a PolyProxyUserInput");
     // pass corresponding module output to each voice
     for (int i = 0; i < voiceCount; ++i) {
-        auto compositeVoiceUserInput = voices[i]->addUserInput(casted->getVoice(i), withName);
-        casted->setProxyVoiceInput(i, dynamic_cast<ProxyModuleUserInput *>(compositeVoiceUserInput));
-        casted->setVoiceInput(i, dynamic_cast<ProxyModuleUserInput *>(compositeVoiceUserInput));
+        auto compositeVoiceUserInput = voices[i]->exposeUserInput(casted->getVoice(i), withName);
+        casted->setProxyVoiceInput(i, dynamic_cast<ExposedModuleUserInput *>(compositeVoiceUserInput));
+        casted->setVoiceInput(i, dynamic_cast<ExposedModuleUserInput *>(compositeVoiceUserInput));
     }
-    auto userInput = dynamic_cast<UserInput *>(casted);
-    if (userInput == nullptr) throw std::runtime_error("PolyModule::addUserInput: casted input is not a UserInput");
-    registerUserInput(*userInput, withName);
-    proxyUserInputs.push_back(casted);
-    return nullptr;
+    auto* polyUserInput = dynamic_cast<UserInput *>(casted);
+    if (polyUserInput == nullptr) throw std::runtime_error("PolyModule::exposeUserInput: casted input is not a UserInput");
+    auto* exposedUserInput = polyUserInput->createExposed(withName);
+    auto castedExposedUserInput = dynamic_cast<UserInput *>(exposedUserInput);
+    if (castedExposedUserInput == nullptr) throw std::runtime_error("PolyModule::exposeUserInput: exposed input is not a UserInput");
+    exposedUserInputs.push_back(exposedUserInput);
+    registerUserInput(*castedExposedUserInput, withName);
+    return castedExposedUserInput;
 }
 
 Module *PolyModule::createModule(const std::string &moduleTypeName, const std::string &moduleName,
@@ -224,12 +254,3 @@ void PolyModule::setActiveVoiceCount(size_t count) {
     }
     activeVoiceCount = count;
 }
-
-
-
-
-
-
-
-
-

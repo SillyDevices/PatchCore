@@ -25,9 +25,9 @@ package com.sillydevices.patchcore.module.io.output
 import com.sillydevices.patchcore.platform.module.output.PlatformPolyDemuxOutput
 
 class ModuleDemuxOutput(
-    createFrom: ProxyModuleOutput,
+    createFrom: ExposedModuleOutput,
     val defaultVoice: Int
-): ProxyModuleOutput(createFrom.moduleName, createFrom.name, createFrom.output) {
+): ExposedModuleOutput(createFrom.moduleName, createFrom.name, createFrom.output) {
 
     fun setVoiceIndex(voiceIndex: Int) {
         PlatformPolyDemuxOutput.setVoiceIndex(pointer, voiceIndex)

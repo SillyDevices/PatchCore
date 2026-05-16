@@ -26,7 +26,7 @@
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
 
-class PolyProxyOutput : public ModuleOutput {
+class PolyProxyOutput : public virtual ModuleOutput {
 public:
     PolyProxyOutput(ModuleOutput *output, std::vector<Module *> modulesToProxy)
         : ModuleOutput(output->getName()) {
@@ -44,7 +44,7 @@ public:
     ModuleOutput* getVoice(int voiceIndex) {
         return voiceOutputs[voiceIndex];
     }
-    //TODO this is a hack to update voiceOutput from PolyModule::addOutput
+    //TODO this is a hack to update voiceOutput from PolyModule::exposeOutput
     void setVoiceOutput(int voiceIndex, ModuleOutput* output) {
         voiceOutputs[voiceIndex] = output;
     }

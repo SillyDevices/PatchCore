@@ -33,6 +33,7 @@ import com.sillydevices.patchcore.modules.ConstModule
 import com.sillydevices.patchcore.synth.ModularSynth
 import org.junit.Before
 import org.junit.Test
+import org.junit.Assert.assertNotEquals
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
@@ -64,6 +65,36 @@ class PolyModuleTest {
         }
 
         val synth = patchCore.createSynth(TestSynth())
+        SynthTester().testModularSynth(
+            synth,
+            2f, 2f,
+            100, 100, 0.0001f
+        )
+
+        synth.release()
+        patchCore.release()
+    }
+
+    @Test
+    fun testPatchFromInternalPolyModuleOutputToOutside() {
+        class CustomModule: PolyModule("poly", 4) {
+            val bias by module(ConstModule("bias", 0.5f))
+            val output by expose(bias.output, "polyOutput")
+        }
+
+        class TestSynth: ModularSynth() {
+            val module by module(CustomModule())
+
+            override val defaultPatch: Patch = createPatch {
+                patch(module.output, monoOutput)
+            }
+        }
+
+        val synth = patchCore.createSynth(TestSynth())
+        assertNotEquals(
+            synth.module.output.pointer.nativePointer,
+            synth.module.bias.output.pointer.nativePointer
+        )
         SynthTester().testModularSynth(
             synth,
             2f, 2f,

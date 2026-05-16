@@ -21,24 +21,165 @@
  */
 
 #include "patchcore/module/router/GraphRouter.hpp"
+#include "patchcore/module/output/ExposedModuleOutput.hpp"
+#include "PatchCoreLogger.hpp"
 #include "../../algorithm/Tarjan.hpp"
 #include "../../algorithm/RemoveUnreachableNodes.hpp"
 #include "../../algorithm/Demucron.hpp"
+#include <algorithm>
+#include <functional>
 #include <queue>
+#include <sstream>
 #include <unordered_set>
 
+namespace {
 
-// hashing function for pair<int, int>
-struct PairHash {
-    size_t operator()(const std::pair<int, int> &p) const noexcept {
-        return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+    constexpr const char* kGraphRouterLogTag = "GraphRouter";
+
+    std::string formatBracketList(std::vector<std::string> values) {
+        std::sort(values.begin(), values.end());
+
+        std::ostringstream result;
+        result << "[";
+        for (size_t index = 0; index < values.size(); ++index) {
+            if (index > 0) {
+                result << ", ";
+            }
+            result << values[index];
+        }
+        result << "]";
+        return result.str();
     }
-};
 
+    std::string formatArrowChain(const std::vector<std::string>& values) {
+        std::ostringstream result;
+        result << "[";
+        for (size_t index = 0; index < values.size(); ++index) {
+            if (index > 0) {
+                result << " -> ";
+            }
+            result << values[index];
+        }
+        result << "]";
+        return result.str();
+    }
 
+    std::vector<std::string> findCycleIoChain(
+        const std::vector<int>& cycleModuleIds,
+        const std::vector<std::pair<ModuleOutput*, ModuleInput*>>& patches,
+        const std::unordered_map<Module*, int>& moduleToId
+    ) {
+        std::vector<std::string> ioChain;
+        if (cycleModuleIds.size() < 2) {
+            return ioChain;
+        }
+
+        for (size_t index = 0; index + 1 < cycleModuleIds.size(); ++index) {
+            const auto fromModuleId = cycleModuleIds[index];
+            const auto toModuleId = cycleModuleIds[index + 1];
+
+            std::vector<std::string> edgeIoDescriptions;
+            for (const auto& patch: patches) {
+                const auto fromIt = moduleToId.find(patch.first->getModule());
+                const auto toIt = moduleToId.find(patch.second->getModule());
+                if (fromIt == moduleToId.end() || toIt == moduleToId.end()) {
+                    continue;
+                }
+
+                if (fromIt->second == fromModuleId && toIt->second == toModuleId) {
+                    edgeIoDescriptions.push_back(
+                        patch.first->getModule()->getModuleName() + ":" + patch.first->getName() +
+                        " -> " +
+                        patch.second->getModule()->getModuleName() + ":" + patch.second->getName()
+                    );
+                }
+            }
+
+            std::sort(edgeIoDescriptions.begin(), edgeIoDescriptions.end());
+            ioChain.insert(ioChain.end(), edgeIoDescriptions.begin(), edgeIoDescriptions.end());
+        }
+
+        return ioChain;
+    }
+
+    std::vector<int> findCycleInScc(
+        const std::vector<int>& sccModuleIds,
+        const std::vector<std::pair<int, int>>& moduleGraph
+    ) {
+        std::unordered_set<int> sccModuleIdSet(sccModuleIds.begin(), sccModuleIds.end());
+        std::unordered_map<int, std::vector<int>> adjacency;
+        for (const auto moduleId: sccModuleIds) {
+            adjacency[moduleId] = {};
+        }
+
+        for (const auto& edge: moduleGraph) {
+            if (
+                sccModuleIdSet.find(edge.first) != sccModuleIdSet.end() &&
+                sccModuleIdSet.find(edge.second) != sccModuleIdSet.end()
+            ) {
+                adjacency[edge.first].push_back(edge.second);
+            }
+        }
+
+        for (auto& [moduleId, neighbours]: adjacency) {
+            std::sort(neighbours.begin(), neighbours.end());
+            neighbours.erase(std::unique(neighbours.begin(), neighbours.end()), neighbours.end());
+        }
+
+        auto orderedModuleIds = sccModuleIds;
+        std::sort(orderedModuleIds.begin(), orderedModuleIds.end());
+
+        std::unordered_map<int, int> stateByModuleId;
+        std::unordered_map<int, size_t> stackIndexByModuleId;
+        std::vector<int> dfsStack;
+        std::vector<int> cycle;
+
+        std::function<bool(int)> dfs = [&](int moduleId) -> bool {
+            stateByModuleId[moduleId] = 1;
+            stackIndexByModuleId[moduleId] = dfsStack.size();
+            dfsStack.push_back(moduleId);
+
+            for (const auto nextModuleId: adjacency[moduleId]) {
+                if (stateByModuleId[nextModuleId] == 0) {
+                    if (dfs(nextModuleId)) {
+                        return true;
+                    }
+                } else if (stateByModuleId[nextModuleId] == 1) {
+                    cycle.assign(
+                        dfsStack.begin() + static_cast<std::ptrdiff_t>(stackIndexByModuleId[nextModuleId]),
+                        dfsStack.end()
+                    );
+                    cycle.push_back(nextModuleId);
+                    return true;
+                }
+            }
+
+            dfsStack.pop_back();
+            stackIndexByModuleId.erase(moduleId);
+            stateByModuleId[moduleId] = 2;
+            return false;
+        };
+
+        for (const auto moduleId: orderedModuleIds) {
+            if (stateByModuleId[moduleId] == 0 && dfs(moduleId)) {
+                break;
+            }
+        }
+
+        return cycle;
+    }
+
+    // hashing function for pair<int, int>
+    struct PairHash {
+        size_t operator()(const std::pair<int, int> &p) const noexcept {
+            return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+        }
+    };
+
+} // namespace
 
 GraphRouter::GraphRouter(Module *parent): AbstractRouter(), parentModule(parent) {
-    if (parent == nullptr) throw std::runtime_error("TopoRouter::TopoRouter: parent module is nullptr");
+    if (parent == nullptr) throw std::runtime_error("GraphRouter::GraphRouter: parent module is nullptr");
     modules.push_back(parent);
     moduleToId[parent] = nextModuleId;
     idToModule[nextModuleId] = parent;
@@ -115,6 +256,7 @@ void GraphRouter::add(ModuleOutput *from, ModuleInput *to) {
             to->getModule()->getModuleName() + ":" + to->getName() +
             " ) with modules not managed by this router( "+ parentModule->getModuleName() +" )");
     }
+    patchcoreLogInfo(kGraphRouterLogTag, "add patch from " + from->getModule()->getModuleName() + ":"+ from->getName() + " to " + to->getModule()->getModuleName() + ":" + to->getName());
     patches.emplace_back(from, to);
     updateModuleGraph();
 }
@@ -149,6 +291,7 @@ void GraphRouter::moduleInputChanged(Module* module) {
 
 
 void GraphRouter::updateModuleGraph() {
+    std::lock_guard<std::mutex> lock(updateModuleGraphMutex);
     bool hasLoops = false;
 
     int parentModuleId = moduleToId[parentModule];
@@ -179,6 +322,7 @@ void GraphRouter::updateModuleGraph() {
             outputModuleIds.insert(toModuleId);
         }
 
+        patchcoreLogInfo(kGraphRouterLogTag, "updateModuleGraph add edge from " + patch.first->getModule()->getModuleName() + ":"+ patch.first->getName() + " to " + patch.second->getModule()->getModuleName() + ":" + patch.second->getName());
         moduleGraphSet.insert({ fromModuleId, toModuleId } );
     }
 
@@ -195,6 +339,7 @@ void GraphRouter::updateModuleGraph() {
     // mo modules in graph; reset connection matrix and update
     if (moduleGraph.empty()) {
         envelopeStages.clear();
+        logModuleGraph("updateModuleGraph");
         return;
     }
 
@@ -210,12 +355,38 @@ void GraphRouter::updateModuleGraph() {
 
     //helper map from moduleId to sccId
     std::unordered_map<int, int> moduleIdToSCCId;
+    std::vector<std::string> loopDescriptions;
     for (int sccId = 0; sccId < SCCs.size(); ++sccId) {
         for (const auto &moduleId: SCCs[sccId]) {
             moduleIdToSCCId[moduleId] = sccId;
         }
         if (SCCs[sccId].size() > 1) {
             hasLoops = true;
+        }
+
+        const auto cycleModuleIds = findCycleInScc(SCCs[sccId], moduleGraph);
+        if (!cycleModuleIds.empty()) {
+            std::vector<std::string> sccModuleNames;
+            sccModuleNames.reserve(SCCs[sccId].size());
+            for (const auto moduleId: SCCs[sccId]) {
+                sccModuleNames.push_back(idToModule[moduleId]->getModuleName());
+            }
+
+            std::vector<std::string> cycleModuleNames;
+            cycleModuleNames.reserve(cycleModuleIds.size());
+            for (const auto moduleId: cycleModuleIds) {
+                cycleModuleNames.push_back(idToModule[moduleId]->getModuleName());
+            }
+
+            const auto cycleIoChain = findCycleIoChain(cycleModuleIds, patches, moduleToId);
+
+            std::ostringstream loopDescription;
+            loopDescription
+                << "updateModuleGraph loop[" << loopDescriptions.size() << "]"
+                << " scc=" << formatBracketList(sccModuleNames)
+                << " chain=" << formatArrowChain(cycleModuleNames)
+                << " io=" << formatBracketList(cycleIoChain);
+            loopDescriptions.push_back(loopDescription.str());
         }
     }
 
@@ -306,10 +477,71 @@ void GraphRouter::updateModuleGraph() {
     allEnvelopeModules = std::vector<Module*>(envelopeModuleSet.begin(), envelopeModuleSet.end());
 
     _containLoops = hasLoops;
+    logModuleGraph("updateModuleGraph");
+    for (const auto& loopDescription: loopDescriptions) {
+        patchcoreLogInfo(kGraphRouterLogTag, loopDescription);
+    }
 }
 
 std::vector<std::pair<ModuleOutput *, ModuleInput *>> GraphRouter::getPatches() const {
     return patches;
+}
+
+void GraphRouter::logModuleGraph(const char* operationName) const {
+    std::ostringstream summary;
+    summary
+        << operationName
+        << " parent=" << parentModule->getModuleName()
+        << " hasLoops=" << (_containLoops ? "true" : "false")
+        << " modules=" << (modules.empty() ? 0 : static_cast<int>(modules.size()) - 1)
+        << " stages=" << envelopeStages.size();
+    patchcoreLogInfo(kGraphRouterLogTag, summary.str());
+
+    for (size_t stageIndex = 0; stageIndex < envelopeStages.size(); ++stageIndex) {
+        const auto& stage = envelopeStages[stageIndex];
+        const auto stagePrefix = std::string("\t stage[") + std::to_string(stageIndex) + "]";
+
+        std::vector<std::string> moduleNames;
+        moduleNames.reserve(stage.modulesInStage.size());
+        for (const auto* module: stage.modulesInStage) {
+            moduleNames.push_back(module->getModuleName());
+        }
+
+        patchcoreLogInfo(
+            kGraphRouterLogTag,
+            stagePrefix + " modules=" + formatBracketList(moduleNames)
+        );
+
+        if (stage.inputsInStage.empty()) {
+            patchcoreLogInfo(
+                kGraphRouterLogTag,
+                stagePrefix + " routes=<empty>"
+            );
+            continue;
+        }
+
+        std::vector<std::string> routeLines;
+        routeLines.reserve(stage.inputsInStage.size());
+        for (size_t inputIndex = 0; inputIndex < stage.inputsInStage.size(); ++inputIndex) {
+            const auto* input = stage.inputsInStage[inputIndex];
+            std::vector<std::string> outputNames;
+            outputNames.reserve(stage.outputsInStage[inputIndex].size());
+            for (const auto* output: stage.outputsInStage[inputIndex]) {
+                outputNames.push_back(output->getModule()->getModuleName() + ":" + output->getName());
+            }
+
+            routeLines.push_back(
+                stagePrefix + " route " +
+                input->getModule()->getModuleName() + ":" + input->getName() +
+                " <- " + formatBracketList(outputNames)
+            );
+        }
+
+        std::sort(routeLines.begin(), routeLines.end());
+        for (const auto& routeLine: routeLines) {
+            patchcoreLogInfo(kGraphRouterLogTag, routeLine);
+        }
+    }
 }
 
 void GraphRouter::onStartBuffer(int size) {

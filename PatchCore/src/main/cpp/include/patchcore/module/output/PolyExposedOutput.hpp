@@ -20,29 +20,21 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/module/input/user/special/ProxyFloatUserInput.hpp"
+#ifndef PATCHCORE_POLYEXPOSEDOUTPUT_HPP
+#define PATCHCORE_POLYEXPOSEDOUTPUT_HPP
 
-ProxyFloatUserInput::ProxyFloatUserInput(std::string name, std::vector<FloatUserInput*> inputs) : FloatUserInput(name), inputs(std::move(inputs)) {
-    count = this->inputs.size();
-}
+#include "patchcore/module/output/ExposedModuleOutput.hpp"
+#include "patchcore/module/output/PolyProxyOutput.hpp"
 
-void ProxyFloatUserInput::setValue(float newValue) {
-    value = newValue;
-    for (int i = 0; i < count; i++){
-        inputs[i]->setValue(newValue);
+class PolyExposedOutput : public PolyProxyOutput, public ExposedModuleOutput {
+public:
+    PolyExposedOutput(PolyProxyOutput *output, const std::string& withName)
+        : ModuleOutput(withName), PolyProxyOutput(*output), ExposedModuleOutput(withName, output) { }
+    ~PolyExposedOutput() override = default;
+
+    void envelope() override {
+        PolyProxyOutput::envelope();
     }
-}
+};
 
-void ProxyFloatUserInput::envelope() {
-    for (int i = 0; i < count; i++){
-        inputs[i]->envelope();
-    }
-}
-
-void ProxyFloatUserInput::onStartBuffer(int size) {
-    for (int i = 0; i < count; i++) {
-        inputs[i]->onStartBuffer(size);
-    }
-}
-
-
+#endif //PATCHCORE_POLYEXPOSEDOUTPUT_HPP

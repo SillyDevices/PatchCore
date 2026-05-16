@@ -26,35 +26,35 @@
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/input/PolyProxyUserInput.hpp"
 #include "patchcore/module/input/user/FloatUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleFloatUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleFloatUserInput.hpp"
 
 class PolyProxyFloatUserInput : public FloatUserInput, public PolyProxyUserInput {
 public:
     PolyProxyFloatUserInput(FloatUserInput *input, std::vector<Module *> modulesToProxy)
     : FloatUserInput(input->getName(), input->getSpeed()), PolyProxyUserInput() {
-        voiceProxyUserInputs.reserve(modulesToProxy.size());
+        voiceExposedModuleUserInputs.reserve(modulesToProxy.size());
         for (auto &module : modulesToProxy) {
             auto rawVoiceInput = module->getUserInput(input->getName());
             auto voiceInput = dynamic_cast<FloatUserInput *>(rawVoiceInput);
             if (voiceInput == nullptr) {
                 throw std::runtime_error("PolyProxyFloatUserInput: Input is not a FloatUserInput");
             }
-            voiceProxyUserInputs.push_back(nullptr);
+            voiceExposedModuleUserInputs.push_back(nullptr);
             voiceInputs.push_back(voiceInput);
         }
     }
     virtual ~PolyProxyFloatUserInput() = default;
 public:
-    void setVoiceInput(int voiceIndex, ProxyModuleUserInput *voiceInput) override {
-        auto casted = dynamic_cast<ProxyModuleFloatUserInput *>(voiceInput);
+    void setVoiceInput(int voiceIndex, ExposedModuleUserInput *voiceInput) override {
+        auto casted = dynamic_cast<ExposedModuleFloatUserInput *>(voiceInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyFloatUserInput: Composite input is not a CompositeModuleFloatUserInput");
         voiceInputs[voiceIndex] = casted;
     }
 
-    void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput *compositeInput) override {
-        auto casted = dynamic_cast<ProxyModuleFloatUserInput *>(compositeInput);
+    void setProxyVoiceInput(int voiceIndex, ExposedModuleUserInput *compositeInput) override {
+        auto casted = dynamic_cast<ExposedModuleFloatUserInput *>(compositeInput);
         if (casted == nullptr) throw std::runtime_error("PolyProxyFloatUserInput: Composite input is not a CompositeModuleFloatUserInput");
-        voiceProxyUserInputs[voiceIndex] = casted;
+        voiceExposedModuleUserInputs[voiceIndex] = casted;
         proxyVoicesSet = true;
     }
 public:
@@ -63,7 +63,7 @@ public:
     }
     void setValue(float newValue) override {
         if (proxyVoicesSet) {
-            for (auto &voiceInput: voiceProxyUserInputs) {
+            for (auto &voiceInput: voiceExposedModuleUserInputs) {
                 voiceInput->setValue(newValue);
             }
         } else {
@@ -74,7 +74,7 @@ public:
     }
     void setParameterLockValue(float newValue) override {
         if (proxyVoicesSet) {
-            for (auto &voiceInput : voiceProxyUserInputs) {
+            for (auto &voiceInput : voiceExposedModuleUserInputs) {
                 voiceInput->setParameterLockValue(newValue);
             }
         } else {
@@ -85,7 +85,7 @@ public:
     }
     void clearParameterLock() override {
         if (proxyVoicesSet) {
-            for (auto &voiceInput: voiceProxyUserInputs) {
+            for (auto &voiceInput: voiceExposedModuleUserInputs) {
                 voiceInput->clearParameterLock();
             }
         } else {
@@ -99,8 +99,8 @@ public:
         // envelope on voice inputs is handled by voice modules directly
     }
 
-    ProxyModuleUserInput * createProxy(const std::string &withName) override {
-        return new ProxyModuleFloatUserInput(withName, this);
+    ExposedModuleUserInput * createExposed(const std::string &withName) override {
+        return new ExposedModuleFloatUserInput(withName, this);
     }
 
     std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override {
@@ -108,7 +108,7 @@ public:
     }
 protected:
     std::vector<FloatUserInput*> voiceInputs;
-    std::vector<ProxyModuleFloatUserInput*> voiceProxyUserInputs;
+    std::vector<ExposedModuleFloatUserInput*> voiceExposedModuleUserInputs;
 };
 
 #endif //PATCHCORE_POLYPROXYFLOATUSERINPUT_HPP
