@@ -29,6 +29,8 @@
 #include <vector>
 #include <unordered_map>
 
+class GraphRouterDiagnostics;
+
 class GraphRouter: public AbstractRouter {
 public:
     explicit GraphRouter(Module* parent);
@@ -52,7 +54,9 @@ public:
     std::vector<std::pair<ModuleOutput*, ModuleInput*>> getPatches() const override;
 
     bool containLoops() const { return _containLoops; }
-    void logModuleGraph(const char* operationName = "logModuleGraph") const;
+
+private:
+    friend class GraphRouterDiagnostics;
 
 protected:
     void updateModuleGraph();

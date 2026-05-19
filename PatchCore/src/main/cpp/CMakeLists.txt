@@ -17,6 +17,7 @@ add_library(
         patchcore/module/PolyProxyPatchModule.cpp
         patchcore/module/router/Router.cpp
         patchcore/module/router/GraphRouter.cpp
+        patchcore/module/router/GraphRouterDiagnostics.cpp
 
         patchcore/module/ModuleParameter.cpp
 

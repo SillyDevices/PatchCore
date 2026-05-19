@@ -23,7 +23,6 @@
 #include "patchcore/modules/vcf/BiQuadVCFModule.hpp"
 
 #include "patchcore/dsp/dsp.h"
-#include <android/log.h>
 
 BiQuadVCFModule::BiQuadVCFModule(std::string name, int sampleRate, std::map<std::string, ModuleParameter> parameters)
     : BiQuadVCFModule(
