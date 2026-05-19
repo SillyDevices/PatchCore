@@ -33,5 +33,5 @@ interface UserInput: NamedIO {
 
     fun applyParentContext(pointer: UserInputPointer, parentContext: NativeContext<ModulePointer>)
 
-    abstract fun <T: UserInput> createProxy(moduleName: String, withName: String): T
+    abstract fun <T: UserInput> createExposed(moduleName: String, withName: String): T
 }

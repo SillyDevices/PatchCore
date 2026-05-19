@@ -22,11 +22,10 @@
 
 package com.sillydevices.patchcore.module.io.user.proxy
 
-import com.sillydevices.patchcore.module.io.user.FloatUserInput
-import com.sillydevices.patchcore.module.io.user.UserInput
+import com.sillydevices.patchcore.module.io.user.BooleanUserInput
 
-class ProxyFloatUserInput(
+class ExposedModuleBooleanUserInput(
     moduleName: String,
     name: String,
-    override val userInput: FloatUserInput
-): FloatUserInput(moduleName, name, 0f .. 1f), ProxyUserInput
+    override val userInput: BooleanUserInput
+): BooleanUserInput(moduleName, name), ExposedModuleUserInput

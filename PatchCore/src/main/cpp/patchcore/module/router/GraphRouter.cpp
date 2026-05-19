@@ -21,24 +21,31 @@
  */
 
 #include "patchcore/module/router/GraphRouter.hpp"
+#include "patchcore/module/output/ExposedModuleOutput.hpp"
+#include "PatchCoreLogger.hpp"
+#include "GraphRouterDiagnostics.hpp"
 #include "../../algorithm/Tarjan.hpp"
 #include "../../algorithm/RemoveUnreachableNodes.hpp"
 #include "../../algorithm/Demucron.hpp"
-#include <queue>
+#include <algorithm>
 #include <unordered_set>
 
+#ifndef PATCHCORE_GRAPH_ROUTER_DEBUG
+#define PATCHCORE_GRAPH_ROUTER_DEBUG 0
+#endif
 
-// hashing function for pair<int, int>
-struct PairHash {
-    size_t operator()(const std::pair<int, int> &p) const noexcept {
-        return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
-    }
-};
+namespace {
+    // hashing function for pair<int, int>
+    struct PairHash {
+        size_t operator()(const std::pair<int, int> &p) const noexcept {
+            return std::hash<int>()(p.first) ^ (std::hash<int>()(p.second) << 1);
+        }
+    };
 
-
+} // namespace
 
 GraphRouter::GraphRouter(Module *parent): AbstractRouter(), parentModule(parent) {
-    if (parent == nullptr) throw std::runtime_error("TopoRouter::TopoRouter: parent module is nullptr");
+    if (parent == nullptr) throw std::runtime_error("GraphRouter::GraphRouter: parent module is nullptr");
     modules.push_back(parent);
     moduleToId[parent] = nextModuleId;
     idToModule[nextModuleId] = parent;
@@ -149,6 +156,7 @@ void GraphRouter::moduleInputChanged(Module* module) {
 
 
 void GraphRouter::updateModuleGraph() {
+    std::lock_guard<std::mutex> lock(updateModuleGraphMutex);
     bool hasLoops = false;
 
     int parentModuleId = moduleToId[parentModule];
@@ -195,6 +203,9 @@ void GraphRouter::updateModuleGraph() {
     // mo modules in graph; reset connection matrix and update
     if (moduleGraph.empty()) {
         envelopeStages.clear();
+#if PATCHCORE_GRAPH_ROUTER_DEBUG
+        GraphRouterDiagnostics::logModuleGraph(*this, "updateModuleGraph");
+#endif
         return;
     }
 
@@ -207,7 +218,6 @@ void GraphRouter::updateModuleGraph() {
     auto SCCs = tarjanSCC<int>(moduleGraph);
 
     // build condensed graph of SCCs
-
     //helper map from moduleId to sccId
     std::unordered_map<int, int> moduleIdToSCCId;
     for (int sccId = 0; sccId < SCCs.size(); ++sccId) {
@@ -306,6 +316,9 @@ void GraphRouter::updateModuleGraph() {
     allEnvelopeModules = std::vector<Module*>(envelopeModuleSet.begin(), envelopeModuleSet.end());
 
     _containLoops = hasLoops;
+#if PATCHCORE_GRAPH_ROUTER_DEBUG
+    GraphRouterDiagnostics::logModuleGraph(*this, SCCs, moduleGraph, "updateModuleGraph");
+#endif
 }
 
 std::vector<std::pair<ModuleOutput *, ModuleInput *>> GraphRouter::getPatches() const {

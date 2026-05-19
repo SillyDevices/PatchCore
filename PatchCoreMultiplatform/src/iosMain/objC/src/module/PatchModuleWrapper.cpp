@@ -103,7 +103,7 @@ uintptr_t patchModuleGetModule(uintptr_t patch_module_pointer, char* module_name
     return reinterpret_cast<uintptr_t>(resultModule);
 }
 
-void patchModuleAddInput(uintptr_t patch_module_pointer, uintptr_t input_pointer, char* input_name) {
+void patchModuleExposeInput(uintptr_t patch_module_pointer, uintptr_t input_pointer, char* input_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
@@ -111,10 +111,10 @@ void patchModuleAddInput(uintptr_t patch_module_pointer, uintptr_t input_pointer
     auto input = reinterpret_cast<ModuleInput *>(input_pointer);
     if (input == nullptr) throw std::runtime_error("Input pointer is null");
     std::string inputNameString(input_name);
-    patchModule->addInput(input, inputNameString);
+    patchModule->exposeInput(input, inputNameString);
 }
 
-void patchModuleAddOutput(uintptr_t patch_module_pointer, uintptr_t output_pointer, char* output_name) {
+void patchModuleExposeOutput(uintptr_t patch_module_pointer, uintptr_t output_pointer, char* output_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
@@ -122,10 +122,10 @@ void patchModuleAddOutput(uintptr_t patch_module_pointer, uintptr_t output_point
     auto output = reinterpret_cast<ModuleOutput *>(output_pointer);
     if (output == nullptr) throw std::runtime_error("Output pointer is null");
     std::string outputNameString(output_name);
-    patchModule->addOutput(output, outputNameString);
+    patchModule->exposeOutput(output, outputNameString);
 }
 
-void patchModuleAddUserInput(uintptr_t patch_module_pointer, uintptr_t user_input_pointer, char* input_name) {
+void patchModuleExposeUserInput(uintptr_t patch_module_pointer, uintptr_t user_input_pointer, char* input_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
     auto *patchModule = dynamic_cast<PatchModule *>(module);
     if (patchModule == nullptr) throw std::runtime_error("PatchModule pointer is null");
@@ -133,7 +133,7 @@ void patchModuleAddUserInput(uintptr_t patch_module_pointer, uintptr_t user_inpu
     auto userInput = reinterpret_cast<UserInput *>(user_input_pointer);
     if (userInput == nullptr) throw std::runtime_error("UserInput pointer is null");
     std::string inputNameString(input_name);
-    patchModule->addUserInput(userInput, inputNameString);
+    patchModule->exposeUserInput(userInput, inputNameString);
 }
 
 void patchModuleResetPatch(uintptr_t patch_module_pointer) {

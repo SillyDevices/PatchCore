@@ -27,7 +27,7 @@
 #include <string>
 
 class Module;
-class ProxyModuleOutput;
+class ExposedModuleOutput;
 
 class ModuleOutput: Output {
 
@@ -51,7 +51,7 @@ public:
         return _module;
     }
 
-    virtual ProxyModuleOutput* createProxy(const std::string& withName);
+    virtual ExposedModuleOutput* createExposed(const std::string& withName);
 
     [[nodiscard]]
     bool hasProxyOutput() const;

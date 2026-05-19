@@ -63,7 +63,7 @@ public:
         return speed;
     }
 
-    virtual ProxyModuleUserInput* createProxy(const std::string &withName) override;
+    virtual ExposedModuleUserInput* createExposed(const std::string &withName) override;
     virtual std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override;
 
 protected:

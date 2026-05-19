@@ -25,7 +25,7 @@
 
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/input/ModuleInput.hpp"
-#include "patchcore/module/input/ProxyModuleInput.hpp"
+#include "patchcore/module/input/ExposedModuleInput.hpp"
 
 class PolyProxyInput : public ModuleInput {
 public:
@@ -44,11 +44,11 @@ public:
     }
     virtual ~PolyProxyInput() = default;
 public:
-    //TODO this is a hack to update voiceOutput from PolyModule::addInput
+    //TODO this is a hack to update voiceOutput from PolyModule::exposeInput
     void setVoiceInput(int voiceIndex, ModuleInput *voiceInput) {
         voiceInputs[voiceIndex] = voiceInput;
     }
-    void setCompositeVoiceInput(int voiceIndex, ProxyModuleInput *compositeInput) {
+    void setCompositeVoiceInput(int voiceIndex, ExposedModuleInput *compositeInput) {
         voiceProxyInputs[voiceIndex] = compositeInput;
     }
 public:
@@ -62,7 +62,7 @@ public:
     }
 protected:
     std::vector<ModuleInput*> voiceInputs;
-    std::vector<ProxyModuleInput*> voiceProxyInputs;
+    std::vector<ExposedModuleInput*> voiceProxyInputs;
 };
 
 #endif //PATCHCORE_POLYPROXYINPUT_HPP

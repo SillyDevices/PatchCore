@@ -21,7 +21,7 @@
  */
 
 #include "patchcore/module/input/user/FloatUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleFloatUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleFloatUserInput.hpp"
 #include "patchcore/module/input/user/poly/PolyProxyFloatUserInput.hpp"
 
 FloatUserInput::FloatUserInput(std::string name): UserInput(name, UserInputType::FLOAT) {};
@@ -56,14 +56,13 @@ void FloatUserInput::clearParameterLock() {
     isLocked = false;
 }
 
-ProxyModuleUserInput *FloatUserInput::createProxy(const std::string &withName) {
-    return new ProxyModuleFloatUserInput(withName, this);
+ExposedModuleUserInput *FloatUserInput::createExposed(const std::string &withName) {
+    return new ExposedModuleFloatUserInput(withName, this);
 }
 
 std::unique_ptr<PolyProxyUserInput> FloatUserInput::createPolyProxy(std::vector<Module *> modulesToProxy) {
     return std::make_unique<PolyProxyFloatUserInput>(this, modulesToProxy);
 }
-
 
 
 

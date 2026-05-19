@@ -26,6 +26,7 @@
 #include <patchcore/modules/ConstModule.hpp>
 #include <patchcore/modules/VCAModule.hpp>
 #include <patchcore/modules/AttenuverterModule.hpp>
+#include <patchcore/module/PolyModule.hpp>
 #include <android/log_macros.h>
 
 #undef LOG_TAG
@@ -43,7 +44,7 @@ void create2SampleDelayPatch(PatchModule* patchModule) {
     auto vcaCvBias = patchModule->createModule(CONST_MODULE_TYPE_NAME, "vcaCvBias", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) }});
 
     auto passOutput = patchModule->createModule(PASS_MODULE_TYPE_NAME, "output", {} );
-    patchModule->addOutput(passOutput->getModuleOutput(PASS_MODULE_OUTPUT), "voiceOutput");
+    patchModule->exposeOutput(passOutput->getModuleOutput(PASS_MODULE_OUTPUT), "voiceOutput");
 
 
 
@@ -75,7 +76,7 @@ void create9SampleDelayPatch(PatchModule* patchModule) {
 
 
     auto passOutput = patchModule->createModule(PASS_MODULE_TYPE_NAME, "output", {} );
-    patchModule->addOutput(passOutput->getModuleOutput(PASS_MODULE_OUTPUT), "voiceOutput");
+    patchModule->exposeOutput(passOutput->getModuleOutput(PASS_MODULE_OUTPUT), "voiceOutput");
 
 
 
@@ -144,8 +145,8 @@ TEST(GraphRouterTest, TwoModuleWithPatchInputFirstTest) {
     {
         auto vca = patchModule->createModule(VCA_MODULE_TYPE_NAME, "vca", {});
         //input added after modules is added to the router, so router don't mark it as "output module"!!! this is a problem!
-        patchModule->addInput(vca->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
-        patchModule->addOutput(vca->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
+        patchModule->exposeInput(vca->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
+        patchModule->exposeOutput(vca->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
         //no adding any patches here, and it causes router have np patches and no modules to envelope
 
         auto vcaBias = patchModule->createModule(CONST_MODULE_TYPE_NAME, "vcaBias", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) } } );
@@ -190,8 +191,8 @@ TEST(GraphRouterTest, TwoModuleWithPatchInputLastTest) {
         auto vcaBias = patchModule->createModule(CONST_MODULE_TYPE_NAME, "vcaBias", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) } } );
         patchModule->addPatch(vcaBias->getModuleOutput(CONST_MODULE_OUTPUT), vca->getModuleInput(VCA_MODULE_INPUT_CV));
 
-        patchModule->addInput(vca->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
-        patchModule->addOutput(vca->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
+        patchModule->exposeInput(vca->getModuleInput(VCA_MODULE_INPUT_INPUT), "input");
+        patchModule->exposeOutput(vca->getModuleOutput(VCA_MODULE_OUTPUT_OUTPUT), "output");
     }
 
     auto bias = synth->createModule(CONST_MODULE_TYPE_NAME, "bias", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.5f) } } );
@@ -227,8 +228,8 @@ TEST(GraphRouterTest, OneModuleWithPatchTest) {
     {
         auto pass = patchModule->createModule(PASS_MODULE_TYPE_NAME, "pass", {});
         //input added after modules is added to the router, so router don't mark it as "output module"!!! this is a problem!
-        patchModule->addInput(pass->getModuleInput(PASS_MODULE_INPUT), "input");
-        patchModule->addOutput(pass->getModuleOutput(PASS_MODULE_OUTPUT), "output");
+        patchModule->exposeInput(pass->getModuleInput(PASS_MODULE_INPUT), "input");
+        patchModule->exposeOutput(pass->getModuleOutput(PASS_MODULE_OUTPUT), "output");
         //no adding any patches here, and it causes router have np patches and no modules to envelope
 
         auto fakeConst = patchModule->createModule(CONST_MODULE_TYPE_NAME, "fakeConst", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(1.0f) } } );
@@ -270,8 +271,8 @@ TEST(GraphRouterTest, OneModuleTest) {
     {
         auto pass = patchModule->createModule(PASS_MODULE_TYPE_NAME, "pass", {});
         //input added after modules is added to the router, so router don't mark it as "output module"!!! this is a problem!
-        patchModule->addInput(pass->getModuleInput(PASS_MODULE_INPUT), "input");
-        patchModule->addOutput(pass->getModuleOutput(PASS_MODULE_OUTPUT), "output");
+        patchModule->exposeInput(pass->getModuleInput(PASS_MODULE_INPUT), "input");
+        patchModule->exposeOutput(pass->getModuleOutput(PASS_MODULE_OUTPUT), "output");
         //no adding any patches here, and it causes router have np patches and no modules to envelope
     }
 
@@ -308,6 +309,47 @@ TEST(GraphRouterTest, OneModuleInSynthTest) {
 
     synth->addPatch(bias->getModuleOutput(CONST_MODULE_OUTPUT), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
+
+    auto samples = 20;
+    auto firstResultSample = -1;
+    synth->onStartBuffer(samples);
+    std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
+    for(int i = 0; i < samples; i++) {
+        auto result = synth->computeSample();
+        results[i] = result;
+        if (result.first == 0.5f && firstResultSample == -1) {
+            firstResultSample = i;
+        }
+    }
+    synth->onEndBuffer();
+
+    ASSERT_EQ(firstResultSample, 0);
+    ASSERT_EQ(results.size(), samples); // for debugging
+
+    delete synth;
+}
+
+TEST(GraphRouterTest, Test) {
+    auto synth = new ModularSynth(&factory, 44100);
+    ASSERT_NE(synth, nullptr);
+
+    auto internal = std::make_unique<PolyModule>(&factory, "voice", 44100, 1);
+    {
+        auto passIn = internal->createModule(PASS_MODULE_TYPE_NAME, "passIn", {});
+        internal->exposeInput(passIn->getModuleInput(PASS_MODULE_INPUT), "poly_input");
+        auto passInternal = internal->createModule(PASS_MODULE_TYPE_NAME, "pass", {});
+        internal->addPatch(passIn->getModuleOutput(PASS_MODULE_OUTPUT), passInternal->getModuleInput(PASS_MODULE_INPUT));
+        internal->exposeOutput(passInternal->getModuleOutput(PASS_MODULE_OUTPUT), "poly_output_internal");
+        auto passOut = internal->createModule(PASS_MODULE_TYPE_NAME, "passOut", {});
+        internal->addPatch(passInternal->getModuleOutput(PASS_MODULE_OUTPUT), passOut->getModuleInput(PASS_MODULE_INPUT));
+        internal->exposeOutput(passOut->getModuleOutput(PASS_MODULE_OUTPUT), "poly_output");
+    }
+    auto internalAdded = synth->addModule(std::move(internal));
+
+    auto constModule = synth->createModule(CONST_MODULE_TYPE_NAME, "bias", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.5f) } } );
+
+    synth->addPatch(constModule->getModuleOutput(CONST_MODULE_OUTPUT), internalAdded->getModuleInput("poly_input"));
+    synth->addPatch(internalAdded->getModuleOutput("poly_output_internal"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
     auto samples = 20;
     auto firstResultSample = -1;

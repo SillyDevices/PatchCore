@@ -25,11 +25,11 @@
 
 #include "patchcore/module/output/ModuleOutput.hpp"
 
-class ProxyModuleOutput: public ModuleOutput {
+class ExposedModuleOutput: public virtual ModuleOutput {
 
 public:
-    ProxyModuleOutput(const std::string& outputName, ModuleOutput* output): ModuleOutput(outputName), _output(output) {};
-    virtual ~ProxyModuleOutput() = default;
+    ExposedModuleOutput(const std::string& outputName, ModuleOutput* output): ModuleOutput(outputName), _output(output) {};
+    virtual ~ExposedModuleOutput() = default;
 
     void envelope(){
         value = _output->value;

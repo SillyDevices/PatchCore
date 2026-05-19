@@ -48,7 +48,7 @@ public:
         currentValue = dynamic_cast<BoolUserInput&>(other).currentValue;
     }
 
-    ProxyModuleUserInput * createProxy(const std::string &withName) override;
+    ExposedModuleUserInput * createExposed(const std::string &withName) override;
     virtual std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override;
 
 private:

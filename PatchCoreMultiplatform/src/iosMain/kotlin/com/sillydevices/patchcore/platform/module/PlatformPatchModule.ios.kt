@@ -6,12 +6,12 @@ import com.sillydevices.patchcore.internal.pointers.ModuleOutputPointer
 import com.sillydevices.patchcore.internal.pointers.ModulePointer
 import com.sillydevices.patchcore.internal.pointers.UserInputPointer
 import com.sillydevices.patchcore.ios.wrappers.ModuleParameterWrapper
-import com.sillydevices.patchcore.ios.wrappers.patchModuleAddInput
+import com.sillydevices.patchcore.ios.wrappers.patchModuleExposeInput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddModule
-import com.sillydevices.patchcore.ios.wrappers.patchModuleAddOutput
+import com.sillydevices.patchcore.ios.wrappers.patchModuleExposeOutput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleAddPatch
 import com.sillydevices.patchcore.ios.wrappers.patchModuleRemovePatch
-import com.sillydevices.patchcore.ios.wrappers.patchModuleAddUserInput
+import com.sillydevices.patchcore.ios.wrappers.patchModuleExposeUserInput
 import com.sillydevices.patchcore.ios.wrappers.patchModuleCreateModule
 import com.sillydevices.patchcore.ios.wrappers.patchModuleNew
 import com.sillydevices.patchcore.ios.wrappers.patchModuleDelete
@@ -80,22 +80,22 @@ actual object PlatformPatchModule {
         ))
     }
 
-    actual fun addInput(patchModulePointer: ModulePointer, inputPointer: ModuleInputPointer, withName: String) {
-        patchModuleAddInput(
+    actual fun exposeInput(patchModulePointer: ModulePointer, inputPointer: ModuleInputPointer, withName: String) {
+        patchModuleExposeInput(
             patchModulePointer.nativePointer,
             inputPointer.nativePointer,
             withName.cstr)
     }
 
-    actual fun addOutput(patchModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String) {
-        patchModuleAddOutput(
+    actual fun exposeOutput(patchModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String) {
+        patchModuleExposeOutput(
             patchModulePointer.nativePointer,
             outputPointer.nativePointer,
             withName.cstr)
     }
 
-    actual fun addUserInput(patchModulePointer: ModulePointer, userInputPointer: UserInputPointer, withName: String) {
-        patchModuleAddUserInput(
+    actual fun exposeUserInput(patchModulePointer: ModulePointer, userInputPointer: UserInputPointer, withName: String) {
+        patchModuleExposeUserInput(
             patchModulePointer.nativePointer,
             userInputPointer.nativePointer,
             withName.cstr)

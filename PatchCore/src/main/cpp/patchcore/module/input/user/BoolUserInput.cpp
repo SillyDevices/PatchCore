@@ -21,11 +21,11 @@
  */
 
 #include "patchcore/module/input/user/BoolUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleBoolUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleBoolUserInput.hpp"
 #include "patchcore/module/input/user/poly/PolyProxyBoolUserInput.hpp"
 
-ProxyModuleUserInput *BoolUserInput::createProxy(const std::string &withName) {
-    return new ProxyModuleBoolUserInput(withName, this);
+ExposedModuleUserInput *BoolUserInput::createExposed(const std::string &withName) {
+    return new ExposedModuleBoolUserInput(withName, this);
 }
 
 std::unique_ptr<PolyProxyUserInput> BoolUserInput::createPolyProxy(std::vector<Module *> modulesToProxy) {

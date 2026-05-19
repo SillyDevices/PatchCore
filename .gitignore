@@ -17,6 +17,7 @@
 
 .externalNativeBuild
 .cxx
+.build
 
 local.properties
 repository.properties

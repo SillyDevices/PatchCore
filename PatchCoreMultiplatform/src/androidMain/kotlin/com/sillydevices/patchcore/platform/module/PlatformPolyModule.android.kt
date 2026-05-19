@@ -53,8 +53,8 @@ actual object PlatformPolyModule {
         )
     }
 
-    actual fun addDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int) {
-        return PolyModuleJni.addDemuxOutput(
+    actual fun exposeDemuxOutput(polyModulePointer: ModulePointer, outputPointer: ModuleOutputPointer, withName: String, defaultVoice: Int) {
+        return PolyModuleJni.exposeDemuxOutput(
             polyModulePointer.nativePointer,
             outputPointer.nativePointer,
             withName,

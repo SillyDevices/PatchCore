@@ -23,13 +23,13 @@
 #ifndef DIGITRON_PROXYMODULEFLOATUSERINPUT_HPP
 #define DIGITRON_PROXYMODULEFLOATUSERINPUT_HPP
 
-#include "patchcore/module/input/ProxyModuleUserInput.hpp"
+#include "patchcore/module/input/ExposedModuleUserInput.hpp"
 #include "patchcore/module/input/user/FloatUserInput.hpp"
 
-class ProxyModuleFloatUserInput: public FloatUserInput, public ProxyModuleUserInput {
+class ExposedModuleFloatUserInput: public FloatUserInput, public ExposedModuleUserInput {
 public:
-    ProxyModuleFloatUserInput(std::string name, FloatUserInput *userInput)
-        : FloatUserInput(name), ProxyModuleUserInput(userInput), _floatInput(userInput){
+    ExposedModuleFloatUserInput(std::string name, FloatUserInput *userInput)
+        : FloatUserInput(name), ExposedModuleUserInput(userInput), _floatInput(userInput){
     };
 
     virtual inline void setValue(float newValue) override {
@@ -52,12 +52,12 @@ public:
         _floatInput->envelope();
     }
 
-    ProxyModuleUserInput * createProxy(const std::string &withName) override {
-        return new ProxyModuleFloatUserInput(withName, this);
+    ExposedModuleUserInput * createExposed(const std::string &withName) override {
+        return new ExposedModuleFloatUserInput(withName, this);
     }
 
     std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override {
-        throw std::runtime_error("ProxyModuleFloatUserInput does not support createPolyProxy");
+        throw std::runtime_error("ExposedModuleFloatUserInput does not support createPolyProxy");
     }
 
 protected:

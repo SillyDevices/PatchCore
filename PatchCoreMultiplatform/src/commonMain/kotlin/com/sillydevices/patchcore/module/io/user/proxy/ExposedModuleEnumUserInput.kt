@@ -20,24 +20,12 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#ifndef PATCHCORE_PROXYFLOATUSERINPUT_HPP
-#define PATCHCORE_PROXYFLOATUSERINPUT_HPP
+package com.sillydevices.patchcore.module.io.user.proxy
 
-#include "patchcore/module/input/user/FloatUserInput.hpp"
-#include <string>
-#include <vector>
+import com.sillydevices.patchcore.module.io.user.EnumUserInput
 
-class ProxyFloatUserInput: public FloatUserInput {
-public:
-    ProxyFloatUserInput(std::string name, std::vector<FloatUserInput*> inputs);
-    virtual ~ProxyFloatUserInput() = default;
-public:
-    void onStartBuffer(int size) override;
-    void envelope() override;
-    void setValue(float value) override;
-private:
-    std::vector<FloatUserInput*> inputs;
-    int count = 0;
-};
-
-#endif //PATCHCORE_PROXYFLOATUSERINPUT_HPP
+class ExposedModuleEnumUserInput<T : Enum<T>>(
+    moduleName: String,
+    name: String,
+    override val userInput: EnumUserInput<T>):
+    EnumUserInput<T>(moduleName, name), ExposedModuleUserInput

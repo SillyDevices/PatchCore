@@ -38,6 +38,31 @@ PolyProxyPatchModule::PolyProxyPatchModule(ModuleFactory *factory, const PatchMo
         this->voices.push_back(self);
         this->modulesToProxy.push_back(self);
     }
+
+    auto inputs = module->getModuleInputs();
+    for (const auto& input : inputs) {
+        polyProxyInputs.push_back(std::make_unique<PolyProxyInput>(input.second, modulesToProxy));
+        auto polyProxyInput = polyProxyInputs.back().get();
+        this->PolyModule::registerInput(*polyProxyInput);
+    }
+
+    auto outputs = module->getModuleOutputs();
+    for (const auto& output : outputs) {
+        polyProxyOutputs.push_back(std::make_unique<PolyProxyOutput>(output.second, modulesToProxy));
+        auto polyProxyOutput = polyProxyOutputs.back().get();
+        this->PolyModule::registerOutput(*polyProxyOutput);
+    }
+
+    auto userInputs = module->getUserInputs();
+    for (const auto& userInput : userInputs) {
+        polyProxyUserInputs.push_back(userInput.second->createPolyProxy(modulesToProxy));
+        auto polyProxyUserInput = polyProxyUserInputs.back().get();
+        auto input = dynamic_cast<UserInput *>(polyProxyUserInput);
+        if (input == nullptr) {
+            throw std::runtime_error("PolyProxyPatchModule::PolyProxyPatchModule: UserInput is not of type UserInput");
+        }
+        this->PolyModule::registerUserInput(*input);
+    }
 }
 
 
@@ -64,7 +89,6 @@ const std::unordered_map<std::string, UserInput *>& PolyProxyPatchModule::getUse
 UserInput *PolyProxyPatchModule::getUserInput(const std::string& inputName) {
     return PolyModule::getUserInput(inputName);
 }
-
 
 
 

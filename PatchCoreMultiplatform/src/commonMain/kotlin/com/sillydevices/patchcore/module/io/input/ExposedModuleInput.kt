@@ -20,12 +20,10 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.io.user.proxy
+package com.sillydevices.patchcore.module.io.input
 
-import com.sillydevices.patchcore.module.io.user.BooleanUserInput
-
-class ProxyBooleanUserInput(
+open class ExposedModuleInput(
     moduleName: String,
     name: String,
-    override val userInput: BooleanUserInput
-): BooleanUserInput(moduleName, name), ProxyUserInput
+    val input: ModuleInput
+): ModuleInput(moduleName, name)

@@ -28,6 +28,7 @@ import com.sillydevices.patchcore.context.PatchCoreContext
 import com.sillydevices.patchcore.context.PatchCoreContextImpl
 import com.sillydevices.patchcore.context.PatchModuleContext
 import com.sillydevices.patchcore.context.PatchModuleContextImpl
+import com.sillydevices.patchcore.context.PolyModuleContext
 import com.sillydevices.patchcore.context.PolyModuleContextImpl
 import com.sillydevices.patchcore.context.UserInputContext
 import com.sillydevices.patchcore.context.UserInputContextImpl
@@ -44,7 +45,11 @@ interface ContextFactory {
     fun createPatchCoreContext(): PatchCoreContext
 
     fun createPolyModuleContext(pointer: ModulePointer, parentContext: PatchModuleContext): PatchModuleContext
-    fun createPatchModuleContext(pointer: ModulePointer, parentContext: PatchModuleContext) : PatchModuleContext
+    fun createPatchModuleContext(
+        pointer: ModulePointer,
+        parentContext: PatchModuleContext,
+        exposedIoAlreadyExists: Boolean = false
+    ) : PatchModuleContext
     fun createModuleContext(pointer: ModulePointer, parentContext: PatchModuleContext): ModuleContext
 
     fun createUserInputContext(pointer: UserInputPointer): UserInputContext
@@ -73,15 +78,26 @@ class ContextFactoryImpl(
         parentContext: PatchModuleContext
     ): PatchModuleContext {
         parentContext as PatchModuleContextImpl
-        return PolyModuleContextImpl(pointer, parentContext.moduleFactory, parentContext.getContextFactory())
+        return PolyModuleContextImpl(
+            pointer = pointer,
+            moduleFactory = parentContext.moduleFactory,
+            contextFactory = parentContext.getContextFactory(),
+            exposedIoAlreadyExists = parentContext.exposedIoAlreadyExists || parentContext is PolyModuleContext
+        )
     }
 
     override fun createPatchModuleContext(
         pointer: ModulePointer,
-        parentContext: PatchModuleContext
+        parentContext: PatchModuleContext,
+        exposedIoAlreadyExists: Boolean
     ): PatchModuleContext {
         parentContext as PatchModuleContextImpl
-        return PatchModuleContextImpl(pointer, parentContext.moduleFactory, parentContext.getContextFactory())
+        return PatchModuleContextImpl(
+            pointer = pointer,
+            moduleFactory = parentContext.moduleFactory,
+            contextFactory = parentContext.getContextFactory(),
+            exposedIoAlreadyExists = exposedIoAlreadyExists
+        )
     }
 
     override fun createModuleContext(

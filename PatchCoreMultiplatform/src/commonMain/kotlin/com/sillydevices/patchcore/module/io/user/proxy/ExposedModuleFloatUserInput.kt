@@ -20,10 +20,13 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.module.io.output
+package com.sillydevices.patchcore.module.io.user.proxy
 
-open class ProxyModuleOutput(
+import com.sillydevices.patchcore.module.io.user.FloatUserInput
+import com.sillydevices.patchcore.module.io.user.UserInput
+
+class ExposedModuleFloatUserInput(
     moduleName: String,
     name: String,
-    val output: ModuleOutput
-): ModuleOutput(moduleName, name)
+    override val userInput: FloatUserInput
+): FloatUserInput(moduleName, name, 0f .. 1f), ExposedModuleUserInput

@@ -20,39 +20,40 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#ifndef PATCHCORE_PROXYMODULEBOOLUSERINPUT_HPP
-#define PATCHCORE_PROXYMODULEBOOLUSERINPUT_HPP
+#ifndef PATCHCORE_PROXYMODULEENUMUSERINPUT_HPP
+#define PATCHCORE_PROXYMODULEENUMUSERINPUT_HPP
 
-#include "patchcore/module/input/ProxyModuleUserInput.hpp"
-#include "patchcore/module/input/user/BoolUserInput.hpp"
-
+#include "patchcore/module/input/ExposedModuleUserInput.hpp"
+#include "patchcore/module/input/user/EnumUserInput.hpp"
 #include <string>
 
-class ProxyModuleBoolUserInput: public virtual ProxyModuleUserInput, public BoolUserInput {
+class ExposedModuleEnumUserInput: public virtual ExposedModuleUserInput, public EnumUserInput {
 public:
-    explicit ProxyModuleBoolUserInput(std::string name, BoolUserInput* userInput)
-        : ProxyModuleUserInput(userInput), BoolUserInput(name), _boolInput(userInput) {};
-    virtual ~ProxyModuleBoolUserInput() = default;
+    explicit ExposedModuleEnumUserInput(std::string name, EnumUserInput* userInput)
+        : ExposedModuleUserInput(userInput), EnumUserInput(name), _enumInput(userInput) {
+
+    };
+    virtual ~ExposedModuleEnumUserInput() = default;
 public:
 
-    inline virtual void setValue(bool value) override{
-        _boolInput->setValue(value);
+    inline void setValue(int value) override {
+        _enumInput->setValue(value);
     }
 
-    inline virtual bool getValue() override {
-        return _boolInput->getValue();
+    inline int getValue() override {
+        return _enumInput->getValue();
     }
 
-    ProxyModuleUserInput * createProxy(const std::string &withName) override {
-        return new ProxyModuleBoolUserInput(withName, _boolInput);
+    ExposedModuleUserInput * createExposed(const std::string &withName) override {
+        return new ExposedModuleEnumUserInput(withName, this);
     }
 
     std::unique_ptr<PolyProxyUserInput> createPolyProxy(std::vector<Module *> modulesToProxy) override {
-        throw std::runtime_error("ProxyModuleBoolUserInput does not support createPolyProxy");
+        throw std::runtime_error("ExposedModuleEnumUserInput does not support createPolyProxy");
     }
 
 protected:
-    BoolUserInput* _boolInput;
+    EnumUserInput *_enumInput;
 };
 
-#endif //PATCHCORE_PROXYMODULEBOOLUSERINPUT_HPP
+#endif //PATCHCORE_PROXYMODULEENUMUSERINPUT_HPP

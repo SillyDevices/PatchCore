@@ -109,7 +109,7 @@ JNIEXPORT jlong JNICALL
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddInput(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleExposeInput(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong input_pointer,
         jstring input_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -119,13 +119,13 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
     if (input == nullptr) throw std::runtime_error("Input pointer is null");
     const char *inputNameChars = env->GetStringUTFChars(input_name, nullptr);
     std::string inputNameString(inputNameChars);
-    patchModule->addInput(input, inputNameString);
+    patchModule->exposeInput(input, inputNameString);
     env->ReleaseStringUTFChars(input_name, inputNameChars);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddOutput(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleExposeOutput(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong output_pointer,
         jstring output_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -135,13 +135,13 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
     if (output == nullptr) throw std::runtime_error("Output pointer is null");
     const char *outputNameChars = env->GetStringUTFChars(output_name, nullptr);
     std::string outputNameString(outputNameChars);
-    patchModule->addOutput(output, outputNameString);
+    patchModule->exposeOutput(output, outputNameString);
     env->ReleaseStringUTFChars(output_name, outputNameChars);
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAddUserInput(
+Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleExposeUserInput(
         JNIEnv *env, jobject thiz, jlong patch_module_pointer, jlong user_input_pointer,
         jstring input_name) {
     auto module = reinterpret_cast<Module *>(patch_module_pointer);
@@ -152,7 +152,7 @@ Java_com_sillydevices_patchcore_android_jni_module_PatchModuleJni_patchModuleAdd
     if (userInput == nullptr) throw std::runtime_error("UserInput pointer is null");
     const char *inputNameChars = env->GetStringUTFChars(input_name, nullptr);
     std::string inputNameString(inputNameChars);
-    patchModule->addUserInput(userInput, inputNameString);
+    patchModule->exposeUserInput(userInput, inputNameString);
     env->ReleaseStringUTFChars(input_name, inputNameChars);
 }
 

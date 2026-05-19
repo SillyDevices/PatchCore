@@ -20,18 +20,28 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-package com.sillydevices.patchcore.android.jni.module
+#include "patchcore/module/input/user/special/ExposedFloatUserInput.hpp"
 
-object PolyModuleJni {
-    @JvmName("polyModuleNew")
-    external fun polyModuleNew(moduleFactoryPointer: ULong, name: String, sampleRate: Int, polyphony: Int): ULong
-//    external fun polyModuleRelease(polyModuleManagedPointer: Long)
-
-    @JvmName("setActiveVoicesCount")
-    external fun setActiveVoicesCount(polyModulePointer: ULong, count: Int)
-    @JvmName("getActiveVoicesCount")
-    external fun getActiveVoicesCount(polyModulePointer: ULong): Int
-
-    @JvmName("exposeDemuxOutput")
-    external fun exposeDemuxOutput(polyModulePointer: ULong, outputPointer: ULong, outputName: String, defaultVoice: Int)
+ExposedFloatUserInput::ExposedFloatUserInput(std::string name, std::vector<FloatUserInput*> inputs) : FloatUserInput(name), inputs(std::move(inputs)) {
+    count = this->inputs.size();
 }
+
+void ExposedFloatUserInput::setValue(float newValue) {
+    value = newValue;
+    for (int i = 0; i < count; i++){
+        inputs[i]->setValue(newValue);
+    }
+}
+
+void ExposedFloatUserInput::envelope() {
+    for (int i = 0; i < count; i++){
+        inputs[i]->envelope();
+    }
+}
+
+void ExposedFloatUserInput::onStartBuffer(int size) {
+    for (int i = 0; i < count; i++) {
+        inputs[i]->onStartBuffer(size);
+    }
+}
+

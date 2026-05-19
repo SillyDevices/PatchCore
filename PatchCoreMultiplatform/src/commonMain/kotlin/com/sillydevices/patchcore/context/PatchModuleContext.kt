@@ -35,6 +35,8 @@ import com.sillydevices.patchcore.platform.module.PlatformPatchModule
 import com.sillydevices.patchcore.platform.module.PlatformPolyModule
 
 interface PatchModuleContext: ModuleContext {
+    val exposedIoAlreadyExists: Boolean
+
     fun createModule(module: FactoryModule): ModulePointer
     fun createPatchModule(newPatchModule: PatchModule): ModulePointer
     fun createPolyModule(newPolyModule: PolyModule): ModulePointer
@@ -42,9 +44,9 @@ interface PatchModuleContext: ModuleContext {
     fun addModule(pointer: ModulePointer, name: String): ModulePointer
     fun getModule(name: String): ModulePointer
 
-    fun addInput(input: ModuleInput, withName: String)
-    fun addOutput(output: ModuleOutput, withName: String)
-    fun addUserInput(userInput: UserInput, withName: String)
+    fun exposeInput(input: ModuleInput, withName: String)
+    fun exposeOutput(output: ModuleOutput, withName: String)
+    fun exposeUserInput(userInput: UserInput, withName: String)
 
 
     fun resetPatch()
@@ -62,6 +64,7 @@ open class PatchModuleContextImpl(
     //TODO refactor to not use moduleFactory outside of the context
     val moduleFactory: ModuleFactory,
     contextFactory: ContextFactory,
+    override val exposedIoAlreadyExists: Boolean = false,
 ): PatchModuleContext, ModuleContextImpl(pointer, contextFactory) {
 
     override fun createModule(module: FactoryModule): ModulePointer {
@@ -98,22 +101,22 @@ open class PatchModuleContextImpl(
     }
 
 
-    override fun addInput(input: ModuleInput, withName: String) {
-        PlatformPatchModule.addInput(
+    override fun exposeInput(input: ModuleInput, withName: String) {
+        PlatformPatchModule.exposeInput(
             getPointer(),
             input.pointer,
             withName)
     }
 
-    override fun addOutput(output: ModuleOutput, withName: String) {
-        PlatformPatchModule.addOutput(
+    override fun exposeOutput(output: ModuleOutput, withName: String) {
+        PlatformPatchModule.exposeOutput(
             getPointer(),
             output.pointer,
             withName)
     }
 
-    override fun addUserInput(userInput: UserInput, withName: String) {
-        PlatformPatchModule.addUserInput(
+    override fun exposeUserInput(userInput: UserInput, withName: String) {
+        PlatformPatchModule.exposeUserInput(
             getPointer(),
             userInput.pointer,
             withName)

@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.module.io.user
 
-import com.sillydevices.patchcore.module.io.user.proxy.ProxyBooleanUserInput
+import com.sillydevices.patchcore.module.io.user.proxy.ExposedModuleBooleanUserInput
 
 open class BooleanUserInput(moduleName: String, name: String): UserInputImpl(moduleName, name) {
 
@@ -30,7 +30,7 @@ open class BooleanUserInput(moduleName: String, name: String): UserInputImpl(mod
         context.setBooleanUserInputValue(value)
     }
 
-    override fun <T: UserInput> createProxy(moduleName: String, withName: String): T {
-        return ProxyBooleanUserInput(moduleName, withName, this) as T
+    override fun <T: UserInput> createExposed(moduleName: String, withName: String): T {
+        return ExposedModuleBooleanUserInput(moduleName, withName, this) as T
     }
 }

@@ -21,11 +21,11 @@
  */
 
 #include "patchcore/module/input/ModuleInput.hpp"
-#include "patchcore/module/input/ProxyModuleInput.hpp"
+#include "patchcore/module/input/ExposedModuleInput.hpp"
 
 ModuleInput::ModuleInput(std::string inputName, float disconnectedValue):
                         name(inputName), disconnectedValue(disconnectedValue) {}
 
-ProxyModuleInput *ModuleInput::createProxy(const std::string &withName) {
-    return new ProxyModuleInput(withName, this);
+ExposedModuleInput *ModuleInput::createExposed(const std::string &withName) {
+    return new ExposedModuleInput(withName, this);
 }

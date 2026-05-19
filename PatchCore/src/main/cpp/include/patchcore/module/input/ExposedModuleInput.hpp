@@ -28,13 +28,13 @@
 #include <vector>
 
 //TODO move implementation to .cpp
-class ProxyModuleInput: public ModuleInput {
+class ExposedModuleInput: public ModuleInput {
 public:
-    ProxyModuleInput(const std::string& inputName, ModuleInput* input): ModuleInput(inputName), _input(input) {
+    ExposedModuleInput(const std::string& inputName, ModuleInput* input): ModuleInput(inputName), _input(input) {
 
     };
 
-    virtual ~ProxyModuleInput() = default;
+    virtual ~ExposedModuleInput() = default;
 
     void envelope() const{
         _input->value = value;

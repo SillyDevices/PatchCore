@@ -24,7 +24,7 @@
 #define PATCHCORE_POLYPROXYUSERINPUT_HPP
 
 #include "patchcore/module/input/UserInput.hpp"
-#include "patchcore/module/input/ProxyModuleUserInput.hpp"
+#include "patchcore/module/input/ExposedModuleUserInput.hpp"
 
 
 // Note: Descendants of this class should inherit from UserInput
@@ -36,9 +36,9 @@ public:
 
 public:
     virtual UserInput* getVoice(int voiceIndex) = 0;
-    ////TODO this is a hack to update voiceOutput from PolyModule::addUserInput
-    virtual void setVoiceInput(int voiceIndex, ProxyModuleUserInput* voiceInput) = 0;
-    virtual void setProxyVoiceInput(int voiceIndex, ProxyModuleUserInput* proxyInput) = 0;
+    ////TODO this is a hack to update voiceOutput from PolyModule::exposeUserInput
+    virtual void setVoiceInput(int voiceIndex, ExposedModuleUserInput* voiceInput) = 0;
+    virtual void setProxyVoiceInput(int voiceIndex, ExposedModuleUserInput* proxyInput) = 0;
 
 protected:
     bool proxyVoicesSet = false;

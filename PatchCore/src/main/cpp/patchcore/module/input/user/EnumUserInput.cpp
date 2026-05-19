@@ -21,11 +21,11 @@
  */
 
 #include "patchcore/module/input/user/EnumUserInput.hpp"
-#include "patchcore/module/input/user/ProxyModuleEnumUserInput.hpp"
+#include "patchcore/module/input/user/ExposedModuleEnumUserInput.hpp"
 #include "patchcore/module/input/user/poly/PolyProxyEnumUserInput.hpp"
 
-ProxyModuleUserInput *EnumUserInput::createProxy(const std::string &withName) {
-    return new ProxyModuleEnumUserInput(withName, this);
+ExposedModuleUserInput *EnumUserInput::createExposed(const std::string &withName) {
+    return new ExposedModuleEnumUserInput(withName, this);
 }
 
 std::unique_ptr<PolyProxyUserInput> EnumUserInput::createPolyProxy(std::vector<Module *> modulesToProxy) {

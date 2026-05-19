@@ -22,7 +22,7 @@
 
 package com.sillydevices.patchcore.module.io.user
 
-import com.sillydevices.patchcore.module.io.user.proxy.ProxyFloatUserInput
+import com.sillydevices.patchcore.module.io.user.proxy.ExposedModuleFloatUserInput
 
 open class FloatUserInput(
     moduleName: String,
@@ -38,7 +38,7 @@ open class FloatUserInput(
         setValue(value)
     }
 
-    override fun <T: UserInput> createProxy(moduleName: String, withName: String): T {
-        return ProxyFloatUserInput(moduleName, withName, this) as T
+    override fun <T: UserInput> createExposed(moduleName: String, withName: String): T {
+        return ExposedModuleFloatUserInput(moduleName, withName, this) as T
     }
 }

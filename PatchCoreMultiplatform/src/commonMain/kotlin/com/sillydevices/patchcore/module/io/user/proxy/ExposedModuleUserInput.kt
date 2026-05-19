@@ -20,27 +20,10 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#ifndef PATCHCORE_PROXYMODULEUSERINPUT_HPP
-#define PATCHCORE_PROXYMODULEUSERINPUT_HPP
+package com.sillydevices.patchcore.module.io.user.proxy
 
-#include "patchcore/module/input/UserInput.hpp"
+import com.sillydevices.patchcore.module.io.user.UserInput
 
-// Note: Descendants of this class should inherit from UserInput
-class ProxyModuleUserInput {
-public:
-    ProxyModuleUserInput(UserInput* userInput):  _userInput(userInput) {
-
-    };
-    virtual ~ProxyModuleUserInput() = default;
-
-public:
-    [[nodiscard]]
-    virtual UserInput* getUserInput() const {
-        return _userInput;
-    };
-
-private:
-    UserInput* _userInput;
-};
-
-#endif //PATCHCORE_PROXYMODULEUSERINPUT_HPP
+interface ExposedModuleUserInput: UserInput {
+    val userInput: UserInput
+}

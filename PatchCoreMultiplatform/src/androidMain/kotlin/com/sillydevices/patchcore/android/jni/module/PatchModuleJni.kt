@@ -38,12 +38,12 @@ object PatchModuleJni {
     @JvmName("patchModuleGetModule")
     external fun patchModuleGetModule(patchModulePointer: ULong, moduleName: String): ULong
 
-    @JvmName("patchModuleAddInput")
-    external fun patchModuleAddInput(patchModuleManagedPointer: ULong, inputPointer: ULong, inputName: String)
-    @JvmName("patchModuleAddOutput")
-    external fun patchModuleAddOutput(patchModuleManagedPointer: ULong, outputPointer: ULong, outputName: String)
-    @JvmName("patchModuleAddUserInput")
-    external fun patchModuleAddUserInput(patchModuleManagedPointer: ULong, userInputPointer: ULong, inputName: String)
+    @JvmName("patchModuleExposeInput")
+    external fun patchModuleExposeInput(patchModuleManagedPointer: ULong, inputPointer: ULong, inputName: String)
+    @JvmName("patchModuleExposeOutput")
+    external fun patchModuleExposeOutput(patchModuleManagedPointer: ULong, outputPointer: ULong, outputName: String)
+    @JvmName("patchModuleExposeUserInput")
+    external fun patchModuleExposeUserInput(patchModuleManagedPointer: ULong, userInputPointer: ULong, inputName: String)
 
     @JvmName("patchModuleResetPatch")
     external fun patchModuleResetPatch(patchModulePointer: ULong)

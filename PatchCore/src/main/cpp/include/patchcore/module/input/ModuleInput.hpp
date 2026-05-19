@@ -29,7 +29,7 @@
 #include <vector>
 
 class Module;
-class ProxyModuleInput;
+class ExposedModuleInput;
 
 //TODO move implementation to .cpp
 class ModuleInput: Input {
@@ -88,7 +88,7 @@ public:
 //        return value;
 //    };
 
-    virtual ProxyModuleInput *createProxy(const std::string &withName);
+    virtual ExposedModuleInput *createExposed(const std::string &withName);
 
 public:
 

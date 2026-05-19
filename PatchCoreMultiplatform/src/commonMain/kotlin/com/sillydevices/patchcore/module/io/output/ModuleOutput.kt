@@ -44,8 +44,8 @@ open class ModuleOutput(
         _pointer = pointer
     }
 
-    open fun createProxy(moduleName: String, withName: String): ProxyModuleOutput {
-        return ProxyModuleOutput(moduleName, withName, this)
+    open fun createExposed(moduleName: String, withName: String): ExposedModuleOutput {
+        return ExposedModuleOutput(moduleName, withName, this)
     }
 
     override fun equals(other: Any?): Boolean {

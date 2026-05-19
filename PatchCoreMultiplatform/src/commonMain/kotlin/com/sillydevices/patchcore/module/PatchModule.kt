@@ -24,16 +24,17 @@ package com.sillydevices.patchcore.module
 
 import com.sillydevices.patchcore.context.ModuleContext
 import com.sillydevices.patchcore.context.PatchModuleContext
+import com.sillydevices.patchcore.context.PolyModuleContext
 import com.sillydevices.patchcore.module.dsl.delegates.ModuleDelegate
 import com.sillydevices.patchcore.module.dsl.delegates.ModuleInputDelegate
 import com.sillydevices.patchcore.module.dsl.delegates.ModuleOutputDelegate
 import com.sillydevices.patchcore.module.dsl.delegates.ModuleUserInputDelegate
 import com.sillydevices.patchcore.module.io.input.ModuleInput
-import com.sillydevices.patchcore.module.io.input.ProxyModuleInput
+import com.sillydevices.patchcore.module.io.input.ExposedModuleInput
 import com.sillydevices.patchcore.module.io.output.ModuleOutput
-import com.sillydevices.patchcore.module.io.output.ProxyModuleOutput
+import com.sillydevices.patchcore.module.io.output.ExposedModuleOutput
 import com.sillydevices.patchcore.module.io.user.UserInput
-import com.sillydevices.patchcore.module.io.user.proxy.ProxyUserInput
+import com.sillydevices.patchcore.module.io.user.proxy.ExposedModuleUserInput
 import kotlin.reflect.KProperty
 
 open class Patch {
@@ -92,9 +93,9 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
     protected val modulesSettings = mutableMapOf<Module, ModuleSettings<*>>()
     val sampleRate: Int = 44100 //TODO: make it configurable
 
-    protected val proxyInputs = mutableListOf<ProxyModuleInput>()
-    protected val proxyOutputs = mutableListOf<ProxyModuleOutput>()
-    protected val proxyUserInputs = mutableListOf<ProxyUserInput>()
+    protected val exposedInputs = mutableListOf<ExposedModuleInput>()
+    protected val exposedOutputs = mutableListOf<ExposedModuleOutput>()
+    protected val exposedUserInputs = mutableListOf<ExposedModuleUserInput>()
 
     protected fun <T:Module> registeredModuleInternal(module: T, settings: ModuleSettings<T>?): T {
         modules.add(module)
@@ -105,13 +106,13 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
     }
 
     private fun exposeInput(input: ModuleInput, name: String = input.name): ModuleInput =
-        input.createProxy(moduleName = this.name, withName = name).also { proxyInputs.add(it) }
+        input.createExposed(moduleName = this.name, withName = name).also { exposedInputs.add(it) }
 
     private fun exposeOutput(output: ModuleOutput, name: String = output.name): ModuleOutput =
-        output.createProxy(moduleName = this.name, withName = name).also { proxyOutputs.add(it) }
+        output.createExposed(moduleName = this.name, withName = name).also { exposedOutputs.add(it) }
 
     private fun <T: UserInput> exposeUserInput(userInput: T, name: String = userInput.name): T =
-        userInput.createProxy<T>(moduleName = this.name, withName = name).also { proxyUserInputs.add(it as ProxyUserInput) }
+        userInput.createExposed<T>(moduleName = this.name, withName = name).also { exposedUserInputs.add(it as ExposedModuleUserInput) }
 
     open val defaultPatch: Patch = Patch()
 
@@ -172,19 +173,27 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
         for (module in modules) {
             module.createFrom(context)
         }
-        for (input in proxyInputs) {
-            context.addInput(input.input, input.name)
-            val pointer = context.getModuleInputPointer(input)
+        for (input in exposedInputs) {
+            context.exposeInput(input.input, input.name)
+            val pointer = if (context.exposedIoAlreadyExists) {
+                input.input.pointer
+            } else {
+                context.getModuleInputPointer(input)
+            }
             input.setPointer(pointer)
         }
-        for (output in proxyOutputs) {
-            context.addOutput(output.output, output.name)
+        for (output in exposedOutputs) {
+            context.exposeOutput(output.output, output.name)
             val pointer = context.getModuleOutputPointer(output)
             output.setPointer(pointer)
         }
-        for (userInput in proxyUserInputs) {
-            context.addUserInput(userInput.userInput, userInput.name)
-            val pointer = context.getUserInputPointer(userInput)
+        for (userInput in exposedUserInputs) {
+            context.exposeUserInput(userInput.userInput, userInput.name)
+            val pointer = if (context.exposedIoAlreadyExists) {
+                userInput.userInput.pointer
+            } else {
+                context.getUserInputPointer(userInput)
+            }
             userInput.applyParentContext(pointer, context)
         }
         //this is here only for ModularSynth's outputs
@@ -213,7 +222,11 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
         //can be called only from PatchModuleContext or PolyModuleContext
         val pointer = parentContext.createPatchModule(newPatchModule = this)
         val newPointer = parentContext.addModule(pointer , this.name)
-        val newContext = parentContext.getContextFactory().createPatchModuleContext(newPointer, parentContext)
+        val newContext = parentContext.getContextFactory().createPatchModuleContext(
+            pointer = newPointer,
+            parentContext = parentContext,
+            exposedIoAlreadyExists = parentContext.exposedIoAlreadyExists || parentContext is PolyModuleContext
+        )
         applyContext(newContext)
     }
 
@@ -306,4 +319,3 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
     }
 
 }
-
