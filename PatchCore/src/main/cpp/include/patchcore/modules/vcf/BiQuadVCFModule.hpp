@@ -57,7 +57,9 @@ public:
     void init();
 public:
     void processSample(int sampleIndex) override;
+    void processBlock() override;
 protected:
+    inline void processSampleInline(int sampleIndex);
     void computeFilter(float cutoff, float resonance, float gainDB = 0.f);
     void reset();
 protected:

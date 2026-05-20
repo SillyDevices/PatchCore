@@ -64,6 +64,16 @@ void BiQuadVCFModule::init() {
 }
 
 void BiQuadVCFModule::processSample(int sampleIndex) {
+    processSampleInline(sampleIndex);
+}
+
+void BiQuadVCFModule::processBlock() {
+    for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+        processSampleInline(sampleIndex);
+    }
+}
+
+inline void BiQuadVCFModule::processSampleInline(int sampleIndex) {
     float inputValue = input.value[sampleIndex];
     float cutoffValue = cutoff.value[sampleIndex] + userCutoff.value[sampleIndex];
     float resonanceValue = resonance.value[sampleIndex] + userResonance.value[sampleIndex];
