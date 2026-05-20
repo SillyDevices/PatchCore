@@ -46,7 +46,7 @@ std::unique_ptr<PolyProxyModule> SingleKeyboardModule::createPolyModuleProxy(Pol
     return std::make_unique<PolyProxyKeyboardModule>(this, polyModule);
 }
 
-void SingleKeyboardModule::envelope() {
+void SingleKeyboardModule::processSample(int sampleIndex) {
     bool multiTrigger = multiTriggerInput.getValue();
     std::lock_guard<std::mutex> lock(changesMutex);
     for (auto notePtr = noteChanges.begin(); notePtr < noteChanges.end(); notePtr++){
@@ -64,16 +64,16 @@ void SingleKeyboardModule::envelope() {
         }
     }
     syncOffset += 1;
-    cv.value = _cv;
-    velocity.value = _velocity;
+    cv.value[sampleIndex] = _cv;
+    velocity.value[sampleIndex] = _velocity;
     if (_gate) {
         if (multiTrigger && _lastCv != _cv) {
-            gate.value = KEYBOARD_GATE_OFF_VALUE;
+            gate.value[sampleIndex] = KEYBOARD_GATE_OFF_VALUE;
         } else {
-            gate.value = KEYBOARD_GATE_ON_VALUE;
+            gate.value[sampleIndex] = KEYBOARD_GATE_ON_VALUE;
         }
     } else {
-        gate.value = KEYBOARD_GATE_OFF_VALUE;
+        gate.value[sampleIndex] = KEYBOARD_GATE_OFF_VALUE;
     }
     _lastCv = _cv;
 }

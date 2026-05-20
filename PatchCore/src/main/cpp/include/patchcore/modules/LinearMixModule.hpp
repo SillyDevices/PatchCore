@@ -42,7 +42,7 @@ public:
     std::unique_ptr<Module> clone() const override;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
 protected:
     ModuleInput inputA = ModuleInput(LINEAR_MIX_MODULE_INPUT_A);

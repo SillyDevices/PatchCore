@@ -39,7 +39,7 @@ public:
     void init();
     virtual ~ConstModule() = default;
 
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
 
 private:

@@ -27,21 +27,16 @@ ExposedFloatUserInput::ExposedFloatUserInput(std::string name, std::vector<Float
 }
 
 void ExposedFloatUserInput::setValue(float newValue) {
-    value = newValue;
+    value.fill(newValue);
     for (int i = 0; i < count; i++){
         inputs[i]->setValue(newValue);
     }
 }
 
-void ExposedFloatUserInput::envelope() {
-    for (int i = 0; i < count; i++){
-        inputs[i]->envelope();
-    }
-}
-
-void ExposedFloatUserInput::onStartBuffer(int size) {
+void ExposedFloatUserInput::prepareBlock(const BlockContext& context) {
+    FloatUserInput::prepareBlock(context);
     for (int i = 0; i < count; i++) {
-        inputs[i]->onStartBuffer(size);
+        inputs[i]->prepareBlock(context);
     }
 }
 

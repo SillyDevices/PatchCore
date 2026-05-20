@@ -51,7 +51,7 @@ public:
     AbstractRouterKeyboard(std::string name, int sampleRate, std::vector<KeyboardModule*> keyboards);
     virtual ~AbstractRouterKeyboard() = default;
 
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
     virtual void setPolyphony(int polyphony);
     virtual void onEvent(KeyboardEvent event) override = 0;

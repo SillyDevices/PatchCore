@@ -23,11 +23,14 @@
 #include <gtest/gtest.h>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
+#include "TestBlockUtils.hpp"
 #include <patchcore/modules/ConstModule.hpp>
 #include <patchcore/modules/VCAModule.hpp>
 #include <patchcore/modules/AttenuverterModule.hpp>
+#include <patchcore/modules/PassModule.hpp>
 #include <patchcore/module/PolyModule.hpp>
 #include <android/log_macros.h>
+#include <utility>
 
 #undef LOG_TAG
 #define LOG_TAG "GraphRouterTest"
@@ -36,6 +39,72 @@
 
 static auto waveTableProvider = DefaultWaveTableProvider(44100);
 static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
+
+namespace {
+
+#define TEST_STEP_MODULE_OUTPUT "out"
+
+class TestStepModule: public Module {
+public:
+    explicit TestStepModule(std::string name): Module(std::move(name), 44100) {
+        registerOutput(output);
+    }
+
+    TestStepModule(const TestStepModule& other): Module(other.name, other.sampleRate) {
+        registerOutput(output);
+        copyIOs(other);
+    }
+
+    [[nodiscard]] std::unique_ptr<Module> clone() const override {
+        return std::make_unique<TestStepModule>(*this);
+    }
+
+    void processSample(int sampleIndex) override {
+        output.value[sampleIndex] = sampleIndex == 0 ? 1.0f : 0.0f;
+    }
+
+private:
+    ModuleOutput output = ModuleOutput(TEST_STEP_MODULE_OUTPUT);
+};
+
+class TestSampleProcessingProbeModule: public Module {
+public:
+    explicit TestSampleProcessingProbeModule(std::string name): Module(std::move(name), 44100) {
+        registerInput(input);
+        registerOutput(output);
+    }
+
+    TestSampleProcessingProbeModule(const TestSampleProcessingProbeModule& other): Module(other.name, other.sampleRate) {
+        registerInput(input);
+        registerOutput(output);
+        processSampleCallCount = other.processSampleCallCount;
+        processBlockCallCount = other.processBlockCallCount;
+        copyIOs(other);
+    }
+
+    [[nodiscard]] std::unique_ptr<Module> clone() const override {
+        return std::make_unique<TestSampleProcessingProbeModule>(*this);
+    }
+
+    void processSample(int sampleIndex) override {
+        processSampleCallCount++;
+        output.value[sampleIndex] = input.value[sampleIndex];
+    }
+
+    void processBlock() override {
+        processBlockCallCount++;
+        Module::processBlock();
+    }
+
+    int processSampleCallCount = 0;
+    int processBlockCallCount = 0;
+
+private:
+    ModuleInput input = ModuleInput(PASS_MODULE_INPUT);
+    ModuleOutput output = ModuleOutput(PASS_MODULE_OUTPUT);
+};
+
+} // namespace
 
 void create2SampleDelayPatch(PatchModule* patchModule) {
     auto constModule = patchModule->createModule(CONST_MODULE_TYPE_NAME, "const", { {CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.5f) }});
@@ -107,6 +176,85 @@ void create9SampleDelayPatch(PatchModule* patchModule) {
     }
 }
 
+TEST(GraphRouterTest, LoopStageDoesNotAddMoreThanOneSampleDelay) {
+    auto synth = new ModularSynth(&factory, 44100);
+    ASSERT_NE(synth, nullptr);
+
+    auto patchModule = dynamic_cast<PatchModule *>(synth->addModule(std::make_unique<PatchModule>(&factory, "voice", 44100)));
+    ASSERT_NE(patchModule, nullptr);
+
+    auto step = patchModule->addModule(std::make_unique<TestStepModule>("step"));
+    auto passA = patchModule->createModule(PASS_MODULE_TYPE_NAME, "passA", {});
+    auto passB = patchModule->createModule(PASS_MODULE_TYPE_NAME, "passB", {});
+    ASSERT_NE(step, nullptr);
+    ASSERT_NE(passA, nullptr);
+    ASSERT_NE(passB, nullptr);
+
+    patchModule->addPatch(step->getModuleOutput(TEST_STEP_MODULE_OUTPUT), passA->getModuleInput(PASS_MODULE_INPUT));
+    patchModule->addPatch(passA->getModuleOutput(PASS_MODULE_OUTPUT), passB->getModuleInput(PASS_MODULE_INPUT));
+    patchModule->addPatch(passB->getModuleOutput(PASS_MODULE_OUTPUT), passA->getModuleInput(PASS_MODULE_INPUT));
+    patchModule->exposeOutput(passB->getModuleOutput(PASS_MODULE_OUTPUT), "voiceOutput");
+
+    synth->addPatch(synth->getModule("voice")->getModuleOutput("voiceOutput"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
+
+    auto samples = PATCHCORE_BLOCK_SIZE + 2;
+    auto firstResultSample = -1;
+    std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
+        results[i] = result;
+        if (result.first == 1.0f && firstResultSample == -1) {
+            firstResultSample = i;
+        }
+    });
+
+    ASSERT_NE(firstResultSample, -1);
+    ASSERT_LE(firstResultSample, 1) << "Looped SCC was processed with more than one sample of latency";
+
+    delete synth;
+}
+
+TEST(GraphRouterTest, LoopStageWithPatchModuleDoesNotAddMoreThanOneSampleDelay) {
+    auto synth = new ModularSynth(&factory, 44100);
+    ASSERT_NE(synth, nullptr);
+
+    auto nestedPatch = dynamic_cast<PatchModule *>(synth->addModule(std::make_unique<PatchModule>(&factory, "nested", 44100)));
+    ASSERT_NE(nestedPatch, nullptr);
+
+    auto nestedProbe = dynamic_cast<TestSampleProcessingProbeModule *>(
+        nestedPatch->addModule(std::make_unique<TestSampleProcessingProbeModule>("nestedProbe"))
+    );
+    ASSERT_NE(nestedProbe, nullptr);
+    nestedPatch->exposeInput(nestedProbe->getModuleInput(PASS_MODULE_INPUT), "input");
+    nestedPatch->exposeOutput(nestedProbe->getModuleOutput(PASS_MODULE_OUTPUT), "output");
+
+    auto step = synth->addModule(std::make_unique<TestStepModule>("step"));
+    auto feedback = synth->createModule(PASS_MODULE_TYPE_NAME, "feedback", {});
+    ASSERT_NE(step, nullptr);
+    ASSERT_NE(feedback, nullptr);
+
+    synth->addPatch(step->getModuleOutput(TEST_STEP_MODULE_OUTPUT), nestedPatch->getModuleInput("input"));
+    synth->addPatch(nestedPatch->getModuleOutput("output"), feedback->getModuleInput(PASS_MODULE_INPUT));
+    synth->addPatch(feedback->getModuleOutput(PASS_MODULE_OUTPUT), nestedPatch->getModuleInput("input"));
+    synth->addPatch(feedback->getModuleOutput(PASS_MODULE_OUTPUT), synth->getModuleInput(MODULE_OUTPUT_INPUT));
+
+    auto samples = PATCHCORE_BLOCK_SIZE + 2;
+    auto firstResultSample = -1;
+    std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
+        results[i] = result;
+        if (result.first == 1.0f && firstResultSample == -1) {
+            firstResultSample = i;
+        }
+    });
+
+    ASSERT_NE(firstResultSample, -1);
+    ASSERT_LE(firstResultSample, 1) << "Looped SCC with PatchModule was processed with more than one sample of latency";
+    ASSERT_GT(nestedProbe->processSampleCallCount, 0) << "Nested PatchModule in loop must process inner graph sample-by-sample";
+    ASSERT_EQ(nestedProbe->processBlockCallCount, 0) << "Nested PatchModule in loop must not process inner graph through block API";
+
+    delete synth;
+}
+
 TEST(GraphRouterTest, GraphRouterZeroLatencyTest) {
     auto synth = new ModularSynth(&factory, 44100);
     ASSERT_NE(synth, nullptr);
@@ -121,15 +269,12 @@ TEST(GraphRouterTest, GraphRouterZeroLatencyTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         //format as "[first, second], "
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
 
@@ -160,16 +305,13 @@ TEST(GraphRouterTest, TwoModuleWithPatchInputFirstTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -202,16 +344,13 @@ TEST(GraphRouterTest, TwoModuleWithPatchInputLastTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -244,16 +383,13 @@ TEST(GraphRouterTest, OneModuleWithPatchTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -283,16 +419,13 @@ TEST(GraphRouterTest, OneModuleTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -312,16 +445,13 @@ TEST(GraphRouterTest, OneModuleInSynthTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -353,16 +483,13 @@ TEST(GraphRouterTest, Test) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging

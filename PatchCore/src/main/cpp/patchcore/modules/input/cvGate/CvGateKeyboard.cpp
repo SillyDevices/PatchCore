@@ -36,14 +36,14 @@ std::unique_ptr<Module> CvGateKeyboard::clone() const {
     return std::make_unique<CvGateKeyboard>(*this);
 }
 
-void CvGateKeyboard::envelope() {
+void CvGateKeyboard::processSample(int sampleIndex) {
     if (_gate) {
-        gate.value = KEYBOARD_GATE_ON_VALUE;
-        cv.value = _cv;
-        velocity.value = _velocity;
+        gate.value[sampleIndex] = KEYBOARD_GATE_ON_VALUE;
+        cv.value[sampleIndex] = _cv;
+        velocity.value[sampleIndex] = _velocity;
     }
     else {
-        gate.value = KEYBOARD_GATE_OFF_VALUE;
+        gate.value[sampleIndex] = KEYBOARD_GATE_OFF_VALUE;
     }
 }
 

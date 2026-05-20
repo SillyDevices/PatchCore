@@ -26,6 +26,12 @@
 
 Module::Module(std::string name, int sampleRate) : sampleRate(sampleRate), name(name) {};
 
+void Module::processBlock() {
+    for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+        processSample(sampleIndex);
+    }
+}
+
 
 const std::string& Module::getModuleName() const {
     return name;
@@ -59,9 +65,17 @@ UserInput *Module::getUserInput(const std::string& inputName) {
     return input;
 }
 
-void Module::onStartBuffer(int size) {
+void Module::onStartBlock(const BlockContext& context) {
+    for (auto &input : uniqueInputs) {
+        input->prepareBlock(context);
+    }
+
+    for (auto &output : uniqueOutputs) {
+        output->prepareBlock(context);
+    }
+
     for (auto &input : interpolatedInputs) {
-        input->onStartBuffer(size);
+        input->prepareBlock(context);
     }
 }
 
@@ -84,3 +98,4 @@ const std::vector<FloatUserInput *> &Module::getInterpolatedInputs() {
 std::unique_ptr<PolyProxyModule> Module::createPolyModuleProxy(PolyModule* polyModule) const {
     return std::make_unique<PolyProxyModule>(this, polyModule);
 }
+

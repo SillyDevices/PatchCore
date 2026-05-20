@@ -36,10 +36,11 @@ public:
     PolyProxyKeyboardModule(const Module *module, PolyModule *polyModule);
 
 public:
-    void onStartBuffer(int size) override {
-        throw std::runtime_error("PolyProxyKeyboardModule does not implement envelope method");
+    void onStartBlock(const BlockContext& context) override {
+        (void) context;
+        throw std::runtime_error("PolyProxyKeyboardModule does not implement onStartBlock method");
     }
-    void envelope() override {
+    void processSample(int sampleIndex) override {
         throw std::runtime_error("PolyProxyKeyboardModule does not implement envelope method");
     }
 public:

@@ -24,6 +24,7 @@
 #define PATCHCORE_ABSTRACTROUTER_HPP
 
 #include "../Module.hpp"
+#include "patchcore/module/buffer/BlockContext.hpp"
 
 class AbstractRouter {
 public:
@@ -47,8 +48,7 @@ public:
     [[nodiscard]]
     virtual std::vector<std::pair<ModuleOutput *, ModuleInput *>> getPatches() const = 0;
 
-    virtual void onStartBuffer(int size) = 0;
-    virtual void envelope() = 0;
+    virtual void onStartBlock(const BlockContext& context) = 0;
 };
 
 #endif //PATCHCORE_ABSTRACTROUTER_HPP

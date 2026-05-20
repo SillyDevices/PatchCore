@@ -27,13 +27,13 @@ BaseEnvelope::BaseEnvelope(std::string name, int sampleRate) : Module(name, samp
     registerOutput(output);
 }
 
-void BaseEnvelope::envelope() {
-    auto gateValue = inputGate.value;
+void BaseEnvelope::processSample(int sampleIndex) {
+    auto gateValue = inputGate.value[sampleIndex];
     bool gate = lastGate;
     if (lastGate && gateValue < ENVELOPE_GATE_OFF_THRESHOLD)
         gate = false;
     else if (!lastGate && gateValue > ENVELOPE_GATE_ON_THRESHOLD )
         gate = true;
-    internalEnvelope(gate);
+    internalEnvelope(gate, sampleIndex);
     lastGate = gate;
 }

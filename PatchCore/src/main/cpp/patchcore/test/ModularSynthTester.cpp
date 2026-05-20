@@ -22,20 +22,21 @@
 
 #include "patchcore/test/ModularSynthTester.hpp"
 
+#include <algorithm>
+
 void ModularSynthTester::testSynth(ModularSynth *synth, float expectedLeft, float expectedRight,
                                    int bufferSize, int samples, float tolerance) {
-    auto bufferCycles = samples / bufferSize;
-    if (bufferCycles <= 0) {
-        bufferCycles = 1; // Ensure at least one cycle
-    }
+    (void) bufferSize;
+
+    StereoBlock block;
     std::pair<float, float> output;
     auto remainingSamples = samples;
-    for (int cycle = 0; cycle < bufferCycles; ++cycle) {
-        synth->onStartBuffer(bufferSize);
-        for (int i = 0; i < bufferSize && remainingSamples > 0; ++i) {
-            output = synth->computeSample();
-            remainingSamples--;
-        }
+    while (remainingSamples > 0) {
+        synth->computeBlock(block);
+
+        const int framesToRead = std::min(remainingSamples, PATCHCORE_BLOCK_SIZE);
+        output = { block.left[framesToRead - 1], block.right[framesToRead - 1] };
+        remainingSamples -= framesToRead;
     }
     auto [left, right] = output;
     if (abs(left - expectedLeft) > tolerance || abs(right - expectedRight) > tolerance) {

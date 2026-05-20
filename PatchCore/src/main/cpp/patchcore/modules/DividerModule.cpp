@@ -46,7 +46,7 @@ void DividerModule::init() {
     registerOutput(output);
 }
 
-void DividerModule::envelope() {
-    output.value = num.value / denum.value;
+void DividerModule::processSample(int sampleIndex) {
+    output.value[sampleIndex] = num.value[sampleIndex] / denum.value[sampleIndex];
 }
 

@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
+#include "TestBlockUtils.hpp"
 
 static auto waveTableProvider = DefaultWaveTableProvider(44100);
 static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
@@ -32,16 +33,13 @@ void testOutputValue(ModularSynth* synth, float cvValue, std::function<void(floa
     std::pair<float, float> lastResult = {0.0f, 0.0f};
 
     int countSamples = 100;
-    synth->onStartBuffer(countSamples);
 
     changeLambda(cvValue);
 
-    for (int sample = 0; sample < countSamples; sample++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int sample, std::pair<float, float> result) {
         lastResult = result;
-    }
+    });
 
-    synth->onEndBuffer();
 
     ASSERT_FLOAT_EQ(lastResult.first, cvValue);
     ASSERT_FLOAT_EQ(lastResult.second, cvValue);

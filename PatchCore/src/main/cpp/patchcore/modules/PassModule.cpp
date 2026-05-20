@@ -46,6 +46,6 @@ void PassModule::init() {
     registerOutput(output);
 }
 
-void PassModule::envelope() {
-    output.value = input.value;
+void PassModule::processSample(int sampleIndex) {
+    output.value[sampleIndex] = input.value[sampleIndex];
 }

@@ -31,7 +31,7 @@ public:
     PassFloatUserInput(std::string name);
     virtual ~PassFloatUserInput() = default;
 public:
-    void envelope() override;
+    void prepareBlock(const BlockContext& context) override;
 };
 
 #endif //PATCHCORE_PASSFLOATUSERINPUT_HPP

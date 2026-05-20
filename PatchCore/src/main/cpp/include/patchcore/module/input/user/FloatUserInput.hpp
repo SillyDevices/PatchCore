@@ -24,11 +24,12 @@
 #define PATCHCORE_FLOATUSERINPUT_HPP
 
 #include "patchcore/module/input/UserInput.hpp"
-#include "patchcore/callback/OnStartBuffer.hpp"
+#include "patchcore/module/buffer/FixedBuffer.hpp"
+#include "patchcore/module/buffer/BlockContext.hpp"
 #include <string>
 
 
-class FloatUserInput: public UserInput, public OnStartBuffer {
+class FloatUserInput: public UserInput {
 public:
     explicit FloatUserInput(std::string name);
     FloatUserInput(std::string name, float speed);
@@ -40,9 +41,11 @@ public:
     virtual inline void setParameterLockValue(float newValue);
     virtual void clearParameterLock();
 
-    void onStartBuffer(int bufferSize) override;
+    virtual void prepareBlock(const BlockContext& context);
 
-    virtual void envelope();
+    const FixedBuffer& getBuffer() const {
+        return value;
+    }
 
 public:
     void copyFrom(UserInput &other) {
@@ -81,7 +84,7 @@ protected:
 
     float speed = 5.0f;
 public:
-    float value = .0f;
+    FixedBuffer value = {};
 };
 
 inline void FloatUserInput::setValue(float newValue) {
@@ -90,7 +93,7 @@ inline void FloatUserInput::setValue(float newValue) {
 }
 
 inline void FloatUserInput::setParameterLockValue(float newValue) {
-    value = newValue;
+    value.fill(newValue);
     lastSetParameterLockValue = newValue;
     isLocked = true;
 }

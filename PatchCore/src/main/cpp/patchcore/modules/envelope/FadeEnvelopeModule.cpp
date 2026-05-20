@@ -63,16 +63,16 @@ void FadeEnvelopeModule::init() {
 
 }
 
-void FadeEnvelopeModule::envelope() {
+void FadeEnvelopeModule::processSample(int sampleIndex) {
     switch (state) {
         case opened:
-            if (input.value < FADER_THRESHOLD){
+            if (input.value[sampleIndex] < FADER_THRESHOLD){
                 state = closing;
             }
             outputValue = 1.0f;
             break;
         case closed:
-            if (input.value > FADER_THRESHOLD){
+            if (input.value[sampleIndex] > FADER_THRESHOLD){
                 state = opening;
             }
             outputValue = 0.0f;
@@ -92,5 +92,5 @@ void FadeEnvelopeModule::envelope() {
             }
             break;
     }
-    output.value = outputValue;
+    output.value[sampleIndex] = outputValue;
 }

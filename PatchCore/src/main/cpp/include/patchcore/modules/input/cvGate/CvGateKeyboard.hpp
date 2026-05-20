@@ -33,7 +33,7 @@ public:
     std::unique_ptr<Module> clone() const override;
     virtual ~CvGateKeyboard() = default;
 
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
     void setValue(bool gate, float cv, float velocity);
     void setMultiTrigger(bool value);

@@ -23,6 +23,8 @@
 #ifndef PATCHCORE_MODULE_HPP
 #define PATCHCORE_MODULE_HPP
 
+#include "patchcore/module/buffer/BlockConfig.hpp"
+#include "patchcore/module/buffer/BlockContext.hpp"
 #include "patchcore/module/input/ModuleInput.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
 #include "patchcore/module/input/UserInput.hpp"
@@ -30,20 +32,23 @@
 #include "patchcore/module/input/user/BoolUserInput.hpp"
 #include "patchcore/module/input/user/EnumUserInput.hpp"
 
+#include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 #include <vector>
 
 class PolyModule;
 class PolyProxyModule;
 
-class Module: public OnStartBuffer {
+class Module {
 public:
     Module(std::string name, int sampleRate);
     Module(const Module& other) = delete;
     virtual ~Module() = default;
 
-    virtual void envelope() = 0;
+    virtual void processSample(int sampleIndex) = 0;
+    virtual void processBlock();
 
     const std::string& getModuleName() const;
 
@@ -61,7 +66,7 @@ public:
     //TODO rename to createPolyProxyModule
     virtual std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule* polyModule) const;
 
-    void onStartBuffer(int size) override;
+    virtual void onStartBlock(const BlockContext& context);
 
     int getSampleRate() const;
 
@@ -70,12 +75,14 @@ public:
     bool hasProxyOutputs() const;
 
 protected:
-
     virtual void registerInput(ModuleInput& input, const std::string& withName = "") final {
         if (!withName.empty()) {
             inputs[withName] = &input;
         } else {
             inputs[input.getName()] = &input;
+        }
+        if (std::find(uniqueInputs.begin(), uniqueInputs.end(), &input) == uniqueInputs.end()) {
+            uniqueInputs.push_back(&input);
         }
         input.setModule(this);
     }
@@ -85,6 +92,9 @@ protected:
             outputs[withName] = &output;
         } else {
             outputs[output.getName()] = &output;
+        }
+        if (std::find(uniqueOutputs.begin(), uniqueOutputs.end(), &output) == uniqueOutputs.end()) {
+            uniqueOutputs.push_back(&output);
         }
         output.setModule(this);
     }
@@ -143,6 +153,8 @@ protected:
     std::unordered_map<std::string, ModuleInput *> inputs = {};
     std::unordered_map<std::string, ModuleOutput *> outputs = {};
     std::unordered_map<std::string, UserInput *> userInputs = {};
+    std::vector<ModuleInput *> uniqueInputs = {};
+    std::vector<ModuleOutput *> uniqueOutputs = {};
     std::vector<FloatUserInput *> interpolatedInputs = {};
 
     int sampleRate;

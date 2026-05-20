@@ -25,6 +25,7 @@
 #include "patchcore/module/input/ExposedModuleUserInput.hpp"
 #include "patchcore/module/output/PolyDemuxOutput.hpp"
 #include "patchcore/module/output/PolyExposedOutput.hpp"
+#include <algorithm>
 #include <string>
 #include <stdio.h>
 
@@ -69,28 +70,49 @@ PolyModule::~PolyModule() {
     ownedProxyOutputs.clear();
 }
 
-void PolyModule::onStartBuffer(int size) {
+void PolyModule::onStartBlock(const BlockContext& context) {
+    Module::onStartBlock(context);
     for (const auto &voice: voices) {
-        voice->onStartBuffer(size);
+        voice->onStartBlock(context);
     }
 }
 
-void PolyModule::envelope() {
+void PolyModule::processSample(int sampleIndex) {
+    (void) sampleIndex;
     for (const auto &exposedInput : exposedInputs) {
-        exposedInput->envelope();
+        exposedInput->copyBlockToInnerInput();
     }
     for (const auto &proxyInput : proxyInputs) {
-        proxyInput->envelope();
+        proxyInput->distributeBlockToVoices();
     }
     //todo optimize: only active voices
     for (int i = 0; i < activeVoiceCount; ++i) {
-        voices[i]->envelope();
+        voices[i]->processSample(sampleIndex);
     }
     for (const auto &proxyOutput : proxyOutputs) {
-        proxyOutput->envelope();
+        proxyOutput->sumVoiceBlocks();
     }
     for (const auto &exposedOutput : exposedOutputs) {
-        exposedOutput->envelope();
+        exposedOutput->copyBlockFromInnerOutput();
+    }
+}
+
+void PolyModule::processBlock() {
+    for (const auto &exposedInput : exposedInputs) {
+        exposedInput->copyBlockToInnerInput();
+    }
+    for (const auto &proxyInput : proxyInputs) {
+        proxyInput->distributeBlockToVoices();
+    }
+    //todo optimize: only active voices
+    for (int i = 0; i < activeVoiceCount; ++i) {
+        voices[i]->processBlock();
+    }
+    for (const auto &proxyOutput : proxyOutputs) {
+        proxyOutput->sumVoiceBlocks();
+    }
+    for (const auto &exposedOutput : exposedOutputs) {
+        exposedOutput->copyBlockFromInnerOutput();
     }
 }
 

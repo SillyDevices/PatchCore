@@ -44,12 +44,11 @@ void KeyboardModule::init() {
     registerOutput(cv);
     registerOutput(velocity);
     registerUserInput(multiTriggerInput);
-    registerUserInput(callbackInput);
 }
 
-void KeyboardModule::onStartBuffer(int size) {
+void KeyboardModule::onStartBlock(const BlockContext& context) {
     std::lock_guard<std::mutex> lock(changesMutex);
-    syncTime = getTimeUs();
+    syncTime = context.blockStartTimeUs > 0.0 ? context.blockStartTimeUs : getTimeUs();
     if (noteChanges.size() > 0){
         for (auto notePtr = noteChanges.begin(); notePtr < noteChanges.end(); notePtr++){
             (*notePtr)->sample = (*notePtr)->sample - syncOffset;
@@ -58,7 +57,7 @@ void KeyboardModule::onStartBuffer(int size) {
     syncOffset = 0;
 }
 
-void KeyboardModule::envelope() {
+void KeyboardModule::processSample(int sampleIndex) {
     bool multiTrigger = multiTriggerInput.getValue();
     std::lock_guard<std::mutex> lock(changesMutex);
     for (auto notePtr = noteChanges.begin(); notePtr < noteChanges.end(); notePtr++){
@@ -81,19 +80,19 @@ void KeyboardModule::envelope() {
     }
     syncOffset += 1;
     if (pressedKeys.empty()){
-        gate.value = KEYBOARD_GATE_OFF_VALUE;
+        gate.value[sampleIndex] = KEYBOARD_GATE_OFF_VALUE;
     } else {
         auto key = pressedKeys.at(0);
         float cvValue = key.cv;
         float velocityValue = key.velocity;
         if (multiTrigger && _lastCv != cvValue) {
-            gate.value = KEYBOARD_GATE_OFF_VALUE;
+            gate.value[sampleIndex] = KEYBOARD_GATE_OFF_VALUE;
         } else {
-            gate.value = KEYBOARD_GATE_ON_VALUE;
+            gate.value[sampleIndex] = KEYBOARD_GATE_ON_VALUE;
         }
         _lastCv = cvValue;
-        velocity.value = velocityValue;
-        cv.value = cvValue;
+        velocity.value[sampleIndex] = velocityValue;
+        cv.value[sampleIndex] = cvValue;
     }
 }
 

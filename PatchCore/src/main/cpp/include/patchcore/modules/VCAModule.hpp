@@ -43,7 +43,7 @@ public:
     virtual ~VCAModule() = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput input = ModuleInput(VCA_MODULE_INPUT_INPUT);
     ModuleInput cv = ModuleInput(VCA_MODULE_INPUT_CV);

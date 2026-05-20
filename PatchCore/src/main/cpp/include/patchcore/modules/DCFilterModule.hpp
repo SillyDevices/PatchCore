@@ -47,7 +47,7 @@ public:
     virtual ~DCFilterModule() = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput input = ModuleInput(DCFILTER_MODULE_INTPUT);
     ModuleOutput output = ModuleOutput(DCFILTER_MODULE_OUTPUT);

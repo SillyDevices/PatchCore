@@ -69,12 +69,14 @@ std::unique_ptr<Module> PolyProxyModule::clone() const {
     throw std::runtime_error("PolyProxyModule does not implement clone method");
 }
 
-void PolyProxyModule::envelope() {
-    throw std::runtime_error("PolyProxyModule does not implement envelope method");
+void PolyProxyModule::processSample(int sampleIndex) {
+    (void) sampleIndex;
+    throw std::runtime_error("PolyProxyModule does not implement processSample method");
 }
 
-void PolyProxyModule::onStartBuffer(int size) {
-    throw std::runtime_error("PolyProxyModule does not implement onStartBuffer method");
+void PolyProxyModule::onStartBlock(const BlockContext& context) {
+    (void) context;
+    throw std::runtime_error("PolyProxyModule does not implement onStartBlock method");
 }
 
 std::unique_ptr<PolyProxyModule> PolyProxyModule::createPolyModuleProxy(PolyModule *polyModule) const {

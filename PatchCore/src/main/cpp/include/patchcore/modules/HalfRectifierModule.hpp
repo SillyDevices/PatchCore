@@ -41,7 +41,7 @@ public:
     virtual ~HalfRectifierModule() = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput input = ModuleInput(HALFRECTIFIER_INPUT);
     ModuleOutput output = ModuleOutput(HALFRECTIFIER_OUTPUT);

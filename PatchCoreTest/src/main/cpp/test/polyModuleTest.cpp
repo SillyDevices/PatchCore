@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
+#include "TestBlockUtils.hpp"
 #include <patchcore/module/PolyModule.hpp>
 
 static auto waveTableProvider = DefaultWaveTableProvider(44100);
@@ -42,12 +43,9 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicOutputTest) {
     std::pair<float, float> lastResult = {0.0f, 0.0f};
 
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
-    for (int i = 0;i < countSamples;i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         lastResult = result;
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_FLOAT_EQ(lastResult.first, 0.2f);
     ASSERT_FLOAT_EQ(lastResult.second, 0.2f);
@@ -71,12 +69,9 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicOutputInlineTest) {
     std::pair<float, float> lastResult = {0.0f, 0.0f};
 
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
-    for (int i = 0;i < countSamples;i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         lastResult = result;
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_FLOAT_EQ(lastResult.first, 0.2f);
     ASSERT_FLOAT_EQ(lastResult.second, 0.2f);
@@ -119,12 +114,9 @@ TEST(PolyModuleTest, PatchModuleToPolyBasicIOTest) {
     std::pair<float, float> lastResult = {0.0f, 0.0f};
 
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
-    for (int i = 0;i < countSamples;i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         lastResult = result;
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_FLOAT_EQ(lastResult.first, 1.0f);
     ASSERT_FLOAT_EQ(lastResult.second, 1.0f);
@@ -164,14 +156,9 @@ TEST(PolyModuleTest, PatchModuleToPolyUserInputTest) {
 
     for (auto i =0; i < 100; i++) {
         int countSamples = 100;
-        synth->onStartBuffer(countSamples);
-
-        for (int sample= 0; sample < countSamples ; sample++) {
-            auto result = synth->computeSample();
+        patchcore_test::computeSynthSamples(synth, countSamples, [&](int sample, std::pair<float, float> result) {
             lastResult = result;
-        }
-
-        synth->onEndBuffer();
+        });
     }
 
     ASSERT_NEAR(lastResult.first, polyCount*1.0f, 0.0001f);

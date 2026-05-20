@@ -41,8 +41,9 @@ public:
 
     //Module interface
 public:
-    void onStartBuffer(int size) override;
-    void envelope() override;
+    void onStartBlock(const BlockContext& context) override;
+    void processSample(int sampleIndex) override;
+    void processBlock() override;
 
     //PatchModule specific
     //creates a new input/output from existing ModuleInput/ModuleOutput

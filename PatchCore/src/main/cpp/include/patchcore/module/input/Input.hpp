@@ -27,9 +27,6 @@ class Input
 {
 public:
     virtual ~Input() = default;
-//    virtual void setValue(float value) = 0;
-public:
-    float value = 0.0f;
 };
 
 #endif //PATCHCORE_IINPUT_HPP

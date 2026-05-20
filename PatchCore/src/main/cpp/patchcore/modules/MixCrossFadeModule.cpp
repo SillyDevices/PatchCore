@@ -47,10 +47,10 @@ void MixCrossFadeModule::init(){
     registerUserInput(userInputCv);
 }
 
-void MixCrossFadeModule::envelope() {
-    auto cv = inputCv.value + userInputCv.value;
+void MixCrossFadeModule::processSample(int sampleIndex) {
+    auto cv = inputCv.value[sampleIndex] + userInputCv.value[sampleIndex];
     auto angle = (cv + 1) * 0.25f * M_PI;
     auto mixA = std::cos(angle);
     auto mixB = std::sin(angle);
-    output.value = inputA.value * mixA + inputB.value * mixB;
+    output.value[sampleIndex] = inputA.value[sampleIndex] * mixA + inputB.value[sampleIndex] * mixB;
 }

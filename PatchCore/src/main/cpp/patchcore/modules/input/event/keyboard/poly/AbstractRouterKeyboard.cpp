@@ -31,7 +31,7 @@ AbstractRouterKeyboard::AbstractRouterKeyboard(std::string name, int sampleRate,
     registerUserInput(multiTriggerInput);
 }
 
-void AbstractRouterKeyboard::envelope() {
+void AbstractRouterKeyboard::processSample(int sampleIndex) {
 
 }
 

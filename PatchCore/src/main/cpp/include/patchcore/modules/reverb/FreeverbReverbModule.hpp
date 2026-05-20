@@ -50,7 +50,7 @@ public:
     std::unique_ptr<Module> clone() const override;
     void init();
     virtual ~FreeverbReverbModule() = default;
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput input = ModuleInput(SIMPLE_REVERB_INPUT_INPUT);
     FloatUserInput inputSize = FloatUserInput(SIMPLE_REVERB_INPUT_ROOM_SIZE);

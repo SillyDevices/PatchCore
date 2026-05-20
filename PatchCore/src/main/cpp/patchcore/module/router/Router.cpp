@@ -113,7 +113,7 @@ void Router::makeInputsAndOutputs() {
     for (const auto &matrixKV: matrix){
         if (matrixKV.second.empty())
             continue;
-        matrixKV.first->value = 0.0f;
+        matrixKV.first->value.fill(0.0f);
         matrix_inputs.push_back(matrixKV.first);
         matrix_outputs.push_back(matrixKV.second);
 
@@ -157,37 +157,13 @@ std::vector<std::pair<ModuleOutput *, ModuleInput *>> Router::getPatches() const
     return patches;
 }
 
-void Router::onStartBuffer(int size) {
+void Router::onStartBlock(const BlockContext& context) {
     for (const auto &module: modulesToEnvelope){
-        module->onStartBuffer(size);
+        module->onStartBlock(context);
     }
-    //TODO move userinput envelope to Module::onStartBuffer
+    //TODO move userinput envelope to Module::onStartBlock
     for (const auto &userInput: userInputsToEnvelope){
-        userInput->onStartBuffer(size);
+        userInput->prepareBlock(context);
     }
 }
-
-void Router::envelope() {
-    int counter = 0;
-    for (const auto &input: matrix_inputs){
-        float sum = .0f;
-        for (const auto &output: matrix_outputs.at(counter)){
-            sum += output->value;
-        }
-        counter++;
-        input->value = sum;
-    }
-    for (const auto &module: modulesToEnvelope){
-        module->envelope();
-    }
-    //TODO move it to Module::envelope
-    for (const auto &userInput: userInputsToEnvelope){
-        userInput->envelope();
-    }
-}
-
-
-
-
-
 

@@ -37,6 +37,7 @@ NoiseModule::NoiseModule(const NoiseModule& other)
     b0 = other.b0; b1 = other.b1; b2 = other.b2; b3 = other.b3;
     b4 = other.b4; b5 = other.b5; b6 = other.b6;
     pinkBuffer = other.pinkBuffer;
+    pinkBufferWriteIndex = other.pinkBufferWriteIndex;
     copyIOs(other);
 }
 
@@ -49,12 +50,15 @@ void NoiseModule::init() {
     registerOutput(pinkOutput);
 }
 
-void NoiseModule::envelope() {
+void NoiseModule::processSample(int sampleIndex) {
 
     float white = noise.envelope();
-    pinkBuffer.push_front(white);
-    pinkBuffer.pop_back();
-    auto delayed = *(pinkBuffer.begin());
+    pinkBuffer[pinkBufferWriteIndex] = white;
+    pinkBufferWriteIndex++;
+    if (pinkBufferWriteIndex >= pinkBufferSize) {
+        pinkBufferWriteIndex = 0;
+    }
+    auto delayed = pinkBuffer[pinkBufferWriteIndex];
 
 
     b0 = 0.99886f * b0 + delayed * 0.0555179f;
@@ -66,6 +70,6 @@ void NoiseModule::envelope() {
     float pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + delayed * 0.5362f;
     b6 = delayed * 0.115926f;
 
-    output.value = white;
-    pinkOutput.value = pink * 0.15;
+    output.value[sampleIndex] = white;
+    pinkOutput.value[sampleIndex] = pink * 0.15;
 }

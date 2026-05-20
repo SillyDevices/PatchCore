@@ -37,7 +37,7 @@ public:
     virtual ~LinearMixWithLimitModule() = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
 private:
     float limit;

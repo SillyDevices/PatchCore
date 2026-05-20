@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
+#include "TestBlockUtils.hpp"
 #include <patchcore/modules/ConstModule.hpp>
 #include <patchcore/modules/AttenuverterModule.hpp>
 
@@ -51,14 +52,9 @@ TEST(ModuleTest, interolatedUserInputTest) {
 
     for (auto i =0; i < 100; i++) {
         int countSamples = 100;
-        synth->onStartBuffer(countSamples);
-
-        for (int sample = 0; sample < countSamples; sample++) {
-            auto result = synth->computeSample();
+        patchcore_test::computeSynthSamples(synth, countSamples, [&](int sample, std::pair<float, float> result) {
             lastResult = result;
-        }
-
-        synth->onEndBuffer();
+        });
     }
 
     ASSERT_NEAR(lastResult.first, 1.0f, 0.0001f);

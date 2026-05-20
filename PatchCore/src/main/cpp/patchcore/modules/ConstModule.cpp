@@ -41,9 +41,9 @@ std::unique_ptr<Module> ConstModule::clone() const {
 
 void ConstModule::init() {
     registerOutput(output);
-    output.value = constValue;
+    output.value.fill(constValue);
 }
 
-void ConstModule::envelope() {
-
+void ConstModule::processSample(int sampleIndex) {
+    output.value[sampleIndex] = constValue;
 }

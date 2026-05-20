@@ -32,8 +32,8 @@ public:
         : ModuleOutput(withName), PolyProxyOutput(*output), ExposedModuleOutput(withName, output) { }
     ~PolyExposedOutput() override = default;
 
-    void envelope() override {
-        PolyProxyOutput::envelope();
+    void sumVoiceBlocks() override {
+        PolyProxyOutput::sumVoiceBlocks();
     }
 };
 

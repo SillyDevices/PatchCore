@@ -34,8 +34,12 @@ public:
         : ModuleOutput(withName), PolyProxyOutput(*output), ExposedModuleOutput(withName, output), _voiceIndex(defaultVoiceIndex) { }
     ~PolyDemuxOutput() override = default;
 public:
-    void envelope() override{
+    void selectVoiceBlock() {
         value = getVoice(_voiceIndex)->value;
+    }
+
+    void sumVoiceBlocks() override {
+        selectVoiceBlock();
     }
 public:
     void setVoiceIndex(int voiceIndex) {

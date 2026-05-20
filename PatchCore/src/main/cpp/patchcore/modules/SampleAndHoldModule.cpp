@@ -46,10 +46,10 @@ void SampleAndHoldModule::init() {
     registerOutput(output);
 }
 
-void SampleAndHoldModule::envelope()  {
-    if (gate.value > .5f){
+void SampleAndHoldModule::processSample(int sampleIndex)  {
+    if (gate.value[sampleIndex] > .5f){
         if (state == WAIT_FOR_RAISE) {
-            output.value = input.value;
+            output.value[sampleIndex] = input.value[sampleIndex];
             state = WAIT_FOR_FALL;
         }
     } else {
