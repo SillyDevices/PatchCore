@@ -71,9 +71,18 @@ PolyModule::~PolyModule() {
 }
 
 void PolyModule::onStartBuffer(int size) {
-    Module::onStartBuffer(size);
+    BlockContext context;
+    context.blockSize = size;
+    context.sampleRate = sampleRate;
+    context.blockStartSample = 0;
+    context.blockStartTimeUs = 0.0;
+    onStartBlock(context);
+}
+
+void PolyModule::onStartBlock(const BlockContext& context) {
+    Module::onStartBlock(context);
     for (const auto &voice: voices) {
-        voice->onStartBuffer(size);
+        voice->onStartBlock(context);
     }
 }
 

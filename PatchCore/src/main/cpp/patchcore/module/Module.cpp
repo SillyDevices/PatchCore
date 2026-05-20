@@ -66,22 +66,31 @@ UserInput *Module::getUserInput(const std::string& inputName) {
 }
 
 void Module::onStartBuffer(int size) {
+    BlockContext context;
+    context.blockSize = size;
+    context.sampleRate = sampleRate;
+    context.blockStartSample = 0;
+    context.blockStartTimeUs = 0.0;
+    onStartBlock(context);
+}
+
+void Module::onStartBlock(const BlockContext& context) {
     std::unordered_set<ModuleInput*> uniqueInputs;
     for (const auto &inputKV : inputs) {
         if (uniqueInputs.insert(inputKV.second).second) {
-            inputKV.second->onStartBuffer(size);
+            inputKV.second->onStartBuffer(context.blockSize);
         }
     }
 
     std::unordered_set<ModuleOutput*> uniqueOutputs;
     for (const auto &outputKV : outputs) {
         if (uniqueOutputs.insert(outputKV.second).second) {
-            outputKV.second->onStartBuffer(size);
+            outputKV.second->onStartBuffer(context.blockSize);
         }
     }
 
     for (auto &input : interpolatedInputs) {
-        input->onStartBuffer(size);
+        input->onStartBuffer(context.blockSize);
     }
 }
 

@@ -24,6 +24,7 @@
 #define PATCHCORE_MODULE_HPP
 
 #include "patchcore/module/buffer/BlockConfig.hpp"
+#include "patchcore/module/buffer/BlockContext.hpp"
 #include "patchcore/module/input/ModuleInput.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
 #include "patchcore/module/input/UserInput.hpp"
@@ -65,6 +66,7 @@ public:
     virtual std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule* polyModule) const;
 
     void onStartBuffer(int size) override;
+    virtual void onStartBlock(const BlockContext& context);
 
     int getSampleRate() const;
 

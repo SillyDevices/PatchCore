@@ -75,7 +75,13 @@ void PolyProxyModule::processSample(int sampleIndex) {
 }
 
 void PolyProxyModule::onStartBuffer(int size) {
+    (void) size;
     throw std::runtime_error("PolyProxyModule does not implement onStartBuffer method");
+}
+
+void PolyProxyModule::onStartBlock(const BlockContext& context) {
+    (void) context;
+    throw std::runtime_error("PolyProxyModule does not implement onStartBlock method");
 }
 
 std::unique_ptr<PolyProxyModule> PolyProxyModule::createPolyModuleProxy(PolyModule *polyModule) const {

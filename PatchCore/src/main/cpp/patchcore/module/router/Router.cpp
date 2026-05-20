@@ -158,12 +158,21 @@ std::vector<std::pair<ModuleOutput *, ModuleInput *>> Router::getPatches() const
 }
 
 void Router::onStartBuffer(int size) {
+    BlockContext context;
+    context.blockSize = size;
+    context.sampleRate = parentModule->getSampleRate();
+    context.blockStartSample = 0;
+    context.blockStartTimeUs = 0.0;
+    onStartBlock(context);
+}
+
+void Router::onStartBlock(const BlockContext& context) {
     for (const auto &module: modulesToEnvelope){
-        module->onStartBuffer(size);
+        module->onStartBlock(context);
     }
-    //TODO move userinput envelope to Module::onStartBuffer
+    //TODO move userinput envelope to Module::onStartBlock
     for (const auto &userInput: userInputsToEnvelope){
-        userInput->onStartBuffer(size);
+        userInput->onStartBuffer(context.blockSize);
     }
 }
 

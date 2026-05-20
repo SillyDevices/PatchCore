@@ -326,18 +326,27 @@ std::vector<std::pair<ModuleOutput *, ModuleInput *>> GraphRouter::getPatches() 
 }
 
 void GraphRouter::onStartBuffer(int size) {
+    BlockContext context;
+    context.blockSize = size;
+    context.sampleRate = parentModule->getSampleRate();
+    context.blockStartSample = 0;
+    context.blockStartTimeUs = 0.0;
+    onStartBlock(context);
+}
+
+void GraphRouter::onStartBlock(const BlockContext& context) {
     for (const auto &module: allEnvelopeModules) {
-        module->onStartBuffer(size);
+        module->onStartBlock(context);
     }
     for (const auto &input: allEnvelopeInputs) {
-        input->onStartBuffer(size);
+        input->onStartBuffer(context.blockSize);
     }
     for (const auto &patch: patches) {
-        patch.first->onStartBuffer(size);
-        patch.second->onStartBuffer(size);
+        patch.first->onStartBuffer(context.blockSize);
+        patch.second->onStartBuffer(context.blockSize);
     }
     for (const auto &userInput: allEnvelopeUserInputs) {
-        userInput->onStartBuffer(size);
+        userInput->onStartBuffer(context.blockSize);
     }
 }
 

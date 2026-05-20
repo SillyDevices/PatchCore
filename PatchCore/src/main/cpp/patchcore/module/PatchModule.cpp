@@ -86,9 +86,18 @@ PatchModule::~PatchModule() {
 };
 
 void PatchModule::onStartBuffer(int size) {
-    Module::onStartBuffer(size);
+    BlockContext context;
+    context.blockSize = size;
+    context.sampleRate = sampleRate;
+    context.blockStartSample = 0;
+    context.blockStartTimeUs = 0.0;
+    onStartBlock(context);
+}
+
+void PatchModule::onStartBlock(const BlockContext& context) {
+    Module::onStartBlock(context);
     std::lock_guard<std::mutex> lock(routerMutex);
-    _router.onStartBuffer(size);
+    _router.onStartBlock(context);
 }
 
 void PatchModule::envelope() {

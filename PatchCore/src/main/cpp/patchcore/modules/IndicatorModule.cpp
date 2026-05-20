@@ -70,7 +70,16 @@ void IndicatorModule::processSample(int sampleIndex) {
 }
 
 void IndicatorModule::onStartBuffer(int bufferSize) {
-    Module::onStartBuffer(bufferSize);
+    BlockContext context;
+    context.blockSize = bufferSize;
+    context.sampleRate = sampleRate;
+    context.blockStartSample = 0;
+    context.blockStartTimeUs = 0.0;
+    onStartBlock(context);
+}
+
+void IndicatorModule::onStartBlock(const BlockContext& context) {
+    Module::onStartBlock(context);
 
     //swap to new buffer without blocking audio thread
     if (targetBufferDescriptor != nullptr) {

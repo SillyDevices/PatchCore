@@ -37,6 +37,7 @@ public:
     void removeModule(Module *module) override;
 
     void onStartBuffer(int size) override;
+    void onStartBlock(const BlockContext& context) override;
     void envelope() override;
 
     void reset() override;

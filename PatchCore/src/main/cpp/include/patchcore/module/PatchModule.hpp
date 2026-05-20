@@ -54,6 +54,7 @@ protected:
     //Module interface
 public:
     void onStartBuffer(int size) override;
+    void onStartBlock(const BlockContext& context) override;
     void envelope();
     void processSample(int sampleIndex) override;
     void processBlock() override;

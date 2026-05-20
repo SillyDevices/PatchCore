@@ -42,6 +42,7 @@ public:
     //Module interface
 public:
     void onStartBuffer(int size) override;
+    void onStartBlock(const BlockContext& context) override;
     void processSample(int sampleIndex) override;
     void processBlock() override;
 

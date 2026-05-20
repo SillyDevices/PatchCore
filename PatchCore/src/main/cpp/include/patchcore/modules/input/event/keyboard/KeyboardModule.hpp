@@ -56,6 +56,7 @@ public:
 
 public:
     void onStartBuffer(int size) override;
+    void onStartBlock(const BlockContext& context) override;
     void processSample(int sampleIndex) override;
 public:
     void onEvent(KeyboardEvent event) override;

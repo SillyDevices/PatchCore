@@ -48,6 +48,16 @@ void KeyboardModule::init() {
 }
 
 void KeyboardModule::onStartBuffer(int size) {
+    BlockContext context;
+    context.blockSize = size;
+    context.sampleRate = sampleRate;
+    context.blockStartSample = 0;
+    context.blockStartTimeUs = 0.0;
+    onStartBlock(context);
+}
+
+void KeyboardModule::onStartBlock(const BlockContext& context) {
+    (void) context;
     std::lock_guard<std::mutex> lock(changesMutex);
     syncTime = getTimeUs();
     if (noteChanges.size() > 0){
