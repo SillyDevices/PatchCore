@@ -35,6 +35,10 @@ public:
         value = _output->value;
     }
 
+    void copySampleFromInnerOutput(int sampleIndex) {
+        value[sampleIndex] = _output->value[sampleIndex];
+    }
+
     [[nodiscard]]
     ModuleOutput* getModuleOutput() const{
         return _output;

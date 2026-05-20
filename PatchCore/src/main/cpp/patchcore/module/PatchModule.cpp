@@ -92,8 +92,17 @@ void PatchModule::onStartBlock(const BlockContext& context) {
 }
 
 void PatchModule::processSample(int sampleIndex) {
-    (void) sampleIndex;
-    throw std::runtime_error("PatchModule::processSample() is not implemented for nested patch graphs, use processBlock()");
+    std::lock_guard<std::mutex> lock(routerMutex);
+
+    for (const auto input: _exposedInputs) {
+        input->copySampleToInnerInput(sampleIndex);
+    }
+
+    _router.processSample(sampleIndex);
+
+    for (auto output: _exposedOutputs) {
+        output->copySampleFromInnerOutput(sampleIndex);
+    }
 }
 
 void PatchModule::processBlock() {

@@ -40,6 +40,10 @@ public:
         _input->value = value;
     }
 
+    void copySampleToInnerInput(int sampleIndex) const {
+        _input->value[sampleIndex] = value[sampleIndex];
+    }
+
     [[nodiscard]]
     ModuleInput* getModuleInput() const{
         return _input;

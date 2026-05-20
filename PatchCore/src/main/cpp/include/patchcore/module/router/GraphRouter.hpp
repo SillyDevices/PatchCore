@@ -48,6 +48,7 @@ public:
     void moduleInputChanged(Module* module) override;
 
     void onStartBlock(const BlockContext& context) override;
+    void processSample(int sampleIndex);
     void processBlock();
 
     [[nodiscard]]
@@ -77,8 +78,11 @@ protected:
         std::vector<Module*> modulesInStage;
         std::vector<ModuleInput*> inputsInStage;
         std::vector<std::vector<ModuleOutput*>> outputsInStage;
-        bool processSampleBySample = false;
+        bool hasLoop = false;
     };
+
+    void processStageSample(const EnvelopeStage& stage, int sampleIndex);
+    void processStageBlock(const EnvelopeStage& stage);
 
     std::vector<ModuleInput*> allEnvelopeInputs;
     std::vector<FloatUserInput*> allEnvelopeUserInputs;
