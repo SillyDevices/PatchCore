@@ -31,6 +31,7 @@ namespace dsp {
 
     inline float voltToHz(float tune, float voltage) {
         return tune * powf(2.0f, voltage);
+//        return tune * exp2f(voltage);
     }
 
     inline float HzToVolt(float frequency) {
