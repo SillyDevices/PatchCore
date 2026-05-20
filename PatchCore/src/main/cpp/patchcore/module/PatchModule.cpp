@@ -26,6 +26,7 @@
 #include "patchcore/module/input/user/ExposedModuleFloatUserInput.hpp"
 #include "patchcore/module/PolyModule.hpp"
 #include "patchcore/module/PolyProxyPatchModule.hpp"
+#include <algorithm>
 #include <stdexcept>
 
 #ifdef ANDROID
@@ -91,10 +92,39 @@ void PatchModule::onStartBuffer(int size) {
 }
 
 void PatchModule::envelope() {
+    throw std::runtime_error("PatchModule::envelope() is deprecated, use processSample/processBlock");
     //need to sync router.envelope
     //it's not a best option to do that
     std::lock_guard<std::mutex> lock(routerMutex);
+    processCurrentSample();
+}
 
+void PatchModule::processSample(int sampleIndex) {
+    (void) sampleIndex;
+    std::lock_guard<std::mutex> lock(routerMutex);
+    processCurrentSample();
+    advanceSampleCursors();
+}
+
+void PatchModule::processBlock() {
+    std::lock_guard<std::mutex> lock(routerMutex);
+
+    for (const auto input: _exposedInputs) {
+        auto* sourceBuffer = input->value.data();
+        auto* targetBuffer = input->getModuleInput()->value.data();
+        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
+    }
+
+    _router.processBlock();
+
+    for (auto output: _exposedOutputs) {
+        auto* sourceBuffer = output->getModuleOutput()->value.data();
+        auto* targetBuffer = output->value.data();
+        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
+    }
+}
+
+void PatchModule::processCurrentSample() {
     // What about _exposedUserInputs? who envelope them? maybe parrent Module does it?
 
     for (const auto input: _exposedInputs) {

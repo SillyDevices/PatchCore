@@ -28,6 +28,9 @@ Module::Module(std::string name, int sampleRate) : sampleRate(sampleRate), name(
 
 void Module::processSample(int sampleIndex) {
     (void) sampleIndex;
+    for (auto &input : interpolatedInputs) {
+        input->envelope();
+    }
     envelope();
     advanceSampleCursors();
 }

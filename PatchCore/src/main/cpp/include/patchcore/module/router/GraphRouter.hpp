@@ -49,6 +49,7 @@ public:
 
     void onStartBuffer(int size) override;
     void envelope() override;
+    void processBlock();
 
     [[nodiscard]]
     std::vector<std::pair<ModuleOutput*, ModuleInput*>> getPatches() const override;

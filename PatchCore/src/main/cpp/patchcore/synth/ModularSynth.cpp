@@ -39,10 +39,26 @@ ModularSynth::ModularSynth(ModuleFactory *factory, int sampleRate) :
 
 
 std::pair<float, float> ModularSynth::computeSample() {
-    PatchModule::envelope();
+    PatchModule::processSample(0);
     float leftValue = leftInput.value + monoInput.value;
     float rightValue = rightInput.value + monoInput.value;
     return { leftValue, rightValue };
+}
+
+void ModularSynth::computeBlock(StereoBlock& out) {
+    PatchModule::processBlock();
+
+    const auto& monoBuffer = monoInput.getBuffer();
+    const auto& leftBuffer = leftInput.getBuffer();
+    const auto& rightBuffer = rightInput.getBuffer();
+
+    for (int index = 0; index < PATCHCORE_BLOCK_SIZE; ++index) {
+        const float monoValue = index < static_cast<int>(monoBuffer.size()) ? monoBuffer[index] : monoInput.value;
+        const float leftValue = index < static_cast<int>(leftBuffer.size()) ? leftBuffer[index] : leftInput.value;
+        const float rightValue = index < static_cast<int>(rightBuffer.size()) ? rightBuffer[index] : rightInput.value;
+        out.left[index] = leftValue + monoValue;
+        out.right[index] = rightValue + monoValue;
+    }
 }
 
 void ModularSynth::onStartBuffer(int size) {

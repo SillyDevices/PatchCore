@@ -204,10 +204,10 @@ oboe::DataCallbackResult OboeAudioInterface::onAudioReady(oboe::AudioStream *obo
 
     auto floatData = (float *) audioData;
     if (mSynth != nullptr) {
-        mSynth->onStartBuffer(numFrames);
         int32_t frameIndex = 0;
         while (frameIndex < numFrames) {
             if (pendingBlockIndex >= PATCHCORE_BLOCK_SIZE) {
+                mSynth->onStartBuffer(PATCHCORE_BLOCK_SIZE);
                 mSynth->computeBlock(pendingBlock);
                 pendingBlockIndex = 0;
             }

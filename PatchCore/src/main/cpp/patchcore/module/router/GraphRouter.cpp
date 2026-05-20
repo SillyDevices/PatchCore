@@ -350,7 +350,29 @@ void GraphRouter::envelope() {
             inputIndex++;
         }
         for (const auto &module: stage.modulesInStage) {
-            module->envelope(); //skip for now
+            module->envelope(); // legacy sample path only
+        }
+    }
+}
+
+void GraphRouter::processBlock() {
+    // TODO: when loops are present, process looped SCCs sample-by-sample.
+    for (const auto &stage: envelopeStages) {
+        int inputIndex = 0;
+        for (const auto &input: stage.inputsInStage) {
+            auto* inputBuffer = input->value.data();
+            std::fill(inputBuffer, inputBuffer + PATCHCORE_BLOCK_SIZE, 0.0f);
+
+            for (const auto &output: stage.outputsInStage[inputIndex]) {
+                const auto* outputBuffer = output->value.data();
+                for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+                    inputBuffer[sampleIndex] += outputBuffer[sampleIndex];
+                }
+            }
+            inputIndex++;
+        }
+        for (const auto &module: stage.modulesInStage) {
+            module->processBlock();
         }
     }
 }
