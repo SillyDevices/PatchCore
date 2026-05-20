@@ -1,6 +1,6 @@
 [versions]
-artifacts-patchCore = "0.2.0"
-artifacts-patchCoreMultiplatform = "0.2.10"
+artifacts-patchCore = "0.3.0"
+artifacts-patchCoreMultiplatform = "0.3.0"
 
 kotlin = "2.2.20"
 jetbrainsKotlinJvm = "2.2.20"
