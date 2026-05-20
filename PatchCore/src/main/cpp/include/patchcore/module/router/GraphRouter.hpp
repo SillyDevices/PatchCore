@@ -75,12 +75,25 @@ protected:
     int nextModuleId = 0;
 
     struct EnvelopeStage {
+        struct SampleInputRoute {
+            ModuleInput* input = nullptr;
+            std::vector<ModuleOutput*> outputs;
+            std::vector<bool> readPreviousSample;
+        };
+
+        struct SampleModuleRoute {
+            Module* module = nullptr;
+            std::vector<SampleInputRoute> inputRoutes;
+        };
+
         std::vector<Module*> modulesInStage;
         std::vector<ModuleInput*> inputsInStage;
         std::vector<std::vector<ModuleOutput*>> outputsInStage;
+        std::vector<SampleModuleRoute> sampleModuleRoutes;
         bool hasLoop = false;
     };
 
+    void processStageSampleWithLoop(const EnvelopeStage& stage, int sampleIndex);
     void processStageSample(const EnvelopeStage& stage, int sampleIndex);
     void processStageBlock(const EnvelopeStage& stage);
 
