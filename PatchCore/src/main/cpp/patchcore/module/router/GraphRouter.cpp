@@ -203,6 +203,10 @@ void GraphRouter::updateModuleGraph() {
     // mo modules in graph; reset connection matrix and update
     if (moduleGraph.empty()) {
         envelopeStages.clear();
+        allEnvelopeInputs.clear();
+        allEnvelopeUserInputs.clear();
+        allEnvelopeModules.clear();
+        _containLoops = false;
 #if PATCHCORE_GRAPH_ROUTER_DEBUG
         GraphRouterDiagnostics::logModuleGraph(*this, "updateModuleGraph");
 #endif
@@ -220,12 +224,14 @@ void GraphRouter::updateModuleGraph() {
     // build condensed graph of SCCs
     //helper map from moduleId to sccId
     std::unordered_map<int, int> moduleIdToSCCId;
+    std::unordered_set<int> loopSCCIds;
     for (int sccId = 0; sccId < SCCs.size(); ++sccId) {
         for (const auto &moduleId: SCCs[sccId]) {
             moduleIdToSCCId[moduleId] = sccId;
         }
         if (SCCs[sccId].size() > 1) {
             hasLoops = true;
+            loopSCCIds.insert(sccId);
         }
     }
 
@@ -238,8 +244,8 @@ void GraphRouter::updateModuleGraph() {
         int toSCC = moduleIdToSCCId[edge.second];
 
         if (fromSCC == toSCC) {
-            //TODO mark as self loop for envelope stage
             hasLoops = true;
+            loopSCCIds.insert(fromSCC);
             continue; // remove self-loops from condensed graph
         }
 
@@ -273,9 +279,11 @@ void GraphRouter::updateModuleGraph() {
     std::unordered_set<Module*> envelopeModuleSet;
     envelopeStages.clear();
     for (const auto &sccTopo: stagedSCCTopo) {
-        EnvelopeStage stage;
         for (const auto &sccId: sccTopo) {
-            // add modules in this SCC to the stage
+            // Keep each SCC in a separate stage so looped SCCs can be processed sample-by-sample
+            // without forcing unrelated acyclic SCCs from the same topological layer into that mode.
+            EnvelopeStage stage;
+            stage.processSampleBySample = loopSCCIds.find(sccId) != loopSCCIds.end();
             stage.modulesInStage.reserve(SCCs[sccId].size());
             std::unordered_map<ModuleInput *, std::vector<ModuleOutput *>> stageMatrix = {};
             for (const auto &moduleId: SCCs[sccId]) {
@@ -301,8 +309,8 @@ void GraphRouter::updateModuleGraph() {
                 stage.inputsInStage.push_back(matrixKV.first);
                 stage.outputsInStage.push_back(matrixKV.second);
             }
+            envelopeStages.push_back(stage);
         }
-        envelopeStages.push_back(stage);
     }
 
     allEnvelopeInputs.clear();
@@ -342,31 +350,73 @@ void GraphRouter::onStartBlock(const BlockContext& context) {
 }
 
 void GraphRouter::processBlock() {
-    // TODO: when loops are present, process looped SCCs sample-by-sample.
     for (const auto &stage: envelopeStages) {
-        int inputIndex = 0;
-        for (const auto &input: stage.inputsInStage) {
-            auto* inputBuffer = input->value.data();
-            if (inputBuffer == nullptr) {
-                input->clearBlock();
-                inputBuffer = input->value.data();
-            }
-            std::fill(inputBuffer, inputBuffer + PATCHCORE_BLOCK_SIZE, 0.0f);
+        if (stage.processSampleBySample) {
+            std::unordered_set<Module*> stageModuleSet(stage.modulesInStage.begin(), stage.modulesInStage.end());
+            for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+                std::unordered_set<Module*> processedModules;
+                for (const auto &module: stage.modulesInStage) {
+                    int inputIndex = 0;
+                    for (const auto &input: stage.inputsInStage) {
+                        if (input->getModule() != module) {
+                            inputIndex++;
+                            continue;
+                        }
 
-            for (const auto &output: stage.outputsInStage[inputIndex]) {
-                const auto* outputBuffer = output->value.data();
-                if (outputBuffer == nullptr) {
-                    output->clearBlock();
-                    outputBuffer = output->value.data();
-                }
-                for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
-                    inputBuffer[sampleIndex] += outputBuffer[sampleIndex];
+                        auto* inputBuffer = input->value.data();
+                        if (inputBuffer == nullptr) {
+                            input->clearBlock();
+                            inputBuffer = input->value.data();
+                        }
+                        inputBuffer[sampleIndex] = 0.0f;
+
+                        for (const auto &output: stage.outputsInStage[inputIndex]) {
+                            const auto* outputBuffer = output->value.data();
+                            if (outputBuffer == nullptr) {
+                                output->clearBlock();
+                                outputBuffer = output->value.data();
+                            }
+
+                            auto* outputModule = output->getModule();
+                            const bool readPreviousSample =
+                                stageModuleSet.find(outputModule) != stageModuleSet.end() &&
+                                processedModules.find(outputModule) == processedModules.end();
+                            const int sourceSampleIndex = readPreviousSample
+                                ? (sampleIndex == 0 ? PATCHCORE_BLOCK_SIZE - 1 : sampleIndex - 1)
+                                : sampleIndex;
+                            inputBuffer[sampleIndex] += outputBuffer[sourceSampleIndex];
+                        }
+                        inputIndex++;
+                    }
+                    module->processSample(sampleIndex);
+                    processedModules.insert(module);
                 }
             }
-            inputIndex++;
-        }
-        for (const auto &module: stage.modulesInStage) {
-            module->processBlock();
+        } else {
+            int inputIndex = 0;
+            for (const auto &input: stage.inputsInStage) {
+                auto* inputBuffer = input->value.data();
+                if (inputBuffer == nullptr) {
+                    input->clearBlock();
+                    inputBuffer = input->value.data();
+                }
+                std::fill(inputBuffer, inputBuffer + PATCHCORE_BLOCK_SIZE, 0.0f);
+
+                for (const auto &output: stage.outputsInStage[inputIndex]) {
+                    const auto* outputBuffer = output->value.data();
+                    if (outputBuffer == nullptr) {
+                        output->clearBlock();
+                        outputBuffer = output->value.data();
+                    }
+                    for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+                        inputBuffer[sampleIndex] += outputBuffer[sampleIndex];
+                    }
+                }
+                inputIndex++;
+            }
+            for (const auto &module: stage.modulesInStage) {
+                module->processBlock();
+            }
         }
     }
 }

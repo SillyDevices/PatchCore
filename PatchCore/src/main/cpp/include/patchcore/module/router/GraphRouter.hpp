@@ -77,6 +77,7 @@ protected:
         std::vector<Module*> modulesInStage;
         std::vector<ModuleInput*> inputsInStage;
         std::vector<std::vector<ModuleOutput*>> outputsInStage;
+        bool processSampleBySample = false;
     };
 
     std::vector<ModuleInput*> allEnvelopeInputs;
