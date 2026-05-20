@@ -150,7 +150,6 @@
         int frameIndex = 0;
         while (frameIndex < frameCount) {
             if (_pendingBlockIndex >= PATCHCORE_BLOCK_SIZE) {
-                _modularSynth->onStartBuffer(PATCHCORE_BLOCK_SIZE);
                 _modularSynth->computeBlock(_pendingBlock);
                 _pendingBlockIndex = 0;
             }

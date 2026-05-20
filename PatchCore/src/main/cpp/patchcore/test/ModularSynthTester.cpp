@@ -32,7 +32,6 @@ void ModularSynthTester::testSynth(ModularSynth *synth, float expectedLeft, floa
     std::pair<float, float> output;
     auto remainingSamples = samples;
     while (remainingSamples > 0) {
-        synth->onStartBuffer(PATCHCORE_BLOCK_SIZE);
         synth->computeBlock(block);
 
         const int framesToRead = std::min(remainingSamples, PATCHCORE_BLOCK_SIZE);

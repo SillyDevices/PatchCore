@@ -27,6 +27,7 @@
 
 #include "patchcore/dsp/dsp.h"
 #include <algorithm>
+#include <stdexcept>
 
 ModularSynth::ModularSynth(ModuleFactory *factory, int sampleRate) :
         AbstractSynth(),
@@ -39,13 +40,19 @@ ModularSynth::ModularSynth(ModuleFactory *factory, int sampleRate) :
 
 
 std::pair<float, float> ModularSynth::computeSample() {
-    PatchModule::processSample(0);
-    float leftValue = leftInput.value[0] + monoInput.value[0];
-    float rightValue = rightInput.value[0] + monoInput.value[0];
-    return { leftValue, rightValue };
+    throw std::runtime_error("ModularSynth::computeSample() is deprecated, use computeBlock()");
 }
 
 void ModularSynth::computeBlock(StereoBlock& out) {
+    BlockContext context;
+    context.blockSize = PATCHCORE_BLOCK_SIZE;
+    context.sampleRate = sampleRate;
+    context.blockStartSample = currentBlockStartSample;
+    context.blockStartTimeUs = sampleRate > 0
+            ? static_cast<double>(currentBlockStartSample) * 1000000.0 / static_cast<double>(sampleRate)
+            : 0.0;
+
+    PatchModule::onStartBlock(context);
     PatchModule::processBlock();
 
     for (int index = 0; index < PATCHCORE_BLOCK_SIZE; ++index) {
@@ -55,10 +62,13 @@ void ModularSynth::computeBlock(StereoBlock& out) {
         out.left[index] = leftValue + monoValue;
         out.right[index] = rightValue + monoValue;
     }
+
+    currentBlockStartSample += PATCHCORE_BLOCK_SIZE;
 }
 
 void ModularSynth::onStartBuffer(int size) {
-    PatchModule::onStartBuffer(size);
+    (void) size;
+    throw std::runtime_error("ModularSynth::onStartBuffer() is deprecated, computeBlock() owns block lifecycle");
 }
 
 void ModularSynth::onEndBuffer() {

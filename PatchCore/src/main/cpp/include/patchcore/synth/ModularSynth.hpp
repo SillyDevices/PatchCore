@@ -33,6 +33,7 @@
 #include "patchcore/modules/input/event/keyboard/EventKeyboard.hpp"
 
 #include <thread>
+#include <cstdint>
 
 #define MODULE_OUTPUT_INPUT "mono"
 #define MODULE_OUTPUT_LEFT_INPUT "left"
@@ -73,6 +74,8 @@ protected:
     ModuleInput monoInput = ModuleInput(MODULE_OUTPUT_INPUT);
     ModuleInput leftInput = ModuleInput(MODULE_OUTPUT_LEFT_INPUT);
     ModuleInput rightInput = ModuleInput(MODULE_OUTPUT_RIGHT_INPUT);
+
+    int64_t currentBlockStartSample = 0;
 };
 
 //}
