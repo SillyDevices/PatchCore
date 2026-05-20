@@ -20,18 +20,14 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/module/input/user/special/OnStartBufferCallbackUserInput.hpp"
 
-OnStartBufferCallbackUserInput::OnStartBufferCallbackUserInput(std::string name, OnStartBuffer *callback): FloatUserInput(name), callback(callback) {
+#ifndef PATCHCORE_BLOCKCONFIG_HPP
+#define PATCHCORE_BLOCKCONFIG_HPP
 
-}
+#ifndef PATCHCORE_PROCESS_BLOCK_SIZE
+#define PATCHCORE_PROCESS_BLOCK_SIZE 64
+#endif
 
-void OnStartBufferCallbackUserInput::envelope() {
+static constexpr int PATCHCORE_BLOCK_SIZE = PATCHCORE_PROCESS_BLOCK_SIZE;
 
-}
-
-void OnStartBufferCallbackUserInput::onStartBuffer(int bufferSize) {
-    callback->onStartBuffer(bufferSize);
-}
-
-
+#endif //PATCHCORE_BLOCKCONFIG_HPP

@@ -46,8 +46,8 @@ public:
     virtual ~PolyProxyModule() override = default;
     // module interface
 public:
-    void envelope() override; // throw runtime_error
-    void onStartBuffer(int size) override; // throw runtime_error
+    void processSample(int sampleIndex) override; // throw runtime_error
+    void onStartBlock(const BlockContext& context) override; // throw runtime_error
     //for test
 public:
     // poly module creation

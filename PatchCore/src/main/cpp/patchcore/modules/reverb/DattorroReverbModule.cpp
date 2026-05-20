@@ -48,15 +48,15 @@ void DattorroReverbModule::init() {
     registerOutput(outputR);
 }
 
-void DattorroReverbModule::envelope() {
+void DattorroReverbModule::processSample(int sampleIndex) {
     excursionPhase += excursion_inc;
     auto excursionValue = excursionAmplitude * sin(2 * (float) M_PI * excursionPhase);
     if (excursionPhase >= 1) { excursionPhase -= 1; }
 
 
-    auto decay = inputRoomSize.value;
-    auto damping = inputDamping.value; //0.0005f;
-    auto bandwidth = inputDiffusion.value;// 0.9995f;
+    auto decay = inputRoomSize.value[sampleIndex];
+    auto damping = inputDamping.value[sampleIndex]; //0.0005f;
+    auto bandwidth = inputDiffusion.value[sampleIndex];// 0.9995f;
 
     preDiffusersFilter.setFeedback(1 - bandwidth);
     tank0DampingFilter.setFeedback(damping);
@@ -67,13 +67,13 @@ void DattorroReverbModule::envelope() {
     auto diffusers01 =  0.750f;
     auto diffusers23 = 0.625f;
 
-    auto decayDiffuser0 = 0.7f; //inputDamping.value;
+    auto decayDiffuser0 = 0.7f; //inputDamping.value[sampleIndex];
     auto decayDiffuser1 = std::max(std::min(decay + 0.25f, 0.5f), 0.25f);
 
 
-//    auto preDelayOutput = preDelay.envelope(input.value, 0);
+//    auto preDelayOutput = preDelay.envelope(input.value[sampleIndex], 0);
 //    auto preDiffusersOutput = preDiffusersFilter.envelope(preDelayOutput);
-    auto preDiffusersOutput = preDiffusersFilter.envelope(inputL.value + inputR.value);
+    auto preDiffusersOutput = preDiffusersFilter.envelope(inputL.value[sampleIndex] + inputR.value[sampleIndex]);
     auto diffuser0Output = diffuser0.envelope(preDiffusersOutput, diffusers01);
     auto diffuser1Output = diffuser1.envelope(diffuser0Output, diffusers01);
     auto diffuser2Output = diffuser2.envelope(diffuser1Output, diffusers23);
@@ -117,6 +117,6 @@ void DattorroReverbModule::envelope() {
             - 0.6f * rightTaps[5]->value +
             - 0.6f * rightTaps[6]->value;
 
-    outputL.value = left;
-    outputR.value = right;
+    outputL.value[sampleIndex] = left;
+    outputR.value[sampleIndex] = right;
 }

@@ -29,7 +29,6 @@ add_library(
         patchcore/module/input/user/BoolUserInput.cpp
         patchcore/module/input/user/special/PassFloatUserInput.cpp
         patchcore/module/input/user/special/ExposedFloatUserInput.cpp
-        patchcore/module/input/user/special/OnStartBufferCallbackUserInput.cpp
         patchcore/module/input/user/special/CallbackFloatUserInput.cpp
         patchcore/module/input/user/special/CallbackBooleanUserInput.cpp
 
@@ -87,7 +86,6 @@ add_library(
         patchcore/dsp/osc/BandLimitedSimpleSquare.cpp
         patchcore/dsp/waveshaper/SimpleWaveShaper.cpp
 
-        patchcore/synth/BufferedSynth.cpp
         patchcore/synth/ModularSynth.cpp
         patchcore/test/ModularSynthTester.cpp
 

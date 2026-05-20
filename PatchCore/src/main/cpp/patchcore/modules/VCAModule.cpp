@@ -48,8 +48,8 @@ void VCAModule::init() {
 }
 
 
-void VCAModule::envelope() {
-    auto val = input.value * cv.value;
-    output.value = val;
-//    output.value = std::max(-1.0f, std::min(1.0f, val));
+void VCAModule::processSample(int sampleIndex) {
+    auto val = input.value[sampleIndex] * cv.value[sampleIndex];
+    output.value[sampleIndex] = val;
+//    output.value[sampleIndex] = std::max(-1.0f, std::min(1.0f, val));
 }

@@ -94,9 +94,10 @@ public:
             }
         }
     }
-    void envelope() override {
-        //DO NOTHING
-        // envelope on voice inputs is handled by voice modules directly
+    void prepareBlock(const BlockContext& context) override {
+        (void) context;
+        // DO NOTHING
+        // prepareBlock on voice inputs is handled by voice modules directly
     }
 
     ExposedModuleUserInput * createExposed(const std::string &withName) override {

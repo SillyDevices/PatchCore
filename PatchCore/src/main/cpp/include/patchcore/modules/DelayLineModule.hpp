@@ -51,7 +51,7 @@ public:
     virtual ~DelayLineModule();
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput input = ModuleInput(DELAYLINE_MODULE_INPUT_INPUT);
     ModuleInput inputTime = ModuleInput(DELAYLINE_MODULE_INPUT_TIME);

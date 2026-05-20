@@ -39,8 +39,9 @@ public:
     PolyProxyPatchModule(ModuleFactory *factory, const PatchModule* module, PolyModule* polyModule);
     ~PolyProxyPatchModule() override = default;
 public:
-    void envelope() override {
-        throw std::runtime_error("PolyProxyPatchModule does not implement envelope method");
+    void processSample(int sampleIndex) override {
+        (void) sampleIndex;
+        throw std::runtime_error("PolyProxyPatchModule does not implement processSample method");
     }
 // Module interface
 // all methods below just call PolyModule versions

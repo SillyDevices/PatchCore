@@ -51,6 +51,7 @@ class NativeInstrumentedTest {
 //        assertEquals("com.sillydevices.patchcore.test", appContext.packageName)
     }
 
+    //./gradlew :PatchCore:PatchCoreTest:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.sillydevices.patchcore.test.NativeInstrumentedTest#runSingleNativeTest
     @Test
     fun runSingleNativeTest() {
         loadLibrary()
@@ -60,7 +61,7 @@ class NativeInstrumentedTest {
 //        val testName = "KeyboardTest.monoKeyboardTwoKeysCvTest1"
 //        val testName = "PerformanceTest.PatchModulePerformanceTest"
 //        val testName = "GraphRouterTest.*"
-        val testName = "GraphRouterTest.Test"
+        val testName = "GraphRouterTest.LoopStageWithPatchModuleDoesNotAddMoreThanOneSampleDelay"
 
         if (runSingleNativeTest(testName) != 0) {
             throw RuntimeException("Native test '$testName' failed")

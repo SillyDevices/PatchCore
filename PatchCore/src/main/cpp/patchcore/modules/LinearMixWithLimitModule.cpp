@@ -41,9 +41,9 @@ std::unique_ptr<Module> LinearMixWithLimitModule::clone() const {
 }
 
 
-void LinearMixWithLimitModule::envelope() {
-    auto cv = inputCv.value + userInputCv.value;
+void LinearMixWithLimitModule::processSample(int sampleIndex) {
+    auto cv = inputCv.value[sampleIndex] + userInputCv.value[sampleIndex];
     auto amount1 = std::max(std::min(1 - cv, limit), 0.0f);
     auto amount2 = std::max(std::min(1 + cv, limit), 0.0f);
-    output.value = inputA.value * amount1 + inputB.value * amount2;
+    output.value[sampleIndex] = inputA.value[sampleIndex] * amount1 + inputB.value[sampleIndex] * amount2;
 }

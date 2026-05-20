@@ -24,6 +24,8 @@
 #include "patchcore/module/input/user/ExposedModuleFloatUserInput.hpp"
 #include "patchcore/module/input/user/poly/PolyProxyFloatUserInput.hpp"
 
+#include <cmath>
+
 FloatUserInput::FloatUserInput(std::string name): UserInput(name, UserInputType::FLOAT) {};
 FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, UserInputType::FLOAT), speed(speed) {
     if (speed < 5.0f) {
@@ -31,28 +33,27 @@ FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, U
     }
 };
 
-void FloatUserInput::onStartBuffer(int bufferSize) {
-    if (!isfinite(value)) {
-        value = 0.0f;
+void FloatUserInput::prepareBlock(const BlockContext& context) {
+    (void) context;
+    if (!std::isfinite(value[PATCHCORE_BLOCK_SIZE - 1])) {
+        value.fill(0.0f);
     }
-    startValue = value;
+    startValue = value[PATCHCORE_BLOCK_SIZE - 1];
     if (isLocked) {
         targetValue = lastSetParameterLockValue;
     } else {
         targetValue = lastSetValue;
     }
-    value = startValue;
     //TODO make it linear and not depend on buffer size
     auto ratio = (sampleRate/441) * speed;
     delta = (targetValue - startValue) / ratio;
-}
-
-void FloatUserInput::envelope() {
-    value += delta;
+    for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+        value[sampleIndex] = startValue + delta * static_cast<float>(sampleIndex + 1);
+    }
 }
 
 void FloatUserInput::clearParameterLock() {
-    value = lastSetValue;
+    value.fill(lastSetValue);
     isLocked = false;
 }
 

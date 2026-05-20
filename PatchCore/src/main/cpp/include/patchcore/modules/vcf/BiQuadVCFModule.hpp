@@ -56,7 +56,7 @@ public:
     virtual ~BiQuadVCFModule() = default;
     void init();
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 protected:
     void computeFilter(float cutoff, float resonance, float gainDB = 0.f);
     void reset();

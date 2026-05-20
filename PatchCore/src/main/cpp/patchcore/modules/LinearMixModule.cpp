@@ -49,15 +49,15 @@ void LinearMixModule::init(){
 
 
 
-void LinearMixModule::envelope() {
-    auto cv = inputCv.value + userInputCv.value;
+void LinearMixModule::processSample(int sampleIndex) {
+    auto cv = inputCv.value[sampleIndex] + userInputCv.value[sampleIndex];
 
     auto amount1 = 1 - cv;
     auto amount2 = 1 + cv;
-    output.value = (inputA.value * amount1 + inputB.value * amount2) / 2.0f;
+    output.value[sampleIndex] = (inputA.value[sampleIndex] * amount1 + inputB.value[sampleIndex] * amount2) / 2.0f;
 //    equal power
 //    auto angle = (cv + 1) * 0.25f * M_PI;
 //    auto mixA = std::cos(angle);
 //    auto mixB = std::sin(angle);
-//    output.setValue((inputA.value * mixA + inputB.value * mixB));
+//    output.setValue((inputA.value[sampleIndex] * mixA + inputB.value[sampleIndex] * mixB));
 }

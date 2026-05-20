@@ -77,15 +77,15 @@ void MultiVCOModule::init() {
     registerOutput(ledOutput);
 }
 
-void MultiVCOModule::envelope() {
-    BaseVCO::envelope();
-    auto pwmValue = pwm.value + userPwm.value;
-    auto cvValue = cv.value + userCv.value;
-    auto fm = hz.value;
+void MultiVCOModule::processSample(int sampleIndex) {
+    BaseVCO::processSample(sampleIndex);
+    auto pwmValue = pwm.value[sampleIndex] + userPwm.value[sampleIndex];
+    auto cvValue = cv.value[sampleIndex] + userCv.value[sampleIndex];
+    auto fm = hz.value[sampleIndex];
     if (!lfoMode) {
-        fm = hz.value * 100.0f;
+        fm = hz.value[sampleIndex] * 100.0f;
     }
-    auto hzValue = userHz.value + fm;
+    auto hzValue = userHz.value[sampleIndex] + fm;
     auto waveShaperCv = pwmValue - 0.5f;
 
     // old code lfo userHz to frequency relation
@@ -138,12 +138,12 @@ void MultiVCOModule::envelope() {
             break;
     }
 //    result = result + syncBlep.process();
-    output.value = result;
+    output.value[sampleIndex] = result;
     if (lfoMode) {
-        ledOutput.value = result;
-        ledOutput.envelope();
+        ledOutput.value[sampleIndex] = result;
+        ledOutput.processSample(sampleIndex);
     }
-//    lastValue = output.value;
+//    lastValue = output.value[sampleIndex];
     phaseIncrement(frequency);
 }
 

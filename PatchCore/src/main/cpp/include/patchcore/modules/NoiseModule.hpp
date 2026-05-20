@@ -27,7 +27,7 @@
 #include "patchcore/module/Module.hpp"
 #include "patchcore/module/ModuleParameter.hpp"
 #include "patchcore/dsp/osc/Noise.hpp"
-#include <list>
+#include <array>
 
 #define NOISEMODULE_OUTPUT "out"
 #define NOISEMODULE_PINK_OUTPUT "pink_out"
@@ -42,14 +42,16 @@ public:
     ~NoiseModule() override = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     Noise noise = Noise();
     ModuleOutput output = ModuleOutput(NOISEMODULE_OUTPUT);
     ModuleOutput pinkOutput = ModuleOutput(NOISEMODULE_PINK_OUTPUT);
 private:
-    float b0, b1, b2, b3, b4, b5, b6;
-    std::list<float> pinkBuffer = std::list<float>(10, 0.0f);
+    static constexpr int pinkBufferSize = 10;
+    float b0 = 0.0f, b1 = 0.0f, b2 = 0.0f, b3 = 0.0f, b4 = 0.0f, b5 = 0.0f, b6 = 0.0f;
+    std::array<float, pinkBufferSize> pinkBuffer = {};
+    int pinkBufferWriteIndex = 0;
 };
 
 #endif //PATCHCORE_NOISEMODULE_HPP

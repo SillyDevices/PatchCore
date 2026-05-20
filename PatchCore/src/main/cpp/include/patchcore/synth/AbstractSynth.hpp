@@ -23,21 +23,15 @@
 #ifndef PATCHCORE_ABSTRACT_SYNTH_H
 #define PATCHCORE_ABSTRACT_SYNTH_H
 
-#include "patchcore/callback/OnStartBuffer.hpp"
-#include "patchcore/callback/OnEndBuffer.hpp"
-
-#include <vector>
-
-//TODO remove? not needed
-#include <utility>
+#include "patchcore/synth/StereoBlock.hpp"
 
 //namespace PatchCore {
 
-class AbstractSynth: public OnStartBuffer, public OnEndBuffer {
+class AbstractSynth {
 public:
     virtual ~AbstractSynth() = default;
 
-    virtual std::pair<float, float> computeSample() = 0;
+    virtual void computeBlock(StereoBlock& out) = 0;
 };
 
 // }

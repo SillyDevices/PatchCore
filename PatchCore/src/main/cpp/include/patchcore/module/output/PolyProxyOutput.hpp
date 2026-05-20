@@ -48,10 +48,12 @@ public:
     void setVoiceOutput(int voiceIndex, ModuleOutput* output) {
         voiceOutputs[voiceIndex] = output;
     }
-    virtual void envelope() {
-        value = 0.0f;
+    virtual void sumVoiceBlocks() {
+        value.fill(0.0f);
         for (auto &voiceOutput : voiceOutputs) {
-            value += voiceOutput->value;
+            for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+                value[sampleIndex] += voiceOutput->value[sampleIndex];
+            }
         }
     }
 protected:

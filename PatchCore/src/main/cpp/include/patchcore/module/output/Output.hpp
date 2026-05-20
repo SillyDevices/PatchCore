@@ -28,8 +28,6 @@ class Output
 public:
     Output() = default;
     virtual ~Output() = default;
-public:
-    float value = 0.0f;
 };
 
 #endif //PATCHCORE_OUTPUT_HPP

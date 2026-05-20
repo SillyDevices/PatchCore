@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
+#include "TestBlockUtils.hpp"
 #include <patchcore/modules/ConstModule.hpp>
 #include <patchcore/modules/VCAModule.hpp>
 #include <patchcore/modules/AttenuverterModule.hpp>
@@ -46,12 +47,9 @@ TEST(PatchModuleTest, PatchModuleBasicOutputTest) {
     std::pair<float, float> lastResult = { 0.0f, 0.0f };
 
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
-    for (int i = 0; i < countSamples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         lastResult = result;
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_FLOAT_EQ(lastResult.first, 0.8f);
     ASSERT_FLOAT_EQ(lastResult.second, 0.8f);
@@ -81,15 +79,12 @@ TEST(PatchModuleTest, PatchModuleBasicInputTest) {
     synth->addPatch(synth->getModule("voice")->getModuleOutput("output"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
     std::pair<float, float> lastResult = {0.0f, 0.0f};
-    for (int i = 0; i < countSamples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         lastResult = result;
-    }
+    });
     ASSERT_FLOAT_EQ(lastResult.first, 0.8f);
     ASSERT_FLOAT_EQ(lastResult.second, 0.8f);
-    synth->onEndBuffer();
     delete synth;
 }
 
@@ -116,15 +111,12 @@ TEST(PatchModuleTest, PatchModuleBasicCopyInputTest) {
     synth->addPatch(synth->getModule("voice")->getModuleOutput("output"), synth->getModuleInput(MODULE_OUTPUT_INPUT));
 
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
     std::pair<float, float> lastResult = {0.0f, 0.0f};
-    for (int i = 0; i < countSamples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         lastResult = result;
-    }
+    });
     ASSERT_FLOAT_EQ(lastResult.first, 0.8f);
     ASSERT_FLOAT_EQ(lastResult.second, 0.8f);
-    synth->onEndBuffer();
     delete synth;
 }
 
@@ -150,14 +142,9 @@ TEST(PatchModuleTest, interolatedUserInputTest) {
 
     for (auto i =0; i < 100; i++) {
         int countSamples = 100;
-        synth->onStartBuffer(countSamples);
-
-        for (int sample= 0; sample < countSamples ; sample++) {
-            auto result = synth->computeSample();
+        patchcore_test::computeSynthSamples(synth, countSamples, [&](int sample, std::pair<float, float> result) {
             lastResult = result;
-        }
-
-        synth->onEndBuffer();
+        });
     }
 
     ASSERT_NEAR(lastResult.first, 1.0f, 0.0001f);

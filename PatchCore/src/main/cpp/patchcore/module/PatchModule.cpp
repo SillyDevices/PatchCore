@@ -26,6 +26,7 @@
 #include "patchcore/module/input/user/ExposedModuleFloatUserInput.hpp"
 #include "patchcore/module/PolyModule.hpp"
 #include "patchcore/module/PolyProxyPatchModule.hpp"
+#include <algorithm>
 #include <stdexcept>
 
 #ifdef ANDROID
@@ -84,30 +85,39 @@ PatchModule::~PatchModule() {
     _exposedUserInputs.clear();
 };
 
-void PatchModule::onStartBuffer(int size) {
+void PatchModule::onStartBlock(const BlockContext& context) {
+    Module::onStartBlock(context);
     std::lock_guard<std::mutex> lock(routerMutex);
-    _router.onStartBuffer(size);
+    _router.onStartBlock(context);
 }
 
-void PatchModule::envelope() {
-    //need to sync router.envelope
-    //it's not a best option to do that
+void PatchModule::processSample(int sampleIndex) {
     std::lock_guard<std::mutex> lock(routerMutex);
-
-    // What about _exposedUserInputs? who envelope them? maybe parrent Module does it?
 
     for (const auto input: _exposedInputs) {
-        input->envelope();
+        input->copySampleToInnerInput(sampleIndex);
     }
 
-    _router.envelope();
+    _router.processSample(sampleIndex);
 
     for (auto output: _exposedOutputs) {
-        output->envelope();
+        output->copySampleFromInnerOutput(sampleIndex);
     }
 }
 
+void PatchModule::processBlock() {
+    std::lock_guard<std::mutex> lock(routerMutex);
 
+    for (const auto input: _exposedInputs) {
+        input->copyBlockToInnerInput();
+    }
+
+    _router.processBlock();
+
+    for (auto output: _exposedOutputs) {
+        output->copyBlockFromInnerOutput();
+    }
+}
 
 Module* PatchModule::createModule(const std::string &moduleTypeName, const std::string &moduleName,
                                        const std::map<std::string, ModuleParameter> &parameters) {

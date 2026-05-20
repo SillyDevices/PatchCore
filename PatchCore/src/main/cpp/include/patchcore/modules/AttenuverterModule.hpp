@@ -43,7 +43,7 @@ public:
     void init();
     virtual ~AttenuverterModule() = default;
 
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     float defaultValue = 1.0f;
     ModuleInput input = ModuleInput(ATTENUVERTER_MODULE_INPUT_INPUT, defaultValue);

@@ -41,7 +41,7 @@ public:
     void init();
     virtual ~PanCrossFadeModule() = default;
 
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
 
     ModuleInput input = ModuleInput(PAN_CROSSFADE_MODULE_INPUT_INPUT);

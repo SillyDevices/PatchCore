@@ -33,6 +33,7 @@
 #include "patchcore/modules/input/event/keyboard/EventKeyboard.hpp"
 
 #include <thread>
+#include <cstdint>
 
 #define MODULE_OUTPUT_INPUT "mono"
 #define MODULE_OUTPUT_LEFT_INPUT "left"
@@ -51,9 +52,7 @@ protected:
     virtual void staticRoutes();
 
 public:
-    void onStartBuffer(int size) override;
-    void onEndBuffer() override;
-    std::pair<float, float> computeSample() override;
+    void computeBlock(StereoBlock& out) override;
 
 public:
     ModuleInput* getMonoOutput() {
@@ -72,6 +71,8 @@ protected:
     ModuleInput monoInput = ModuleInput(MODULE_OUTPUT_INPUT);
     ModuleInput leftInput = ModuleInput(MODULE_OUTPUT_LEFT_INPUT);
     ModuleInput rightInput = ModuleInput(MODULE_OUTPUT_RIGHT_INPUT);
+
+    int64_t currentBlockStartSample = 0;
 };
 
 //}

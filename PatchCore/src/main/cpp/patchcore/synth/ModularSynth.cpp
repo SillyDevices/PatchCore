@@ -26,6 +26,7 @@
 #include "patchcore/modules/input/event/keyboard/SingleKeyboardModule.hpp"
 
 #include "patchcore/dsp/dsp.h"
+#include "timeUtils.h"
 #include <algorithm>
 
 ModularSynth::ModularSynth(ModuleFactory *factory, int sampleRate) :
@@ -38,19 +39,25 @@ ModularSynth::ModularSynth(ModuleFactory *factory, int sampleRate) :
 }
 
 
-std::pair<float, float> ModularSynth::computeSample() {
-    PatchModule::envelope();
-    float leftValue = leftInput.value + monoInput.value;
-    float rightValue = rightInput.value + monoInput.value;
-    return { leftValue, rightValue };
-}
+void ModularSynth::computeBlock(StereoBlock& out) {
+    BlockContext context;
+    context.blockSize = PATCHCORE_BLOCK_SIZE;
+    context.sampleRate = sampleRate;
+    context.blockStartSample = currentBlockStartSample;
+    context.blockStartTimeUs = getTimeUs();
 
-void ModularSynth::onStartBuffer(int size) {
-    PatchModule::onStartBuffer(size);
-}
+    PatchModule::onStartBlock(context);
+    PatchModule::processBlock();
 
-void ModularSynth::onEndBuffer() {
+    for (int index = 0; index < PATCHCORE_BLOCK_SIZE; ++index) {
+        const float monoValue = monoInput.value[index];
+        const float leftValue = leftInput.value[index];
+        const float rightValue = rightInput.value[index];
+        out.left[index] = leftValue + monoValue;
+        out.right[index] = rightValue + monoValue;
+    }
 
+    currentBlockStartSample += PATCHCORE_BLOCK_SIZE;
 }
 
 void ModularSynth::staticRoutes() {

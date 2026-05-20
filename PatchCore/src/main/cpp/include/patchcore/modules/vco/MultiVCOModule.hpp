@@ -66,7 +66,7 @@ public:
     virtual ~MultiVCOModule() = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
     void setWaveForm(WaveForm waveform);
 
     WaveForm getCurrentWaveForm();

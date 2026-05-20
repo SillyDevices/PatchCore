@@ -47,8 +47,9 @@ public:
 
     void moduleInputChanged(Module* module) override;
 
-    void onStartBuffer(int size) override;
-    void envelope() override;
+    void onStartBlock(const BlockContext& context) override;
+    void processSample(int sampleIndex);
+    void processBlock();
 
     [[nodiscard]]
     std::vector<std::pair<ModuleOutput*, ModuleInput*>> getPatches() const override;
@@ -74,10 +75,27 @@ protected:
     int nextModuleId = 0;
 
     struct EnvelopeStage {
+        struct SampleInputRoute {
+            ModuleInput* input = nullptr;
+            std::vector<ModuleOutput*> outputs;
+            std::vector<bool> readPreviousSample;
+        };
+
+        struct SampleModuleRoute {
+            Module* module = nullptr;
+            std::vector<SampleInputRoute> inputRoutes;
+        };
+
         std::vector<Module*> modulesInStage;
         std::vector<ModuleInput*> inputsInStage;
         std::vector<std::vector<ModuleOutput*>> outputsInStage;
+        std::vector<SampleModuleRoute> sampleModuleRoutes;
+        bool hasLoop = false;
     };
+
+    void processStageSampleWithLoop(const EnvelopeStage& stage, int sampleIndex);
+    void processStageSample(const EnvelopeStage& stage, int sampleIndex);
+    void processStageBlock(const EnvelopeStage& stage);
 
     std::vector<ModuleInput*> allEnvelopeInputs;
     std::vector<FloatUserInput*> allEnvelopeUserInputs;

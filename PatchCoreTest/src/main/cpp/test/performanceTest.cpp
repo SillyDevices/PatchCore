@@ -88,9 +88,6 @@ static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
 //        int countSamples = 44100 * 100; //100 seconds
 //        for (int j = 0; j < countSamples;) {
 //            for (int i = 0; i < 100; i++) {
-//                synth->onStartBuffer(countSamples);
-//                auto result = synth->computeSample();
-//                synth->onEndBuffer();
 //            }
 //            j += 100;
 //        }

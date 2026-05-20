@@ -63,11 +63,11 @@ void BiQuadVCFModule::init() {
     registerUserInput(userGain);
 }
 
-void BiQuadVCFModule::envelope() {
-    float inputValue = input.value;
-    float cutoffValue = cutoff.value + userCutoff.value;
-    float resonanceValue = resonance.value + userResonance.value;
-    float gainValue = userGain.value;
+void BiQuadVCFModule::processSample(int sampleIndex) {
+    float inputValue = input.value[sampleIndex];
+    float cutoffValue = cutoff.value[sampleIndex] + userCutoff.value[sampleIndex];
+    float resonanceValue = resonance.value[sampleIndex] + userResonance.value[sampleIndex];
+    float gainValue = userGain.value[sampleIndex];
 
     float cutoffHz = dsp::voltToHz(dsp::tune_C0, cutoffValue);
     //temp fix for old xcode
@@ -98,7 +98,7 @@ void BiQuadVCFModule::envelope() {
     y[1] = y[0];
     y[0] = outputValue;
 
-    output.value = outputValue * outputGain;
+    output.value[sampleIndex] = outputValue * outputGain;
 }
 
 void BiQuadVCFModule::computeFilter(float cutoff, float resonance, float gainDb) {

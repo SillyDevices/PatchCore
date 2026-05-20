@@ -40,10 +40,10 @@ public:
 
     virtual ~BaseEnvelope() = default;
 
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
 protected:
-    virtual void internalEnvelope(bool gate) = 0;
+    virtual void internalEnvelope(bool gate, int sampleIndex) = 0;
 protected:
     ModuleInput inputGate = ModuleInput(ENVELOPE_INPUT_GATE);
     ModuleOutput output = ModuleOutput(ENVELOPE_OUTPUT);
