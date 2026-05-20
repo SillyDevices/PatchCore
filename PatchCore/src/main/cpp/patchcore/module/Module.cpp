@@ -66,18 +66,12 @@ UserInput *Module::getUserInput(const std::string& inputName) {
 }
 
 void Module::onStartBlock(const BlockContext& context) {
-    std::unordered_set<ModuleInput*> uniqueInputs;
-    for (const auto &inputKV : inputs) {
-        if (uniqueInputs.insert(inputKV.second).second) {
-            inputKV.second->prepareBlock(context);
-        }
+    for (auto &input : uniqueInputs) {
+        input->prepareBlock(context);
     }
 
-    std::unordered_set<ModuleOutput*> uniqueOutputs;
-    for (const auto &outputKV : outputs) {
-        if (uniqueOutputs.insert(outputKV.second).second) {
-            outputKV.second->prepareBlock(context);
-        }
+    for (auto &output : uniqueOutputs) {
+        output->prepareBlock(context);
     }
 
     for (auto &input : interpolatedInputs) {

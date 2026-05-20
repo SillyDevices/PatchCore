@@ -32,6 +32,7 @@
 #include "patchcore/module/input/user/BoolUserInput.hpp"
 #include "patchcore/module/input/user/EnumUserInput.hpp"
 
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
@@ -80,6 +81,9 @@ protected:
         } else {
             inputs[input.getName()] = &input;
         }
+        if (std::find(uniqueInputs.begin(), uniqueInputs.end(), &input) == uniqueInputs.end()) {
+            uniqueInputs.push_back(&input);
+        }
         input.setModule(this);
     }
 
@@ -88,6 +92,9 @@ protected:
             outputs[withName] = &output;
         } else {
             outputs[output.getName()] = &output;
+        }
+        if (std::find(uniqueOutputs.begin(), uniqueOutputs.end(), &output) == uniqueOutputs.end()) {
+            uniqueOutputs.push_back(&output);
         }
         output.setModule(this);
     }
@@ -146,6 +153,8 @@ protected:
     std::unordered_map<std::string, ModuleInput *> inputs = {};
     std::unordered_map<std::string, ModuleOutput *> outputs = {};
     std::unordered_map<std::string, UserInput *> userInputs = {};
+    std::vector<ModuleInput *> uniqueInputs = {};
+    std::vector<ModuleOutput *> uniqueOutputs = {};
     std::vector<FloatUserInput *> interpolatedInputs = {};
 
     int sampleRate;
