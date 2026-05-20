@@ -26,6 +26,7 @@
 #include "patchcore/module/input/Input.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
 #include "patchcore/module/buffer/FixedBuffer.hpp"
+#include "patchcore/module/buffer/BlockContext.hpp"
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -70,19 +71,6 @@ public:
         return _isConnected;
     };
 
-    //TODO remove
-    void envelope() {
-        printf("ModuleInput::envelope() called for input: %s\n", name.c_str());
-        if(_isConnected) {
-            value.fill(0.0f);
-            for (auto output : outputs) {
-                for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
-                    value[sampleIndex] += output->value[sampleIndex];
-                }
-            }
-        }
-    };
-
 //    virtual inline void setValue(float newValue) override {
 //        value = newValue;
 //    };
@@ -92,9 +80,14 @@ public:
 //    };
 
     virtual ExposedModuleInput *createExposed(const std::string &withName);
-    void onStartBuffer(int size) {
-        (void) size;
+
+    void clearBlock() {
         value.fill(value[PATCHCORE_BLOCK_SIZE - 1]);
+    }
+
+    void prepareBlock(const BlockContext& context) {
+        (void) context;
+        clearBlock();
     }
 
     const FixedBuffer& getBuffer() const {

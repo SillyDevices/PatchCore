@@ -29,7 +29,6 @@ add_library(
         patchcore/module/input/user/BoolUserInput.cpp
         patchcore/module/input/user/special/PassFloatUserInput.cpp
         patchcore/module/input/user/special/ExposedFloatUserInput.cpp
-        patchcore/module/input/user/special/OnStartBufferCallbackUserInput.cpp
         patchcore/module/input/user/special/CallbackFloatUserInput.cpp
         patchcore/module/input/user/special/CallbackBooleanUserInput.cpp
 

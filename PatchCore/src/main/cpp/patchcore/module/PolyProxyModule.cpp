@@ -74,11 +74,6 @@ void PolyProxyModule::processSample(int sampleIndex) {
     throw std::runtime_error("PolyProxyModule does not implement processSample method");
 }
 
-void PolyProxyModule::onStartBuffer(int size) {
-    (void) size;
-    throw std::runtime_error("PolyProxyModule does not implement onStartBuffer method");
-}
-
 void PolyProxyModule::onStartBlock(const BlockContext& context) {
     (void) context;
     throw std::runtime_error("PolyProxyModule does not implement onStartBlock method");

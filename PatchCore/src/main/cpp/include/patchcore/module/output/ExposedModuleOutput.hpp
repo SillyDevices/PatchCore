@@ -31,7 +31,7 @@ public:
     ExposedModuleOutput(const std::string& outputName, ModuleOutput* output): ModuleOutput(outputName), _output(output) {};
     virtual ~ExposedModuleOutput() = default;
 
-    void envelope(){
+    void copyBlockFromInnerOutput() {
         value = _output->value;
     }
 

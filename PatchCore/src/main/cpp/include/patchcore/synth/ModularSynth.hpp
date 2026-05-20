@@ -52,9 +52,6 @@ protected:
     virtual void staticRoutes();
 
 public:
-    void onStartBuffer(int size) override;
-    void onEndBuffer() override;
-    std::pair<float, float> computeSample() override;
     void computeBlock(StereoBlock& out) override;
 
 public:

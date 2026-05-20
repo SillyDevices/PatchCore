@@ -47,9 +47,7 @@ public:
 
     void moduleInputChanged(Module* module) override;
 
-    void onStartBuffer(int size) override;
     void onStartBlock(const BlockContext& context) override;
-    void envelope() override;
     void processBlock();
 
     [[nodiscard]]

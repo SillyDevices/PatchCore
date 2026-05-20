@@ -33,16 +33,10 @@ void ExposedFloatUserInput::setValue(float newValue) {
     }
 }
 
-void ExposedFloatUserInput::envelope() {
-    for (int i = 0; i < count; i++){
-        inputs[i]->envelope();
-    }
-}
-
-void ExposedFloatUserInput::onStartBuffer(int size) {
-    FloatUserInput::onStartBuffer(size);
+void ExposedFloatUserInput::prepareBlock(const BlockContext& context) {
+    FloatUserInput::prepareBlock(context);
     for (int i = 0; i < count; i++) {
-        inputs[i]->onStartBuffer(size);
+        inputs[i]->prepareBlock(context);
     }
 }
 

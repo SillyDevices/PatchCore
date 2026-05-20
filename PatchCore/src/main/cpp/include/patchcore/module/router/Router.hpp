@@ -36,9 +36,7 @@ public:
     void addModule(Module *module) override;
     void removeModule(Module *module) override;
 
-    void onStartBuffer(int size) override;
     void onStartBlock(const BlockContext& context) override;
-    void envelope() override;
 
     void reset() override;
     void add(ModuleOutput* from, ModuleInput* to) override;

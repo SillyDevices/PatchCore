@@ -36,7 +36,7 @@ public:
 
     virtual ~ExposedModuleInput() = default;
 
-    void envelope() const{
+    void copyBlockToInnerInput() const {
         _input->value = value;
     }
 

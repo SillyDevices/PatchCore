@@ -32,8 +32,7 @@ public:
     ExposedFloatUserInput(std::string name, std::vector<FloatUserInput*> inputs);
     virtual ~ExposedFloatUserInput() = default;
 public:
-    void onStartBuffer(int size) override;
-    void envelope() override;
+    void prepareBlock(const BlockContext& context) override;
     void setValue(float value) override;
 private:
     std::vector<FloatUserInput*> inputs;

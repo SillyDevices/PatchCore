@@ -226,7 +226,6 @@ oboe::DataCallbackResult OboeAudioInterface::onAudioReady(oboe::AudioStream *obo
             frameIndex += framesToCopy;
             pendingBlockIndex += framesToCopy;
         }
-//        mSynth->onEndBuffer();
     }
 
     return oboe::DataCallbackResult::Continue;

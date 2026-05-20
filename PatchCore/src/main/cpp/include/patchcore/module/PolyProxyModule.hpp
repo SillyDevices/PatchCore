@@ -47,7 +47,6 @@ public:
     // module interface
 public:
     void processSample(int sampleIndex) override; // throw runtime_error
-    void onStartBuffer(int size) override; // throw runtime_error
     void onStartBlock(const BlockContext& context) override; // throw runtime_error
     //for test
 public:

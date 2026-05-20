@@ -24,7 +24,6 @@
 #define PATCHCORE_CALLBACKFLOATUSERINPUT_HPP
 
 #include "patchcore/module/input/user/FloatUserInput.hpp"
-#include "patchcore/callback/OnStartBuffer.hpp"
 #include <string>
 
 class CallbackFloatUserInput: public FloatUserInput{

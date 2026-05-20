@@ -41,7 +41,7 @@ public:
     TriggerModuleInput(std::string name, OnTriggerCallback *callback);
     virtual ~TriggerModuleInput() = default;
 public:
-    void envelope(int sampleIndex);
+    void processSample(int sampleIndex);
 private:
     OnTriggerCallback *callback;
     bool isOn = false;

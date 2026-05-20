@@ -70,15 +70,6 @@ PolyModule::~PolyModule() {
     ownedProxyOutputs.clear();
 }
 
-void PolyModule::onStartBuffer(int size) {
-    BlockContext context;
-    context.blockSize = size;
-    context.sampleRate = sampleRate;
-    context.blockStartSample = 0;
-    context.blockStartTimeUs = 0.0;
-    onStartBlock(context);
-}
-
 void PolyModule::onStartBlock(const BlockContext& context) {
     Module::onStartBlock(context);
     for (const auto &voice: voices) {
@@ -89,43 +80,39 @@ void PolyModule::onStartBlock(const BlockContext& context) {
 void PolyModule::processSample(int sampleIndex) {
     (void) sampleIndex;
     for (const auto &exposedInput : exposedInputs) {
-        exposedInput->envelope();
+        exposedInput->copyBlockToInnerInput();
     }
     for (const auto &proxyInput : proxyInputs) {
-        proxyInput->envelope();
+        proxyInput->distributeBlockToVoices();
     }
     //todo optimize: only active voices
     for (int i = 0; i < activeVoiceCount; ++i) {
         voices[i]->processSample(sampleIndex);
     }
     for (const auto &proxyOutput : proxyOutputs) {
-        proxyOutput->envelope();
+        proxyOutput->sumVoiceBlocks();
     }
     for (const auto &exposedOutput : exposedOutputs) {
-        exposedOutput->envelope();
+        exposedOutput->copyBlockFromInnerOutput();
     }
 }
 
 void PolyModule::processBlock() {
     for (const auto &exposedInput : exposedInputs) {
-        auto* sourceBuffer = exposedInput->value.data();
-        auto* targetBuffer = exposedInput->getModuleInput()->value.data();
-        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
+        exposedInput->copyBlockToInnerInput();
     }
     for (const auto &proxyInput : proxyInputs) {
-        proxyInput->envelope();
+        proxyInput->distributeBlockToVoices();
     }
     //todo optimize: only active voices
     for (int i = 0; i < activeVoiceCount; ++i) {
         voices[i]->processBlock();
     }
     for (const auto &proxyOutput : proxyOutputs) {
-        proxyOutput->envelope();
+        proxyOutput->sumVoiceBlocks();
     }
     for (const auto &exposedOutput : exposedOutputs) {
-        auto* sourceBuffer = exposedOutput->getModuleOutput()->value.data();
-        auto* targetBuffer = exposedOutput->value.data();
-        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
+        exposedOutput->copyBlockFromInnerOutput();
     }
 }
 

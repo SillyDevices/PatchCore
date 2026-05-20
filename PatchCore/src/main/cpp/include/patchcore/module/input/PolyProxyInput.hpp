@@ -55,7 +55,7 @@ public:
     ModuleInput* getVoice(int voiceIndex) {
         return voiceInputs[voiceIndex];
     }
-    void envelope() {
+    void distributeBlockToVoices() {
         for (auto &voiceInput : voiceProxyInputs) {
             voiceInput->value = value;
         }

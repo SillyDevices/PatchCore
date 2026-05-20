@@ -325,33 +325,20 @@ std::vector<std::pair<ModuleOutput *, ModuleInput *>> GraphRouter::getPatches() 
     return patches;
 }
 
-void GraphRouter::onStartBuffer(int size) {
-    BlockContext context;
-    context.blockSize = size;
-    context.sampleRate = parentModule->getSampleRate();
-    context.blockStartSample = 0;
-    context.blockStartTimeUs = 0.0;
-    onStartBlock(context);
-}
-
 void GraphRouter::onStartBlock(const BlockContext& context) {
     for (const auto &module: allEnvelopeModules) {
         module->onStartBlock(context);
     }
     for (const auto &input: allEnvelopeInputs) {
-        input->onStartBuffer(context.blockSize);
+        input->prepareBlock(context);
     }
     for (const auto &patch: patches) {
-        patch.first->onStartBuffer(context.blockSize);
-        patch.second->onStartBuffer(context.blockSize);
+        patch.first->prepareBlock(context);
+        patch.second->prepareBlock(context);
     }
     for (const auto &userInput: allEnvelopeUserInputs) {
-        userInput->onStartBuffer(context.blockSize);
+        userInput->prepareBlock(context);
     }
-}
-
-void GraphRouter::envelope() {
-    throw std::runtime_error("GraphRouter::envelope() is deprecated, use processBlock");
 }
 
 void GraphRouter::processBlock() {
@@ -361,7 +348,7 @@ void GraphRouter::processBlock() {
         for (const auto &input: stage.inputsInStage) {
             auto* inputBuffer = input->value.data();
             if (inputBuffer == nullptr) {
-                input->onStartBuffer(PATCHCORE_BLOCK_SIZE);
+                input->clearBlock();
                 inputBuffer = input->value.data();
             }
             std::fill(inputBuffer, inputBuffer + PATCHCORE_BLOCK_SIZE, 0.0f);
@@ -369,7 +356,7 @@ void GraphRouter::processBlock() {
             for (const auto &output: stage.outputsInStage[inputIndex]) {
                 const auto* outputBuffer = output->value.data();
                 if (outputBuffer == nullptr) {
-                    output->onStartBuffer(PATCHCORE_BLOCK_SIZE);
+                    output->clearBlock();
                     outputBuffer = output->value.data();
                 }
                 for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {

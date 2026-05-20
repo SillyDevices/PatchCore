@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
+#include "TestBlockUtils.hpp"
 #include <patchcore/modules/ConstModule.hpp>
 #include <patchcore/modules/VCAModule.hpp>
 #include <patchcore/modules/AttenuverterModule.hpp>
@@ -121,15 +122,12 @@ TEST(GraphRouterTest, GraphRouterZeroLatencyTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         //format as "[first, second], "
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
 
@@ -160,16 +158,13 @@ TEST(GraphRouterTest, TwoModuleWithPatchInputFirstTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -202,16 +197,13 @@ TEST(GraphRouterTest, TwoModuleWithPatchInputLastTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -244,16 +236,13 @@ TEST(GraphRouterTest, OneModuleWithPatchTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -283,16 +272,13 @@ TEST(GraphRouterTest, OneModuleTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -312,16 +298,13 @@ TEST(GraphRouterTest, OneModuleInSynthTest) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging
@@ -353,16 +336,13 @@ TEST(GraphRouterTest, Test) {
 
     auto samples = 20;
     auto firstResultSample = -1;
-    synth->onStartBuffer(samples);
     std::vector<std::pair<float, float>> results(samples, {0.0f, 0.0f});
-    for(int i = 0; i < samples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, samples, [&](int i, std::pair<float, float> result) {
         results[i] = result;
         if (result.first == 0.5f && firstResultSample == -1) {
             firstResultSample = i;
         }
-    }
-    synth->onEndBuffer();
+    });
 
     ASSERT_EQ(firstResultSample, 0);
     ASSERT_EQ(results.size(), samples); // for debugging

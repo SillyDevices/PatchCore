@@ -53,9 +53,7 @@ protected:
     PatchModule();
     //Module interface
 public:
-    void onStartBuffer(int size) override;
     void onStartBlock(const BlockContext& context) override;
-    void envelope();
     void processSample(int sampleIndex) override;
     void processBlock() override;
     //PatchModule specific
@@ -95,7 +93,6 @@ public:
     virtual void removePatch(ModuleOutput* output, ModuleInput* input);
 private:
     void clonePatches(const AbstractRouter &router);
-    void processCurrentSample();
 
     //Module copy and poly module creation
 public:

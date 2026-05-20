@@ -49,8 +49,7 @@ public:
 //        writePointer = (writePointer + 1) % buffer.size();
 //    };
 
-    //TODO call this!
-    inline void envelope(int sampleIndex) {
+    inline void processSample(int sampleIndex) {
         buffer[writePointer] = value[sampleIndex];
         writePointer = (writePointer + 1) % buffer.size();
     }

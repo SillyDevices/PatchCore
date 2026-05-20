@@ -24,6 +24,8 @@
 #include "patchcore/module/input/user/ExposedModuleFloatUserInput.hpp"
 #include "patchcore/module/input/user/poly/PolyProxyFloatUserInput.hpp"
 
+#include <cmath>
+
 FloatUserInput::FloatUserInput(std::string name): UserInput(name, UserInputType::FLOAT) {};
 FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, UserInputType::FLOAT), speed(speed) {
     if (speed < 5.0f) {
@@ -31,9 +33,9 @@ FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, U
     }
 };
 
-void FloatUserInput::onStartBuffer(int bufferSize) {
-    (void) bufferSize;
-    if (!isfinite(value[PATCHCORE_BLOCK_SIZE - 1])) {
+void FloatUserInput::prepareBlock(const BlockContext& context) {
+    (void) context;
+    if (!std::isfinite(value[PATCHCORE_BLOCK_SIZE - 1])) {
         value.fill(0.0f);
     }
     startValue = value[PATCHCORE_BLOCK_SIZE - 1];
@@ -48,9 +50,6 @@ void FloatUserInput::onStartBuffer(int bufferSize) {
     for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
         value[sampleIndex] = startValue + delta * static_cast<float>(sampleIndex + 1);
     }
-}
-
-void FloatUserInput::envelope() {
 }
 
 void FloatUserInput::clearParameterLock() {

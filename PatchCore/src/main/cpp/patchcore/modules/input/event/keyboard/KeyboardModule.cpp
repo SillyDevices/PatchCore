@@ -44,22 +44,11 @@ void KeyboardModule::init() {
     registerOutput(cv);
     registerOutput(velocity);
     registerUserInput(multiTriggerInput);
-    registerUserInput(callbackInput);
-}
-
-void KeyboardModule::onStartBuffer(int size) {
-    BlockContext context;
-    context.blockSize = size;
-    context.sampleRate = sampleRate;
-    context.blockStartSample = 0;
-    context.blockStartTimeUs = 0.0;
-    onStartBlock(context);
 }
 
 void KeyboardModule::onStartBlock(const BlockContext& context) {
-    (void) context;
     std::lock_guard<std::mutex> lock(changesMutex);
-    syncTime = getTimeUs();
+    syncTime = context.blockStartTimeUs > 0.0 ? context.blockStartTimeUs : getTimeUs();
     if (noteChanges.size() > 0){
         for (auto notePtr = noteChanges.begin(); notePtr < noteChanges.end(); notePtr++){
             (*notePtr)->sample = (*notePtr)->sample - syncOffset;

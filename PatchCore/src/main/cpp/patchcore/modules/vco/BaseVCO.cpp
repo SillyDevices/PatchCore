@@ -38,7 +38,7 @@ bool BaseVCO::isPeriodStart() {
 }
 
 void BaseVCO::processSample(int sampleIndex) {
-    resetPhaseInput.envelope(sampleIndex);
+    resetPhaseInput.processSample(sampleIndex);
 }
 
 void BaseVCO::reset() {

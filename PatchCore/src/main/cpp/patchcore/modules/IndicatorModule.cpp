@@ -69,15 +69,6 @@ void IndicatorModule::processSample(int sampleIndex) {
     writeIndex = (writeIndex + 1) % (dataSize);
 }
 
-void IndicatorModule::onStartBuffer(int bufferSize) {
-    BlockContext context;
-    context.blockSize = bufferSize;
-    context.sampleRate = sampleRate;
-    context.blockStartSample = 0;
-    context.blockStartTimeUs = 0.0;
-    onStartBlock(context);
-}
-
 void IndicatorModule::onStartBlock(const BlockContext& context) {
     Module::onStartBlock(context);
 

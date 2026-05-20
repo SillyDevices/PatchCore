@@ -26,7 +26,8 @@ PassFloatUserInput::PassFloatUserInput(std::string name) : FloatUserInput(name) 
 
 }
 
-void PassFloatUserInput::envelope() {
+void PassFloatUserInput::prepareBlock(const BlockContext& context) {
+    (void) context;
     value.fill(lastSetValue);
 }
 

@@ -141,7 +141,7 @@ void MultiVCOModule::processSample(int sampleIndex) {
     output.value[sampleIndex] = result;
     if (lfoMode) {
         ledOutput.value[sampleIndex] = result;
-        ledOutput.envelope(sampleIndex);
+        ledOutput.processSample(sampleIndex);
     }
 //    lastValue = output.value[sampleIndex];
     phaseIncrement(frequency);

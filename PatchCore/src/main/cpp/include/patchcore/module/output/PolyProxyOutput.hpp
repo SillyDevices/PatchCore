@@ -48,7 +48,7 @@ public:
     void setVoiceOutput(int voiceIndex, ModuleOutput* output) {
         voiceOutputs[voiceIndex] = output;
     }
-    virtual void envelope() {
+    virtual void sumVoiceBlocks() {
         value.fill(0.0f);
         for (auto &voiceOutput : voiceOutputs) {
             for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {

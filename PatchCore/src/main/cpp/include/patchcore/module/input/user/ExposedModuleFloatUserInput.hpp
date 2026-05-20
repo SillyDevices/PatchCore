@@ -44,12 +44,8 @@ public:
         _floatInput->clearParameterLock();
     }
 
-    void onStartBuffer(int bufferSize) override {
-        _floatInput->onStartBuffer(bufferSize);
-    }
-
-    virtual void envelope() override {
-        _floatInput->envelope();
+    void prepareBlock(const BlockContext& context) override {
+        _floatInput->prepareBlock(context);
     }
 
     ExposedModuleUserInput * createExposed(const std::string &withName) override {

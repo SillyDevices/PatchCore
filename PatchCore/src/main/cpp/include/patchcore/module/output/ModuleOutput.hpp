@@ -25,6 +25,7 @@
 
 #include "patchcore/module/output/Output.hpp"
 #include "patchcore/module/buffer/FixedBuffer.hpp"
+#include "patchcore/module/buffer/BlockContext.hpp"
 #include <string>
 
 class Module;
@@ -53,9 +54,14 @@ public:
     }
 
     virtual ExposedModuleOutput* createExposed(const std::string& withName);
-    void onStartBuffer(int size) {
-        (void) size;
+
+    void clearBlock() {
         value.fill(value[PATCHCORE_BLOCK_SIZE - 1]);
+    }
+
+    void prepareBlock(const BlockContext& context) {
+        (void) context;
+        clearBlock();
     }
 
     const FixedBuffer& getBuffer() const {

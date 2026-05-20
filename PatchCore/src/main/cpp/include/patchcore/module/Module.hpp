@@ -40,7 +40,7 @@
 class PolyModule;
 class PolyProxyModule;
 
-class Module: public OnStartBuffer {
+class Module {
 public:
     Module(std::string name, int sampleRate);
     Module(const Module& other) = delete;
@@ -65,7 +65,6 @@ public:
     //TODO rename to createPolyProxyModule
     virtual std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule* polyModule) const;
 
-    void onStartBuffer(int size) override;
     virtual void onStartBlock(const BlockContext& context);
 
     int getSampleRate() const;

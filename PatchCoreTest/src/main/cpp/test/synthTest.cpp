@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <patchcore/module/factory/DefaultModuleFactory.hpp>
 #include <patchcore/synth/ModularSynth.hpp>
+#include "TestBlockUtils.hpp"
 
 static auto waveTableProvider = DefaultWaveTableProvider(44100);
 static auto factory = DefaultModuleFactory(&waveTableProvider, nullptr);
@@ -36,13 +37,10 @@ TEST(SynthTest, synthCreation) {
 TEST(SynthTest, synthTest) {
     auto synth = new ModularSynth(&factory, 44100);
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
-    for (int i = 0; i < countSamples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         ASSERT_FLOAT_EQ(result.first, 0.0f);
         ASSERT_FLOAT_EQ(result.second, 0.0f);
-    }
-    synth->onEndBuffer();
+    });
     delete synth;
 }
 
@@ -51,13 +49,10 @@ TEST(SynthTest, synthTestOutput) {
     synth->createModule(CONST_MODULE_TYPE_NAME, "const", { { CONST_MODULE_PARAMETER_VALUE, ModuleParameter(0.8f) } } );
     synth->addPatch(synth->getModule("const")->getModuleOutput(CONST_MODULE_OUTPUT), synth->getModuleInput(MODULE_OUTPUT_INPUT));
     int countSamples = 1;
-    synth->onStartBuffer(countSamples);
-    for (int i = 0; i < countSamples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         ASSERT_FLOAT_EQ(result.first, 0.8f);
         ASSERT_FLOAT_EQ(result.second, 0.8f);
-    }
-    synth->onEndBuffer();
+    });
     delete synth;
 }
 
@@ -80,14 +75,11 @@ TEST(SynthTest, synthTestVCAOutput) {
             synth->getModule("vca")->getModuleInput(VCA_MODULE_INPUT_CV));
 
     int countSamples = 10;
-    synth->onStartBuffer(countSamples);
     std::pair<float, float> lastResult = {0.0f, 0.0f};
-    for (int i = 0; i < countSamples; i++) {
-        auto result = synth->computeSample();
+    patchcore_test::computeSynthSamples(synth, countSamples, [&](int i, std::pair<float, float> result) {
         lastResult = result;
-    }
+    });
     ASSERT_FLOAT_EQ(lastResult.first, 0.8f);
     ASSERT_FLOAT_EQ(lastResult.second, 0.8f);
-    synth->onEndBuffer();
     delete synth;
 }

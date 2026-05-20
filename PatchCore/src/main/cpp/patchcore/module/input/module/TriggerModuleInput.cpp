@@ -26,7 +26,7 @@
 TriggerModuleInput::TriggerModuleInput(std::string name, TriggerModuleInput::OnTriggerCallback *callback):
 ModuleInput(name), callback(callback) { }
 
-void TriggerModuleInput::envelope(int sampleIndex) {
+void TriggerModuleInput::processSample(int sampleIndex) {
     const float sampleValue = value[sampleIndex];
     if (isOn && sampleValue < TRIGGER_OFF_THRESHOLD) {
         isOn = false;

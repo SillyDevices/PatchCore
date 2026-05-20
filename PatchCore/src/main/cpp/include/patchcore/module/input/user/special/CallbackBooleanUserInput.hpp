@@ -24,7 +24,6 @@
 #define PATCHCORE_CALLBACKBOOLEANUSERINPUT_HPP
 
 #include "patchcore/module/input/user/BoolUserInput.hpp"
-#include "patchcore/callback/OnStartBuffer.hpp"
 #include <string>
 
 class CallbackBooleanUserInput: public BoolUserInput{

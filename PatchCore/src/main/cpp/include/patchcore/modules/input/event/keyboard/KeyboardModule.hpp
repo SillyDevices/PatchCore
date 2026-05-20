@@ -27,7 +27,6 @@
 #include "patchcore/modules/input/AbstractKeyboard.hpp"
 #include "patchcore/module/input/user/FloatUserInput.hpp"
 #include "patchcore/module/input/user/special/CallbackFloatUserInput.hpp"
-#include "patchcore/module/input/user/special/OnStartBufferCallbackUserInput.hpp"
 #include "patchcore/module/input/user/special/PassFloatUserInput.hpp"
 #include "patchcore/module/input/user/BoolUserInput.hpp"
 #include "patchcore/modules/input/event/keyboard/EventKeyboard.hpp"
@@ -55,14 +54,12 @@ public:
     virtual ~KeyboardModule() = default;
 
 public:
-    void onStartBuffer(int size) override;
     void onStartBlock(const BlockContext& context) override;
     void processSample(int sampleIndex) override;
 public:
     void onEvent(KeyboardEvent event) override;
 
 public:
-    OnStartBufferCallbackUserInput callbackInput = OnStartBufferCallbackUserInput("KeyboardModuleCallback", this);
     BoolUserInput multiTriggerInput = BoolUserInput(KEYBOARD_INPUT_MULTI_TRIGGER);
 
 private:

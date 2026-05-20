@@ -85,68 +85,30 @@ PatchModule::~PatchModule() {
     _exposedUserInputs.clear();
 };
 
-void PatchModule::onStartBuffer(int size) {
-    BlockContext context;
-    context.blockSize = size;
-    context.sampleRate = sampleRate;
-    context.blockStartSample = 0;
-    context.blockStartTimeUs = 0.0;
-    onStartBlock(context);
-}
-
 void PatchModule::onStartBlock(const BlockContext& context) {
     Module::onStartBlock(context);
     std::lock_guard<std::mutex> lock(routerMutex);
     _router.onStartBlock(context);
 }
 
-void PatchModule::envelope() {
-    throw std::runtime_error("PatchModule::envelope() is deprecated, use processSample/processBlock");
-    //need to sync router.envelope
-    //it's not a best option to do that
-    std::lock_guard<std::mutex> lock(routerMutex);
-    processCurrentSample();
-}
-
 void PatchModule::processSample(int sampleIndex) {
     (void) sampleIndex;
-    std::lock_guard<std::mutex> lock(routerMutex);
-    processCurrentSample();
+    throw std::runtime_error("PatchModule::processSample() is not implemented for nested patch graphs, use processBlock()");
 }
 
 void PatchModule::processBlock() {
     std::lock_guard<std::mutex> lock(routerMutex);
 
     for (const auto input: _exposedInputs) {
-        auto* sourceBuffer = input->value.data();
-        auto* targetBuffer = input->getModuleInput()->value.data();
-        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
+        input->copyBlockToInnerInput();
     }
 
     _router.processBlock();
 
     for (auto output: _exposedOutputs) {
-        auto* sourceBuffer = output->getModuleOutput()->value.data();
-        auto* targetBuffer = output->value.data();
-        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
+        output->copyBlockFromInnerOutput();
     }
 }
-
-void PatchModule::processCurrentSample() {
-    // What about _exposedUserInputs? who envelope them? maybe parrent Module does it?
-
-    for (const auto input: _exposedInputs) {
-        input->envelope();
-    }
-
-    _router.envelope();
-
-    for (auto output: _exposedOutputs) {
-        output->envelope();
-    }
-}
-
-
 
 Module* PatchModule::createModule(const std::string &moduleTypeName, const std::string &moduleName,
                                        const std::map<std::string, ModuleParameter> &parameters) {

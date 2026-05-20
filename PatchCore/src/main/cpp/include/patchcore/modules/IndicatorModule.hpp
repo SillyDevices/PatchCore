@@ -50,7 +50,6 @@ public:
 
 public:
     void processSample(int sampleIndex) override;
-    void onStartBuffer(int size) override;
     void onStartBlock(const BlockContext& context) override;
 public:
     float* getBuffer(int requestedDataSize);

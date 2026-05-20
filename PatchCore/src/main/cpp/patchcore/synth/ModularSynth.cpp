@@ -26,8 +26,8 @@
 #include "patchcore/modules/input/event/keyboard/SingleKeyboardModule.hpp"
 
 #include "patchcore/dsp/dsp.h"
+#include "timeUtils.h"
 #include <algorithm>
-#include <stdexcept>
 
 ModularSynth::ModularSynth(ModuleFactory *factory, int sampleRate) :
         AbstractSynth(),
@@ -39,18 +39,12 @@ ModularSynth::ModularSynth(ModuleFactory *factory, int sampleRate) :
 }
 
 
-std::pair<float, float> ModularSynth::computeSample() {
-    throw std::runtime_error("ModularSynth::computeSample() is deprecated, use computeBlock()");
-}
-
 void ModularSynth::computeBlock(StereoBlock& out) {
     BlockContext context;
     context.blockSize = PATCHCORE_BLOCK_SIZE;
     context.sampleRate = sampleRate;
     context.blockStartSample = currentBlockStartSample;
-    context.blockStartTimeUs = sampleRate > 0
-            ? static_cast<double>(currentBlockStartSample) * 1000000.0 / static_cast<double>(sampleRate)
-            : 0.0;
+    context.blockStartTimeUs = getTimeUs();
 
     PatchModule::onStartBlock(context);
     PatchModule::processBlock();
@@ -64,15 +58,6 @@ void ModularSynth::computeBlock(StereoBlock& out) {
     }
 
     currentBlockStartSample += PATCHCORE_BLOCK_SIZE;
-}
-
-void ModularSynth::onStartBuffer(int size) {
-    (void) size;
-    throw std::runtime_error("ModularSynth::onStartBuffer() is deprecated, computeBlock() owns block lifecycle");
-}
-
-void ModularSynth::onEndBuffer() {
-
 }
 
 void ModularSynth::staticRoutes() {
