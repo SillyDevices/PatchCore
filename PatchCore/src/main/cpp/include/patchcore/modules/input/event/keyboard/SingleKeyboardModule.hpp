@@ -37,7 +37,7 @@ public:
     std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule *polyModule) const override;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     float _cv = 0.0f;
     float _velocity = 0.5f;

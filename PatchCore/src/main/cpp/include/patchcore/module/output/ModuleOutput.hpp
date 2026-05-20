@@ -24,6 +24,7 @@
 #define PATCHCORE_MODULEOUTPUT_HPP
 
 #include "patchcore/module/output/Output.hpp"
+#include "patchcore/module/buffer/FixedBuffer.hpp"
 #include <string>
 
 class Module;
@@ -53,15 +54,12 @@ public:
 
     virtual ExposedModuleOutput* createExposed(const std::string& withName);
     void onStartBuffer(int size) {
-        value.onStartBuffer(size);
+        (void) size;
+        value.fill(value[PATCHCORE_BLOCK_SIZE - 1]);
     }
 
-    void advanceSample() {
-        value.advanceSample();
-    }
-
-    const std::vector<float>& getBuffer() const {
-        return value.getBuffer();
+    const FixedBuffer& getBuffer() const {
+        return value;
     }
 
     [[nodiscard]]
@@ -75,7 +73,7 @@ private:
     bool hasProxy = false;
 
 public:
-    BufferedValue value = BufferedValue(0.0f);
+    FixedBuffer value = {};
 
 };
 

@@ -48,6 +48,6 @@ void FixedHardClipModule::init() {
     registerOutput(output);
 }
 
-void FixedHardClipModule::envelope() {
-    output.value = std::max(-threshold, std::min(threshold, static_cast<float>(input.value)));
+void FixedHardClipModule::processSample(int sampleIndex) {
+    output.value[sampleIndex] = std::max(-threshold, std::min(threshold, static_cast<float>(input.value[sampleIndex])));
 }

@@ -49,7 +49,7 @@ void FreeverbReverbModule::init() {
     registerOutput(output);
 }
 
-void FreeverbReverbModule::envelope() {
+void FreeverbReverbModule::processSample(int sampleIndex) {
     if (inputFreeze.getValue()) {
         float out = 0;
         for (int i = 0; i < 8; i++) {
@@ -58,13 +58,13 @@ void FreeverbReverbModule::envelope() {
         for (int i = 0; i < 4; i++) {
             out = allPass[i].envelope(out, 0.5);
         }
-        float outputValue = out * inputLevel.value;
+        float outputValue = out * inputLevel.value[sampleIndex];
         undenormalise(outputValue);
-        output.value = outputValue;
+        output.value[sampleIndex] = outputValue;
     } else {
-        float sample = input.value * 0.015f;
-        float size = inputSize.value * 0.28f + 0.7f;
-        float damping = inputDamping.value * 0.4f;
+        float sample = input.value[sampleIndex] * 0.015f;
+        float size = inputSize.value[sampleIndex] * 0.28f + 0.7f;
+        float damping = inputDamping.value[sampleIndex] * 0.4f;
 
         float out = 0;
         for (int i = 0; i < 8; i++) {
@@ -73,8 +73,8 @@ void FreeverbReverbModule::envelope() {
         for (int i = 0; i < 4; i++) {
             out = allPass[i].envelope(out, 0.5);
         }
-        float outputValue = out * inputLevel.value;
+        float outputValue = out * inputLevel.value[sampleIndex];
         undenormalise(outputValue);
-        output.value = outputValue;
+        output.value[sampleIndex] = outputValue;
     }
 }

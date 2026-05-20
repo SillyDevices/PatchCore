@@ -42,7 +42,7 @@ public:
     ~NoiseModule() override = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     Noise noise = Noise();
     ModuleOutput output = ModuleOutput(NOISEMODULE_OUTPUT);

@@ -70,7 +70,7 @@ void GraphRouter::removeModule(Module *module) {
         auto& patch = *it;
 
         if (patch.first->getModule() == module || patch.second->getModule() == module) {
-            patch.second->value = patch.second->getDisconnectedValue(); // set disconnected value
+            patch.second->value.fill(patch.second->getDisconnectedValue()); // set disconnected value
             it = patches.erase(it);
         } else {
             ++it;
@@ -90,7 +90,7 @@ void GraphRouter::removeModule(Module *module) {
 
 void GraphRouter::clearModules() {
     for (const auto &patch: patches) {
-        patch.second->value = patch.second->getDisconnectedValue(); // set disconnected value
+        patch.second->value.fill(patch.second->getDisconnectedValue()); // set disconnected value
     }
     patches.clear();
     modules.clear();
@@ -130,7 +130,7 @@ void GraphRouter::remove(ModuleOutput *from, ModuleInput *to) {
     for (auto it = patches.begin(); it != patches.end(); ) {
         auto& patch = *it;
         if (patch.first == from && patch.second == to) {
-            patch.second->value = patch.second->getDisconnectedValue(); // set disconnected value
+            patch.second->value.fill(patch.second->getDisconnectedValue()); // set disconnected value
             it = patches.erase(it);
         } else {
             ++it;
@@ -142,7 +142,7 @@ void GraphRouter::remove(ModuleOutput *from, ModuleInput *to) {
 
 void GraphRouter::reset() {
     for (const auto &patch: patches) {
-        patch.second->value = patch.second->getDisconnectedValue(); // set disconnected value
+        patch.second->value.fill(patch.second->getDisconnectedValue()); // set disconnected value
     }
     patches.clear();
     updateModuleGraph();
@@ -329,30 +329,20 @@ void GraphRouter::onStartBuffer(int size) {
     for (const auto &module: allEnvelopeModules) {
         module->onStartBuffer(size);
     }
+    for (const auto &input: allEnvelopeInputs) {
+        input->onStartBuffer(size);
+    }
+    for (const auto &patch: patches) {
+        patch.first->onStartBuffer(size);
+        patch.second->onStartBuffer(size);
+    }
     for (const auto &userInput: allEnvelopeUserInputs) {
         userInput->onStartBuffer(size);
     }
 }
 
 void GraphRouter::envelope() {
-    for (const auto &userInput: allEnvelopeUserInputs) {
-        userInput->envelope();
-    }
-    for (const auto &input: allEnvelopeInputs) {
-        input->value = 0.0f;
-    }
-    for (const auto &stage: envelopeStages) {
-        int inputIndex = 0;
-        for (const auto &input: stage.inputsInStage) {
-            for (const auto &output: stage.outputsInStage[inputIndex]) {
-                input->value += output->value;
-            }
-            inputIndex++;
-        }
-        for (const auto &module: stage.modulesInStage) {
-            module->envelope(); // legacy sample path only
-        }
-    }
+    throw std::runtime_error("GraphRouter::envelope() is deprecated, use processBlock");
 }
 
 void GraphRouter::processBlock() {
@@ -361,10 +351,18 @@ void GraphRouter::processBlock() {
         int inputIndex = 0;
         for (const auto &input: stage.inputsInStage) {
             auto* inputBuffer = input->value.data();
+            if (inputBuffer == nullptr) {
+                input->onStartBuffer(PATCHCORE_BLOCK_SIZE);
+                inputBuffer = input->value.data();
+            }
             std::fill(inputBuffer, inputBuffer + PATCHCORE_BLOCK_SIZE, 0.0f);
 
             for (const auto &output: stage.outputsInStage[inputIndex]) {
                 const auto* outputBuffer = output->value.data();
+                if (outputBuffer == nullptr) {
+                    output->onStartBuffer(PATCHCORE_BLOCK_SIZE);
+                    outputBuffer = output->value.data();
+                }
                 for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
                     inputBuffer[sampleIndex] += outputBuffer[sampleIndex];
                 }

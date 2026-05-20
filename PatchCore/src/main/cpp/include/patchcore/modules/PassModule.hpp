@@ -39,7 +39,7 @@ public:
     ~PassModule() override = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput input = ModuleInput(PASS_MODULE_INPUT);
     ModuleOutput output = ModuleOutput(PASS_MODULE_OUTPUT);

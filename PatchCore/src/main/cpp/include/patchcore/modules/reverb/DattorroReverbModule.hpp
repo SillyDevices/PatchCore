@@ -49,7 +49,7 @@ public:
     std::unique_ptr<Module> clone() const override;
     void init();
     virtual ~DattorroReverbModule() = default;
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
 private:
     ModuleInput inputL = ModuleInput(DATTORRO_REVERB_INPUT_INPUT_LEFT);

@@ -45,8 +45,7 @@ public:
     Module(const Module& other) = delete;
     virtual ~Module() = default;
 
-    virtual void envelope() = 0;
-    virtual void processSample(int sampleIndex);
+    virtual void processSample(int sampleIndex) = 0;
     virtual void processBlock();
 
     const std::string& getModuleName() const;
@@ -74,8 +73,6 @@ public:
     bool hasProxyOutputs() const;
 
 protected:
-    void advanceSampleCursors();
-
     virtual void registerInput(ModuleInput& input, const std::string& withName = "") final {
         if (!withName.empty()) {
             inputs[withName] = &input;

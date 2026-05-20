@@ -52,7 +52,7 @@ public:
     BaseVCO(std::string name, int sampleRate, float tune = dsp::tune_C0);
     virtual ~BaseVCO() = default;
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 public:
     bool isPeriodStart();
     virtual void reset();

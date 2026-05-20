@@ -26,15 +26,6 @@
 
 Module::Module(std::string name, int sampleRate) : sampleRate(sampleRate), name(name) {};
 
-void Module::processSample(int sampleIndex) {
-    (void) sampleIndex;
-    for (auto &input : interpolatedInputs) {
-        input->envelope();
-    }
-    envelope();
-    advanceSampleCursors();
-}
-
 void Module::processBlock() {
     for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
         processSample(sampleIndex);
@@ -114,22 +105,3 @@ std::unique_ptr<PolyProxyModule> Module::createPolyModuleProxy(PolyModule* polyM
     return std::make_unique<PolyProxyModule>(this, polyModule);
 }
 
-void Module::advanceSampleCursors() {
-    std::unordered_set<ModuleInput*> uniqueInputs;
-    for (const auto &inputKV : inputs) {
-        if (uniqueInputs.insert(inputKV.second).second) {
-            inputKV.second->advanceSample();
-        }
-    }
-
-    std::unordered_set<ModuleOutput*> uniqueOutputs;
-    for (const auto &outputKV : outputs) {
-        if (uniqueOutputs.insert(outputKV.second).second) {
-            outputKV.second->advanceSample();
-        }
-    }
-
-    for (auto &input : interpolatedInputs) {
-        input->advanceSample();
-    }
-}

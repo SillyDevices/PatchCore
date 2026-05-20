@@ -64,8 +64,8 @@ std::unique_ptr<PolyProxyModule> IndicatorModule::createPolyModuleProxy(PolyModu
     throw std::runtime_error("IndicatorModule::createPolyModuleProxy() This module is not intended for polyphonic use");
 }
 
-void IndicatorModule::envelope() {
-    dataPtr[writeIndex] = input.value;
+void IndicatorModule::processSample(int sampleIndex) {
+    dataPtr[writeIndex] = input.value[sampleIndex];
     writeIndex = (writeIndex + 1) % (dataSize);
 }
 

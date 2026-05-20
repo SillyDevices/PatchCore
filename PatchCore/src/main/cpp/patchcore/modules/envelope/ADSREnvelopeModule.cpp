@@ -60,7 +60,7 @@ void ADSREnvelopeModule::init() {
     registerOutput(expOutput);
 }
 
-void ADSREnvelopeModule::internalEnvelope(bool gate) {
+void ADSREnvelopeModule::internalEnvelope(bool gate, int sampleIndex) {
     float outputValue = 0.0f;
     float expOutputValue = 0.0f;
     bool cycleValue = cycle.getValue();
@@ -76,7 +76,7 @@ void ADSREnvelopeModule::internalEnvelope(bool gate) {
             break;
         }
         case DELAY: {
-            auto holdTime = delay.value;
+            auto holdTime = delay.value[sampleIndex];
             if (gate || cycleValue) {
                 if (t <= holdTime) {
                     outputValue = .0f;
@@ -93,9 +93,10 @@ void ADSREnvelopeModule::internalEnvelope(bool gate) {
             break;
         }
         case ATTACK: {
-            auto attackTime = attack.value;
+            auto attackTime = attack.value[sampleIndex];
             if (t <= attackTime) {
-                auto expCoefficient = (expCurve.value < 0) ? (1.0f + expCurve.value) : (1.0f + expCurve.value * 9.0f);
+                const auto expCurveValue = expCurve.value[sampleIndex];
+                auto expCoefficient = (expCurveValue < 0) ? (1.0f + expCurveValue) : (1.0f + expCurveValue * 9.0f);
                 outputValue = 1.0f * t / attackTime;
                 expOutputValue = 1.0f * pow(t / attackTime, expCoefficient);
 //                expOutputValue = 1.0f * pow(t / attackTime, 0.5f);
@@ -120,14 +121,15 @@ void ADSREnvelopeModule::internalEnvelope(bool gate) {
             break;
         }
         case DECAY: {
-            float decayTime = decay.value;
+            float decayTime = decay.value[sampleIndex];
             if (decayIsRelease) {
-                decayTime = release.value;
+                decayTime = release.value[sampleIndex];
             }
-            float sustainLevel = sustain.value + moduleSustain.value;
+            float sustainLevel = sustain.value[sampleIndex] + moduleSustain.value[sampleIndex];
             if (t <= decayTime) {
                 outputValue = 1.0f - (1.0f - sustainLevel) * t / decayTime;
-                auto expCoefficient = (expCurve.value < 0) ? (1.0f + expCurve.value) : (1.0f + expCurve.value * 9.0f);
+                const auto expCurveValue = expCurve.value[sampleIndex];
+                auto expCoefficient = (expCurveValue < 0) ? (1.0f + expCurveValue) : (1.0f + expCurveValue * 9.0f);
                 expOutputValue = 1.0f - (1.0f - sustainLevel) * pow(t / decayTime, expCoefficient);
 //                expOutputValue = 1.0f - (1.0f - sustainLevel) * pow(t / decayTime, 0.5);
                 if (!gate) {
@@ -162,7 +164,7 @@ void ADSREnvelopeModule::internalEnvelope(bool gate) {
             break;
         }
         case SUSTAIN: {
-            float sustainLevel = sustain.value + moduleSustain.value;
+            float sustainLevel = sustain.value[sampleIndex] + moduleSustain.value[sampleIndex];
             outputValue = sustainLevel;
             expOutputValue = sustainLevel;
             if (!gate || cycleValue) {
@@ -174,12 +176,13 @@ void ADSREnvelopeModule::internalEnvelope(bool gate) {
             break;
         }
         case RELEASE: {
-            float releaseTime = release.value;
+            float releaseTime = release.value[sampleIndex];
             if (releaseTime < 0.0001f) {
                 releaseTime = 0.0001f;
             }
             outputValue = releaseStart - releaseStart * t / releaseTime;
-            auto expCoefficient = (expCurve.value < 0) ? (1.0f + expCurve.value) : (1.0f + expCurve.value * 9.0f);
+            const auto expCurveValue = expCurve.value[sampleIndex];
+            auto expCoefficient = (expCurveValue < 0) ? (1.0f + expCurveValue) : (1.0f + expCurveValue * 9.0f);
             expOutputValue = releaseStartExp - releaseStartExp * pow(t / releaseTime, expCoefficient);
 //            expOutputValue = releaseStartExp - releaseStartExp * pow(t / releaseTime, 0.5f);
             if (t >= releaseTime) {
@@ -221,7 +224,7 @@ void ADSREnvelopeModule::internalEnvelope(bool gate) {
     expOutputValue = (1-outputFilterParamter)*expOutputValue + outputFilterParamter*expOutputFilterTemp;
     expOutputFilterTemp = expOutputValue;
     //TODO NAN check
-    output.value = outputValue;
-    expOutput.value = expOutputValue;
+    output.value[sampleIndex] = outputValue;
+    expOutput.value[sampleIndex] = expOutputValue;
 }
 

@@ -103,7 +103,6 @@ void PatchModule::processSample(int sampleIndex) {
     (void) sampleIndex;
     std::lock_guard<std::mutex> lock(routerMutex);
     processCurrentSample();
-    advanceSampleCursors();
 }
 
 void PatchModule::processBlock() {

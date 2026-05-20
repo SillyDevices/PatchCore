@@ -56,11 +56,11 @@ void DCFilterModule::init() {
     registerOutput(output);
 }
 
-void DCFilterModule::envelope() {
-    auto inputValue = input.value;
+void DCFilterModule::processSample(int sampleIndex) {
+    auto inputValue = input.value[sampleIndex];
     float outputValue = inputValue - prevInputValue + alpha * prevOutputValue;
     prevInputValue = inputValue;
     prevOutputValue = outputValue;
-    output.value = outputValue;
+    output.value[sampleIndex] = outputValue;
 }
 

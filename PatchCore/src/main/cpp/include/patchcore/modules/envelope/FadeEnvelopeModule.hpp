@@ -44,7 +44,7 @@ public:
     virtual ~FadeEnvelopeModule() = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
 private:
     enum FaderState { opened , closed, opening, closing };

@@ -58,7 +58,7 @@ void KeyboardModule::onStartBuffer(int size) {
     syncOffset = 0;
 }
 
-void KeyboardModule::envelope() {
+void KeyboardModule::processSample(int sampleIndex) {
     bool multiTrigger = multiTriggerInput.getValue();
     std::lock_guard<std::mutex> lock(changesMutex);
     for (auto notePtr = noteChanges.begin(); notePtr < noteChanges.end(); notePtr++){
@@ -81,19 +81,19 @@ void KeyboardModule::envelope() {
     }
     syncOffset += 1;
     if (pressedKeys.empty()){
-        gate.value = KEYBOARD_GATE_OFF_VALUE;
+        gate.value[sampleIndex] = KEYBOARD_GATE_OFF_VALUE;
     } else {
         auto key = pressedKeys.at(0);
         float cvValue = key.cv;
         float velocityValue = key.velocity;
         if (multiTrigger && _lastCv != cvValue) {
-            gate.value = KEYBOARD_GATE_OFF_VALUE;
+            gate.value[sampleIndex] = KEYBOARD_GATE_OFF_VALUE;
         } else {
-            gate.value = KEYBOARD_GATE_ON_VALUE;
+            gate.value[sampleIndex] = KEYBOARD_GATE_ON_VALUE;
         }
         _lastCv = cvValue;
-        velocity.value = velocityValue;
-        cv.value = cvValue;
+        velocity.value[sampleIndex] = velocityValue;
+        cv.value[sampleIndex] = cvValue;
     }
 }
 

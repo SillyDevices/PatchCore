@@ -50,6 +50,6 @@ void AttenuverterModule::init() {
     registerUserInput(value);
 }
 
-void AttenuverterModule::envelope() {
-    output.value = input.value * value.value;
+void AttenuverterModule::processSample(int sampleIndex) {
+    output.value[sampleIndex] = input.value[sampleIndex] * value.value[sampleIndex];
 }

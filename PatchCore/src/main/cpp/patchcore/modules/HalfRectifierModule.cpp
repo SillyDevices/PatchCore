@@ -46,8 +46,8 @@ void HalfRectifierModule::init() {
     registerOutput(output);
 }
 
-void HalfRectifierModule::envelope() {
-    auto inputValue = input.value;
+void HalfRectifierModule::processSample(int sampleIndex) {
+    auto inputValue = input.value[sampleIndex];
     if (inputValue < 0) inputValue = 0;
-    output.value = inputValue;
+    output.value[sampleIndex] = inputValue;
 }

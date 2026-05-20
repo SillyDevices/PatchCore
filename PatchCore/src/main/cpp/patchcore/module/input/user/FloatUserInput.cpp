@@ -32,28 +32,29 @@ FloatUserInput::FloatUserInput(std::string name, float speed): UserInput(name, U
 };
 
 void FloatUserInput::onStartBuffer(int bufferSize) {
-    if (!isfinite(static_cast<float>(value))) {
-        value = 0.0f;
+    (void) bufferSize;
+    if (!isfinite(value[PATCHCORE_BLOCK_SIZE - 1])) {
+        value.fill(0.0f);
     }
-    startValue = value;
+    startValue = value[PATCHCORE_BLOCK_SIZE - 1];
     if (isLocked) {
         targetValue = lastSetParameterLockValue;
     } else {
         targetValue = lastSetValue;
     }
-    value = startValue;
-    value.onStartBuffer(bufferSize);
     //TODO make it linear and not depend on buffer size
     auto ratio = (sampleRate/441) * speed;
     delta = (targetValue - startValue) / ratio;
+    for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+        value[sampleIndex] = startValue + delta * static_cast<float>(sampleIndex + 1);
+    }
 }
 
 void FloatUserInput::envelope() {
-    value += delta;
 }
 
 void FloatUserInput::clearParameterLock() {
-    value = lastSetValue;
+    value.fill(lastSetValue);
     isLocked = false;
 }
 

@@ -25,6 +25,7 @@
 #include "patchcore/module/input/ExposedModuleUserInput.hpp"
 #include "patchcore/module/output/PolyDemuxOutput.hpp"
 #include "patchcore/module/output/PolyExposedOutput.hpp"
+#include <algorithm>
 #include <string>
 #include <stdio.h>
 
@@ -76,7 +77,8 @@ void PolyModule::onStartBuffer(int size) {
     }
 }
 
-void PolyModule::envelope() {
+void PolyModule::processSample(int sampleIndex) {
+    (void) sampleIndex;
     for (const auto &exposedInput : exposedInputs) {
         exposedInput->envelope();
     }
@@ -85,13 +87,36 @@ void PolyModule::envelope() {
     }
     //todo optimize: only active voices
     for (int i = 0; i < activeVoiceCount; ++i) {
-        voices[i]->envelope();
+        voices[i]->processSample(sampleIndex);
     }
     for (const auto &proxyOutput : proxyOutputs) {
         proxyOutput->envelope();
     }
     for (const auto &exposedOutput : exposedOutputs) {
         exposedOutput->envelope();
+    }
+}
+
+void PolyModule::processBlock() {
+    for (const auto &exposedInput : exposedInputs) {
+        auto* sourceBuffer = exposedInput->value.data();
+        auto* targetBuffer = exposedInput->getModuleInput()->value.data();
+        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
+    }
+    for (const auto &proxyInput : proxyInputs) {
+        proxyInput->envelope();
+    }
+    //todo optimize: only active voices
+    for (int i = 0; i < activeVoiceCount; ++i) {
+        voices[i]->processBlock();
+    }
+    for (const auto &proxyOutput : proxyOutputs) {
+        proxyOutput->envelope();
+    }
+    for (const auto &exposedOutput : exposedOutputs) {
+        auto* sourceBuffer = exposedOutput->getModuleOutput()->value.data();
+        auto* targetBuffer = exposedOutput->value.data();
+        std::copy(sourceBuffer, sourceBuffer + PATCHCORE_BLOCK_SIZE, targetBuffer);
     }
 }
 

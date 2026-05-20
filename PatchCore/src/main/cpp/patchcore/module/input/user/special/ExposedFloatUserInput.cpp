@@ -27,7 +27,7 @@ ExposedFloatUserInput::ExposedFloatUserInput(std::string name, std::vector<Float
 }
 
 void ExposedFloatUserInput::setValue(float newValue) {
-    value = newValue;
+    value.fill(newValue);
     for (int i = 0; i < count; i++){
         inputs[i]->setValue(newValue);
     }

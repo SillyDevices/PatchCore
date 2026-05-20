@@ -39,7 +39,7 @@ public:
     void init();
     virtual ~InverseModule() = default;
 
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 
 private:
     ModuleInput input = ModuleInput(INVERSE_MODULE_INPUT);

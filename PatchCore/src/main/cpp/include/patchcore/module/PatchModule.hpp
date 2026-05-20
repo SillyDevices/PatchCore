@@ -54,7 +54,7 @@ protected:
     //Module interface
 public:
     void onStartBuffer(int size) override;
-    void envelope() override;
+    void envelope();
     void processSample(int sampleIndex) override;
     void processBlock() override;
     //PatchModule specific

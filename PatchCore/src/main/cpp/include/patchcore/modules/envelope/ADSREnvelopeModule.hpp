@@ -56,7 +56,7 @@ public:
     virtual ~ADSREnvelopeModule() = default;
 
 public:
-    void internalEnvelope(bool gate) override;
+    void internalEnvelope(bool gate, int sampleIndex) override;
 protected:
     inline void resetTime() { t = .0f; };
 protected:

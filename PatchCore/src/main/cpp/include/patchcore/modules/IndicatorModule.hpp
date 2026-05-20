@@ -49,7 +49,7 @@ public:
     std::unique_ptr<PolyProxyModule> createPolyModuleProxy(PolyModule *polyModule) const override;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
     void onStartBuffer(int size) override;
 public:
     float* getBuffer(int requestedDataSize);

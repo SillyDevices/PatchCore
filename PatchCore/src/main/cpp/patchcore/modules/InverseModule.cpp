@@ -44,6 +44,6 @@ void InverseModule::init() {
     registerOutput(output);
 }
 
-void InverseModule::envelope() {
-    output.value = 1.0f / input.value;
+void InverseModule::processSample(int sampleIndex) {
+    output.value[sampleIndex] = 1.0f / input.value[sampleIndex];
 }

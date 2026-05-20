@@ -49,7 +49,7 @@ void NoiseModule::init() {
     registerOutput(pinkOutput);
 }
 
-void NoiseModule::envelope() {
+void NoiseModule::processSample(int sampleIndex) {
 
     float white = noise.envelope();
     pinkBuffer.push_front(white);
@@ -66,6 +66,6 @@ void NoiseModule::envelope() {
     float pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + delayed * 0.5362f;
     b6 = delayed * 0.115926f;
 
-    output.value = white;
-    pinkOutput.value = pink * 0.15;
+    output.value[sampleIndex] = white;
+    pinkOutput.value[sampleIndex] = pink * 0.15;
 }

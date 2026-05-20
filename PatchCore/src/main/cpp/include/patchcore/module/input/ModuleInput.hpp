@@ -25,6 +25,8 @@
 
 #include "patchcore/module/input/Input.hpp"
 #include "patchcore/module/output/ModuleOutput.hpp"
+#include "patchcore/module/buffer/FixedBuffer.hpp"
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -45,14 +47,14 @@ public:
 
     //TODO remove
     inline void disconnect() {
-        value = disconnectedValue;
+        value.fill(disconnectedValue);
         _isConnected = false;
         outputs.clear();
     };
 
     //TODO remove
     inline void disconnectAll() {
-        value = disconnectedValue;
+        value.fill(disconnectedValue);
         _isConnected = false;
         outputs.clear();
     };
@@ -72,11 +74,12 @@ public:
     void envelope() {
         printf("ModuleInput::envelope() called for input: %s\n", name.c_str());
         if(_isConnected) {
-            auto computedValue = 0.0f;
+            value.fill(0.0f);
             for (auto output : outputs) {
-                computedValue += output->value;
+                for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+                    value[sampleIndex] += output->value[sampleIndex];
+                }
             }
-            this->value = computedValue;
         }
     };
 
@@ -90,15 +93,12 @@ public:
 
     virtual ExposedModuleInput *createExposed(const std::string &withName);
     void onStartBuffer(int size) {
-        value.onStartBuffer(size);
+        (void) size;
+        value.fill(value[PATCHCORE_BLOCK_SIZE - 1]);
     }
 
-    void advanceSample() {
-        value.advanceSample();
-    }
-
-    const std::vector<float>& getBuffer() const {
-        return value.getBuffer();
+    const FixedBuffer& getBuffer() const {
+        return value;
     }
 
 public:
@@ -123,7 +123,7 @@ private:
     Module* _module;
 
 public:
-    BufferedValue value = BufferedValue(0.0f);
+    FixedBuffer value = {};
     bool _isConnected = false;
     std::vector<ModuleOutput*> outputs = {};
 

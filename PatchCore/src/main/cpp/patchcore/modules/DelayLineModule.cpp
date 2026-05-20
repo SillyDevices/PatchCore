@@ -79,9 +79,9 @@ DelayLineModule::~DelayLineModule() {
 }
 
 //I have confidence in this implementation
-void DelayLineModule::envelope() {
+void DelayLineModule::processSample(int sampleIndex) {
     if (buffer == nullptr) {
-        output.value = 0;
+        output.value[sampleIndex] = 0;
         return;
     }
 
@@ -90,10 +90,10 @@ void DelayLineModule::envelope() {
 //    if (writePointer >= bufferSize) {
 //        writePointer = 0;
 //    }
-    buffer[writePointer] = input.value;
+    buffer[writePointer] = input.value[sampleIndex];
 
     // 0 < < bufferSize
-    float deltaSamples = std::min(std::max( (inputTime.value + userInputTime.value) * ( (float)sampleRate ), 0.0f), (float) bufferSize);
+    float deltaSamples = std::min(std::max( (inputTime.value[sampleIndex] + userInputTime.value[sampleIndex]) * ( (float)sampleRate ), 0.0f), (float) bufferSize);
 
     float readPointer = (float) writePointer - deltaSamples + (float) bufferSize;
     if (readPointer >= (float) bufferSize) {
@@ -128,5 +128,5 @@ void DelayLineModule::envelope() {
         if (nextNextReadPointer >= bufferSize) { nextNextReadPointer = 0; }
         result = dsp::cubicInterpolation(buffer[prevReadPointer], buffer[actualReadPointer],buffer[nextReadPointer], buffer[nextNextReadPointer], fraction);
     }
-    output.value = result;
+    output.value[sampleIndex] = result;
 }

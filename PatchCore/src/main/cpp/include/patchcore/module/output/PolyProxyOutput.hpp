@@ -49,9 +49,11 @@ public:
         voiceOutputs[voiceIndex] = output;
     }
     virtual void envelope() {
-        value = 0.0f;
+        value.fill(0.0f);
         for (auto &voiceOutput : voiceOutputs) {
-            value += voiceOutput->value;
+            for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
+                value[sampleIndex] += voiceOutput->value[sampleIndex];
+            }
         }
     }
 protected:

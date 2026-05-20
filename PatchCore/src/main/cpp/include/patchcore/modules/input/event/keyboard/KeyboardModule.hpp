@@ -56,7 +56,7 @@ public:
 
 public:
     void onStartBuffer(int size) override;
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 public:
     void onEvent(KeyboardEvent event) override;
 

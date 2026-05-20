@@ -24,7 +24,7 @@
 #define PATCHCORE_FLOATUSERINPUT_HPP
 
 #include "patchcore/module/input/UserInput.hpp"
-#include "patchcore/module/buffer/BufferedValue.hpp"
+#include "patchcore/module/buffer/FixedBuffer.hpp"
 #include "patchcore/callback/OnStartBuffer.hpp"
 #include <string>
 
@@ -44,12 +44,8 @@ public:
     void onStartBuffer(int bufferSize) override;
 
     virtual void envelope();
-    void advanceSample() {
-        value.advanceSample();
-    }
-
-    const std::vector<float>& getBuffer() const {
-        return value.getBuffer();
+    const FixedBuffer& getBuffer() const {
+        return value;
     }
 
 public:
@@ -89,7 +85,7 @@ protected:
 
     float speed = 5.0f;
 public:
-    BufferedValue value = BufferedValue(.0f);
+    FixedBuffer value = {};
 };
 
 inline void FloatUserInput::setValue(float newValue) {
@@ -98,7 +94,7 @@ inline void FloatUserInput::setValue(float newValue) {
 }
 
 inline void FloatUserInput::setParameterLockValue(float newValue) {
-    value = newValue;
+    value.fill(newValue);
     lastSetParameterLockValue = newValue;
     isLocked = true;
 }

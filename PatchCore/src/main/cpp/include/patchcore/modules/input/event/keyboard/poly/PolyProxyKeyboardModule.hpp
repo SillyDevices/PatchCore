@@ -39,7 +39,7 @@ public:
     void onStartBuffer(int size) override {
         throw std::runtime_error("PolyProxyKeyboardModule does not implement envelope method");
     }
-    void envelope() override {
+    void processSample(int sampleIndex) override {
         throw std::runtime_error("PolyProxyKeyboardModule does not implement envelope method");
     }
 public:

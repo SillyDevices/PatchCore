@@ -41,7 +41,7 @@ public:
     ~FixedHardClipModule() override = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput input = ModuleInput(FIXED_HARD_CLIP_MODULE_INPUT);
     ModuleOutput output = ModuleOutput(FIXED_HARD_CLIP_MODULE_OUTPUT);

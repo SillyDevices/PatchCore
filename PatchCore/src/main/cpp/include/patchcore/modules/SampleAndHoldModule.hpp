@@ -41,7 +41,7 @@ public:
     ~SampleAndHoldModule() override = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     enum State {
         WAIT_FOR_RAISE, WAIT_FOR_FALL

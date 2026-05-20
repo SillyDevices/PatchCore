@@ -41,7 +41,7 @@ public:
     virtual ~DividerModule() = default;
 
 public:
-    void envelope() override;
+    void processSample(int sampleIndex) override;
 private:
     ModuleInput num = ModuleInput(DIVIDER_MODULE_INPUT_NUMERATOR);
     ModuleInput denum = ModuleInput(DIVIDER_MODULE_INPUT_DENOMINATOR);

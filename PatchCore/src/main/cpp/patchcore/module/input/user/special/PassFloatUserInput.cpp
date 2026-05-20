@@ -27,7 +27,7 @@ PassFloatUserInput::PassFloatUserInput(std::string name) : FloatUserInput(name) 
 }
 
 void PassFloatUserInput::envelope() {
-    value = lastSetValue;
+    value.fill(lastSetValue);
 }
 
 

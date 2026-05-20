@@ -23,15 +23,11 @@
 #ifndef PATCHCORE_OUTPUT_HPP
 #define PATCHCORE_OUTPUT_HPP
 
-#include "patchcore/module/buffer/BufferedValue.hpp"
-
 class Output
 {
 public:
     Output() = default;
     virtual ~Output() = default;
-public:
-    BufferedValue value = BufferedValue(0.0f);
 };
 
 #endif //PATCHCORE_OUTPUT_HPP
