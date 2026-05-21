@@ -70,9 +70,10 @@ void Module::onStartBlock(const BlockContext& context) {
         input->prepareBlock(context);
     }
 
-    for (auto &output : uniqueOutputs) {
-        output->prepareBlock(context);
-    }
+//    // not needed
+//    for (auto &output : uniqueOutputs) {
+//        output->prepareBlock(context);
+//    }
 
     for (auto &input : interpolatedInputs) {
         input->prepareBlock(context);
