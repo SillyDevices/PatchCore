@@ -28,6 +28,7 @@
 #include "../../algorithm/RemoveUnreachableNodes.hpp"
 #include "../../algorithm/Demucron.hpp"
 #include <algorithm>
+#include <cstring>
 #include <unordered_set>
 
 #ifndef PATCHCORE_GRAPH_ROUTER_DEBUG
@@ -304,10 +305,25 @@ void GraphRouter::updateModuleGraph() {
                     envelopeInputSet.insert(patch.second);
                 }
             }
-            // convert stageMatrix to inputsInStage and outputsInStage
+            // convert stageMatrix to input/output routes
             for (const auto &matrixKV: stageMatrix) {
-                stage.inputsInStage.push_back(matrixKV.first);
-                stage.outputsInStage.push_back(matrixKV.second);
+                auto* input = matrixKV.first;
+                const auto& outputs = matrixKV.second;
+
+                stage.inputsInStage.push_back(input);
+                stage.outputsInStage.push_back(outputs);
+
+                if (outputs.size() == 1) {
+                    EnvelopeStage::SingleOutputInputRoute route;
+                    route.input = input;
+                    route.output = outputs.front();
+                    stage.singleOutputInputRoutes.push_back(route);
+                } else {
+                    EnvelopeStage::MultiOutputInputRoute route;
+                    route.input = input;
+                    route.outputs = outputs;
+                    stage.multiOutputInputRoutes.push_back(std::move(route));
+                }
             }
 
             if (stage.hasLoop) {
@@ -462,27 +478,31 @@ void GraphRouter::processStageSample(const EnvelopeStage& stage, int sampleIndex
 }
 
 void GraphRouter::processStageBlock(const EnvelopeStage& stage) {
-    int inputIndex = 0;
-    for (const auto &input: stage.inputsInStage) {
-        auto* inputBuffer = input->value.data();
-        if (inputBuffer == nullptr) {
-            input->clearBlock();
-            inputBuffer = input->value.data();
-        }
-        std::fill(inputBuffer, inputBuffer + PATCHCORE_BLOCK_SIZE, 0.0f);
 
-        for (const auto &output: stage.outputsInStage[inputIndex]) {
-            const auto* outputBuffer = output->value.data();
-            if (outputBuffer == nullptr) {
-                output->clearBlock();
-                outputBuffer = output->value.data();
-            }
-            for (int sampleIndex = 0; sampleIndex < PATCHCORE_BLOCK_SIZE; ++sampleIndex) {
-                inputBuffer[sampleIndex] += outputBuffer[sampleIndex];
+    for (const auto &route : stage.singleOutputInputRoutes) {
+        float* inputBuffer = route.input->value.data();
+        const float* outputBuffer = route.output->value.data();
+        std::memcpy(inputBuffer, outputBuffer, PATCHCORE_BLOCK_SIZE * sizeof(float));
+    }
+
+    for (const auto &route : stage.multiOutputInputRoutes) {
+        float* inputBuffer = route.input->value.data();
+        const auto& outputs = route.outputs;
+
+        const float* firstOutput = outputs.front()->value.data();
+        for (int s = 0; s < PATCHCORE_BLOCK_SIZE; ++s) {
+            inputBuffer[s] = firstOutput[s];
+        }
+
+        for (auto it = std::next(outputs.begin()); it != outputs.end(); ++it) {
+            const float* outputBuffer = (*it)->value.data();
+
+            for (int s = 0; s < PATCHCORE_BLOCK_SIZE; ++s) {
+                inputBuffer[s] += outputBuffer[s];
             }
         }
-        inputIndex++;
     }
+
     for (const auto &module: stage.modulesInStage) {
         module->processBlock();
     }
