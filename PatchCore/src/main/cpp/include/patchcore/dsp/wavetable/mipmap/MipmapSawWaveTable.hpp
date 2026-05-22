@@ -20,20 +20,22 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#ifndef PATCHCORE_SIMPLESQUAREWAVETABLE_HPP
-#define PATCHCORE_SIMPLESQUAREWAVETABLE_HPP
+#ifndef PATCHCORE_MIPMAP_SAWWAVETABLE_HPP
+#define PATCHCORE_MIPMAP_SAWWAVETABLE_HPP
 
 
+#include "patchcore/dsp/wavetable/SawWaveTable.hpp"
 #include "patchcore/dsp/wavetable/mipmap/MipmapWaveTable.hpp"
 
 
-class SimpleSquareWaveTable : public MipmapWaveTable {
+class MipmapSawWaveTable : public SawWaveTable, public MipmapWaveTable {
 public:
-    explicit SimpleSquareWaveTable(int sampleRate);
-    virtual ~SimpleSquareWaveTable() = default;
+    explicit MipmapSawWaveTable(int sampleRate);
+    virtual ~MipmapSawWaveTable() = default;
 protected:
     struct noprapere_tag {};
-    SimpleSquareWaveTable(noprapere_tag);
+    //TODO why i need this?
+    MipmapSawWaveTable(noprapere_tag);
 };
 
-#endif //PATCHCORE_SIMPLESQUAREWAVETABLE_HPP
+#endif //PATCHCORE_MIPMAP_SAWWAVETABLE_HPP

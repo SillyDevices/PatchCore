@@ -20,35 +20,34 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/dsp/wavetable/mipmap/SimpleSquareWaveTable.hpp"
-#include "patchcore/dsp/osc/BandLimitedSimpleSquare.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapSawWaveTable.hpp"
+#include "patchcore/dsp/osc/BandLimitedSaw.hpp"
 #include <cmath>
 
 
 #define TABLE_COUNT 10
 
 
-SimpleSquareWaveTable::SimpleSquareWaveTable(int sampleRate): MipmapWaveTable(TABLE_COUNT) {
+MipmapSawWaveTable::MipmapSawWaveTable(int sampleRate): MipmapWaveTable(TABLE_COUNT) {
     data = new float *[tableCount];
     maxFrequency = new float[tableCount];
     lengths = new int[tableCount];
-    int harmonics[10] = {1024 ,512, 256, 128, 64, 32, 16, 8, 4, 1};
+    int harmonics[10] = { 1024 ,512, 256, 128, 64, 32, 16, 8, 4, 1 };
     int samples = 4096;
     for (int i = 0; i < tableCount; i++) {
         data[i] = new float[samples];
         maxFrequency[i] = float(sampleRate) / (harmonics[i] * 2);
         int h = harmonics[i] - 2;
-        h = (h-1)/2;
         if (h < 1) h = 1;
         lengths[i] = samples;
         float phase = .0f;
         for (int j = 0; j < samples; j++) {
-            data[i][j] = bandLimitedSimpleSquareWithHarmonics(maxFrequency[i], phase, h);
+            data[i][j] = bandLimitedSawWithHarmonics(maxFrequency[i], phase, h);
             phase = j / ((float) samples);
         }
     }
 }
 
-SimpleSquareWaveTable::SimpleSquareWaveTable(SimpleSquareWaveTable::noprapere_tag): MipmapWaveTable(TABLE_COUNT) {
+MipmapSawWaveTable::MipmapSawWaveTable(MipmapSawWaveTable::noprapere_tag): MipmapWaveTable(TABLE_COUNT) {
     //do nothing
 }

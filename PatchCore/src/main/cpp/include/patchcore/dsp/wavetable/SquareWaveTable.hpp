@@ -20,25 +20,18 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#ifndef PATCHCORE_WAVETABLEPROVIDER_HPP
-#define PATCHCORE_WAVETABLEPROVIDER_HPP
+#ifndef PATCHCORE_SQUAREWAVETABLE_INTERFACE_HPP
+#define PATCHCORE_SQUAREWAVETABLE_INTERFACE_HPP
 
+#include "patchcore/dsp/wavetable/WaveTable.hpp"
 
-#include "patchcore/dsp/wavetable/SawWaveTable.hpp"
-#include "patchcore/dsp/wavetable/TriangleWaveTable.hpp"
-#include "patchcore/dsp/wavetable/SquareWaveTable.hpp"
-#include "patchcore/dsp/wavetable/SimpleSquareWaveTable.hpp"
-
-
-class WaveTableProvider {
+class SquareWaveTable : public virtual WaveTable {
 public:
-    virtual ~WaveTableProvider() = default;
+    virtual ~SquareWaveTable() = default;
 
 public:
-    virtual SawWaveTable *getSawWaveTable() = 0;
-    virtual TriangleWaveTable *getTriangleWaveTable() = 0;
-    virtual SquareWaveTable *getSquareWaveTable() = 0;
-    virtual SimpleSquareWaveTable *getSimpleSquareWaveTable() = 0;
+    using WaveTable::getSample;
+    virtual float getSample(float frequency, float pwm, float phase) = 0;
 };
 
-#endif //PATCHCORE_WAVETABLEPROVIDER_HPP
+#endif //PATCHCORE_SQUAREWAVETABLE_INTERFACE_HPP

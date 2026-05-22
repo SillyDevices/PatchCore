@@ -24,12 +24,12 @@
 #define PATCHCORE_SUPERWAVE_HPP
 
 
-#include "patchcore/dsp/wavetable/mipmap/MipmapWaveTable.hpp"
+#include "patchcore/dsp/wavetable/WaveTable.hpp"
 #include <cmath>
 
 class SuperWave {
 public:
-    SuperWave(MipmapWaveTable *waveTable, int sampleRate) {
+    SuperWave(WaveTable *waveTable, int sampleRate) {
         this->sampleRate = sampleRate;
         this->waveTable = waveTable;
     }
@@ -78,7 +78,7 @@ public:
         return result / 5.0f;
     }
     int sampleRate;
-    MipmapWaveTable *waveTable;
+    WaveTable *waveTable;
     float phase0 = 0.0f;
     float phase1 = 0.0f;
     float phase2 = 0.0f;

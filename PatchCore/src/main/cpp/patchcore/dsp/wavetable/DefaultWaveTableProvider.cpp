@@ -21,13 +21,19 @@
  */
 
 #include "patchcore/dsp/wavetable/DefaultWaveTableProvider.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapSawWaveTable.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapTriangleWaveTable.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapSquareWaveTable.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapSimpleSquareWaveTable.hpp"
+
+//#include "patchcore/dsp/wavetable/fast_mipmap/FastSawWaveTable.hpp"
 
 
 DefaultWaveTableProvider::DefaultWaveTableProvider(int SampleRate) {
-    sawTable = new SawWaveTable(SampleRate);
-    triangleWaveTable = new TriangleWaveTable(SampleRate);
-    squareWaveTable = new SquareWaveTable(sawTable);
-    simpleSquareWaveTable = new SimpleSquareWaveTable(SampleRate);
+    sawTable = new MipmapSawWaveTable(SampleRate);
+    triangleWaveTable = new MipmapTriangleWaveTable(SampleRate);
+    squareWaveTable = new MipmapSquareWaveTable(sawTable);
+    simpleSquareWaveTable = new MipmapSimpleSquareWaveTable(SampleRate);
 }
 
 DefaultWaveTableProvider::~DefaultWaveTableProvider() {
