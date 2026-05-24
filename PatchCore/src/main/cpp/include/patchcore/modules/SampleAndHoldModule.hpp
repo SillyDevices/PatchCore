@@ -47,6 +47,7 @@ private:
         WAIT_FOR_RAISE, WAIT_FOR_FALL
     };
     State state = WAIT_FOR_RAISE;
+    float heldValue = 0.0f;
 
     ModuleInput input = ModuleInput(SAMPLE_AND_HOLD_MODULE_INPUT);
     ModuleInput gate = ModuleInput(SAMPLE_AND_HOLD_MODULE_INPUT_GATE);

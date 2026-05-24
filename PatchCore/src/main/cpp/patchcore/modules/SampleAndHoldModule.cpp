@@ -31,7 +31,7 @@ SampleAndHoldModule::SampleAndHoldModule(std::string name) : Module(name, 0) {
 }
 
 SampleAndHoldModule::SampleAndHoldModule(const SampleAndHoldModule& other)
-    : Module(other.name, other.sampleRate), state(other.state) {
+    : Module(other.name, other.sampleRate), state(other.state), heldValue(other.heldValue) {
     init();
     copyIOs(other);
 }
@@ -47,12 +47,14 @@ void SampleAndHoldModule::init() {
 }
 
 void SampleAndHoldModule::processSample(int sampleIndex)  {
-    if (gate.value[sampleIndex] > .5f){
+    if (gate.value[sampleIndex] > .5f) {
         if (state == WAIT_FOR_RAISE) {
-            output.value[sampleIndex] = input.value[sampleIndex];
+            heldValue = input.value[sampleIndex];
             state = WAIT_FOR_FALL;
         }
     } else {
         state = WAIT_FOR_RAISE;
     }
+
+    output.value[sampleIndex] = heldValue;
 }
