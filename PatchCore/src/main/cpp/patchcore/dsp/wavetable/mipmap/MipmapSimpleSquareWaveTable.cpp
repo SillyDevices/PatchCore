@@ -20,15 +20,15 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/dsp/wavetable/mipmap/TriangleWaveTable.hpp"
-#include "patchcore/dsp/osc/BandLimitedTriangle.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapSimpleSquareWaveTable.hpp"
+#include "patchcore/dsp/osc/BandLimitedSimpleSquare.hpp"
 #include <cmath>
 
 
 #define TABLE_COUNT 10
 
 
-TriangleWaveTable::TriangleWaveTable(int sampleRate): MipmapWaveTable(TABLE_COUNT) {
+MipmapSimpleSquareWaveTable::MipmapSimpleSquareWaveTable(int sampleRate): MipmapWaveTable(TABLE_COUNT) {
     data = new float *[tableCount];
     maxFrequency = new float[tableCount];
     lengths = new int[tableCount];
@@ -43,12 +43,12 @@ TriangleWaveTable::TriangleWaveTable(int sampleRate): MipmapWaveTable(TABLE_COUN
         lengths[i] = samples;
         float phase = .0f;
         for (int j = 0; j < samples; j++) {
-            data[i][j] = bandLimitedTriangleWithHarmonics(maxFrequency[i], phase, h);
+            data[i][j] = bandLimitedSimpleSquareWithHarmonics(maxFrequency[i], phase, h);
             phase = j / ((float) samples);
         }
     }
 }
 
-TriangleWaveTable::TriangleWaveTable(TriangleWaveTable::noprapere_tag): MipmapWaveTable(TABLE_COUNT) {
+MipmapSimpleSquareWaveTable::MipmapSimpleSquareWaveTable(MipmapSimpleSquareWaveTable::noprapere_tag): MipmapWaveTable(TABLE_COUNT) {
     //do nothing
 }

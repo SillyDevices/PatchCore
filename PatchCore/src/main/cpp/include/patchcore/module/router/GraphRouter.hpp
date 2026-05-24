@@ -86,9 +86,21 @@ protected:
             std::vector<SampleInputRoute> inputRoutes;
         };
 
+        struct SingleOutputInputRoute {
+            ModuleInput* input = nullptr;
+            ModuleOutput* output = nullptr;
+        };
+
+        struct MultiOutputInputRoute {
+            ModuleInput* input = nullptr;
+            std::vector<ModuleOutput*> outputs;
+        };
+
         std::vector<Module*> modulesInStage;
         std::vector<ModuleInput*> inputsInStage;
         std::vector<std::vector<ModuleOutput*>> outputsInStage;
+        std::vector<SingleOutputInputRoute> singleOutputInputRoutes;
+        std::vector<MultiOutputInputRoute> multiOutputInputRoutes;
         std::vector<SampleModuleRoute> sampleModuleRoutes;
         bool hasLoop = false;
     };

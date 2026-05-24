@@ -20,18 +20,22 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/dsp/wavetable/mipmap/SquareWaveTable.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapSquareWaveTable.hpp"
 #include <cmath>
 
 
-SquareWaveTable::SquareWaveTable(SawWaveTable *table): MipmapWaveTable(0), sawWaveTable(table) {
+MipmapSquareWaveTable::MipmapSquareWaveTable(SawWaveTable *table): MipmapWaveTable(0), sawWaveTable(table) {
     // Initialize this, because MipmapWaveTable destructor will delete these pointers
     lengths = new int[0];
     maxFrequency = new float[0];
     data = new float*[0];
 }
 
-float SquareWaveTable::getSample(float frequency, float pwm, float phase) {
+float MipmapSquareWaveTable::getSample(float frequency, float phase) {
+    return getSample(frequency, 0.5f, phase);
+}
+
+float MipmapSquareWaveTable::getSample(float frequency, float pwm, float phase) {
     float phase1 = phase;
     float phase2 = phase + pwm;
     float saw1 =  sawWaveTable->getSample(frequency, phase1);

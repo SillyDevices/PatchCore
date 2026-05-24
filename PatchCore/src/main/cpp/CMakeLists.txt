@@ -74,10 +74,11 @@ add_library(
 
         patchcore/dsp/wavetable/DefaultWaveTableProvider.cpp
         patchcore/dsp/wavetable/mipmap/MipmapWaveTable.cpp
-        patchcore/dsp/wavetable/mipmap/SawWaveTable.cpp
-        patchcore/dsp/wavetable/mipmap/TriangleWaveTable.cpp
-        patchcore/dsp/wavetable/mipmap/SimpleSquareWaveTable.cpp
-        patchcore/dsp/wavetable/mipmap/SquareWaveTable.cpp
+        patchcore/dsp/wavetable/mipmap/MipmapSawWaveTable.cpp
+        patchcore/dsp/wavetable/mipmap/MipmapTriangleWaveTable.cpp
+        patchcore/dsp/wavetable/mipmap/MipmapSimpleSquareWaveTable.cpp
+        patchcore/dsp/wavetable/mipmap/MipmapSquareWaveTable.cpp
+#        patchcore/dsp/wavetable/fast_mipmap/FastSawWaveTable.cpp
         patchcore/dsp/osc/NativeWaveOsc.cpp
         patchcore/dsp/osc/Noise.cpp
         patchcore/dsp/osc/BandLimitedSaw.cpp

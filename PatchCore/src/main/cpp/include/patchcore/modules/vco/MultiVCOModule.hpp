@@ -31,9 +31,10 @@
 #include "patchcore/dsp/WaveForm.hpp"
 #include "patchcore/module/input/user/EnumUserInput.hpp"
 
-#include "patchcore/dsp/wavetable/mipmap/SawWaveTable.hpp"
-#include "patchcore/dsp/wavetable/mipmap/TriangleWaveTable.hpp"
-#include "patchcore/dsp/wavetable/mipmap/SquareWaveTable.hpp"
+#include "patchcore/dsp/wavetable/SawWaveTable.hpp"
+#include "patchcore/dsp/wavetable/TriangleWaveTable.hpp"
+#include "patchcore/dsp/wavetable/SquareWaveTable.hpp"
+#include "patchcore/dsp/wavetable/SimpleSquareWaveTable.hpp"
 #include "patchcore/dsp/wavetable/WaveTableProvider.hpp"
 #include "patchcore/dsp/osc/Noise.hpp"
 

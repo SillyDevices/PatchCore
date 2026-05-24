@@ -20,34 +20,35 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#include "patchcore/dsp/wavetable/mipmap/SawWaveTable.hpp"
-#include "patchcore/dsp/osc/BandLimitedSaw.hpp"
+#include "patchcore/dsp/wavetable/mipmap/MipmapTriangleWaveTable.hpp"
+#include "patchcore/dsp/osc/BandLimitedTriangle.hpp"
 #include <cmath>
 
 
 #define TABLE_COUNT 10
 
 
-SawWaveTable::SawWaveTable(int sampleRate): MipmapWaveTable(TABLE_COUNT) {
+MipmapTriangleWaveTable::MipmapTriangleWaveTable(int sampleRate): MipmapWaveTable(TABLE_COUNT) {
     data = new float *[tableCount];
     maxFrequency = new float[tableCount];
     lengths = new int[tableCount];
-    int harmonics[10] = { 1024 ,512, 256, 128, 64, 32, 16, 8, 4, 1 };
+    int harmonics[10] = {1024 ,512, 256, 128, 64, 32, 16, 8, 4, 1};
     int samples = 4096;
     for (int i = 0; i < tableCount; i++) {
         data[i] = new float[samples];
         maxFrequency[i] = float(sampleRate) / (harmonics[i] * 2);
         int h = harmonics[i] - 2;
+        h = (h-1)/2;
         if (h < 1) h = 1;
         lengths[i] = samples;
         float phase = .0f;
         for (int j = 0; j < samples; j++) {
-            data[i][j] = bandLimitedSawWithHarmonics(maxFrequency[i], phase, h);
+            data[i][j] = bandLimitedTriangleWithHarmonics(maxFrequency[i], phase, h);
             phase = j / ((float) samples);
         }
     }
 }
 
-SawWaveTable::SawWaveTable(SawWaveTable::noprapere_tag): MipmapWaveTable(TABLE_COUNT) {
+MipmapTriangleWaveTable::MipmapTriangleWaveTable(MipmapTriangleWaveTable::noprapere_tag): MipmapWaveTable(TABLE_COUNT) {
     //do nothing
 }

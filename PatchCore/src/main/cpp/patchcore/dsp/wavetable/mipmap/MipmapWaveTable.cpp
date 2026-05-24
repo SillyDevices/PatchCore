@@ -50,9 +50,9 @@ float MipmapWaveTable::getSample(float frequency, float phase) {
 
 MipmapWaveTable::~MipmapWaveTable() {
     for (int i =0; i < tableCount; i++) {
-        delete data[i];
+        delete[] data[i];
     }
-    delete lengths;
-    delete data;
-    delete maxFrequency;
+    delete[] lengths;
+    delete[] data;
+    delete[] maxFrequency;
 }

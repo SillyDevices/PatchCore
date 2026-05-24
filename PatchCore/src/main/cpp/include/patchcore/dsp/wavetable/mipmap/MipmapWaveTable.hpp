@@ -23,12 +23,14 @@
 #ifndef PATCHCORE_MIPMAP_WAVETABLE_HPP
 #define PATCHCORE_MIPMAP_WAVETABLE_HPP
 
-class MipmapWaveTable {
+#include "patchcore/dsp/wavetable/WaveTable.hpp"
+
+class MipmapWaveTable : public virtual WaveTable {
 protected:
     explicit MipmapWaveTable(int count);
     virtual ~MipmapWaveTable();
 public:
-    float getSample(float frequency, float phase);
+    float getSample(float frequency, float phase) override;
 protected:
     const int tableCount;
     float** data;

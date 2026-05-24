@@ -20,21 +20,14 @@
  * Commercial licensing available: contact sillydevices@gmail.com
  */
 
-#ifndef PATCHCORE_SAWWAVETABLE_HPP
-#define PATCHCORE_SAWWAVETABLE_HPP
+#ifndef PATCHCORE_TRIANGLEWAVETABLE_INTERFACE_HPP
+#define PATCHCORE_TRIANGLEWAVETABLE_INTERFACE_HPP
 
+#include "patchcore/dsp/wavetable/WaveTable.hpp"
 
-#include "patchcore/dsp/wavetable/mipmap/MipmapWaveTable.hpp"
-
-
-class SawWaveTable : public MipmapWaveTable {
+class TriangleWaveTable : public virtual WaveTable {
 public:
-    explicit SawWaveTable(int sampleRate);
-    virtual ~SawWaveTable() = default;
-protected:
-    struct noprapere_tag {};
-    //TODO why i need this?
-    SawWaveTable(noprapere_tag);
+    virtual ~TriangleWaveTable() = default;
 };
 
-#endif //PATCHCORE_SAWWAVETABLE_HPP
+#endif //PATCHCORE_TRIANGLEWAVETABLE_INTERFACE_HPP
