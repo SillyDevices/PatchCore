@@ -38,17 +38,57 @@ abstract class FlatModule(name: String): PatchModule(name, moduleNamePrefix = na
     }
 
     override fun applyPatchModuleContext(context: PatchModuleContext) {
-        //all from PatchModule except patches
+        //all from PatchModule except patches. FlatModule patch is collected by the nearest parent PatchModule.
         applyContextForIO(context)
         applyChildrenSettings()
     }
 
-    override fun addPatch(connection: Patch.Connection) {
-        throw IllegalStateException("Not supported")
+    internal fun collectInlinePatchConnections(): List<Patch.Connection> {
+        return collectPatchConnections()
     }
 
+    private fun patchMutationNotSupported(): Nothing {
+        throw IllegalStateException("FlatModule patch is owned by the nearest parent PatchModule")
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR,)
+    override fun addPatch(from: ModuleOutput, to: ModuleInput, layer: PatchLayer, policy: PatchPolicy?) {
+        patchMutationNotSupported()
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR)
+    override fun addPatch(connection: Patch.Connection) {
+        patchMutationNotSupported()
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR)
+    override fun removePatch(from: ModuleOutput, to: ModuleInput, layer: PatchLayer?) {
+        patchMutationNotSupported()
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR)
     override fun removePatch(connection: Patch.Connection) {
-        throw IllegalStateException("Not supported")
+        patchMutationNotSupported()
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR)
+    override fun replacePatchLayer(layer: PatchLayer, connections: List<Patch.Connection>) {
+        patchMutationNotSupported()
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR)
+    override fun clearPatchLayer(layer: PatchLayer) {
+        patchMutationNotSupported()
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR)
+    override fun replacePatch(patch: Patch) {
+        patchMutationNotSupported()
+    }
+
+    @Deprecated(message = "FlatModule patch is owned by the nearest parent PatchModule. Mutate the parent PatchModule instead.", level = DeprecationLevel.ERROR)
+    override fun clearPatch() {
+        patchMutationNotSupported()
     }
 
     @Deprecated("not needed in FlatModule, use = instead")

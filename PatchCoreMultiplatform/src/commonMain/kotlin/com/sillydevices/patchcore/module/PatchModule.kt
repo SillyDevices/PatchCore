@@ -37,12 +37,41 @@ import com.sillydevices.patchcore.module.io.user.UserInput
 import com.sillydevices.patchcore.module.io.user.proxy.ExposedModuleUserInput
 import kotlin.reflect.KProperty
 
+enum class PatchLayer {
+    Internal,
+    Normal,
+    User,
+}
+
+enum class PatchPolicy {
+    Replace,
+    Keep,
+    Mix,
+}
+
 open class Patch {
-    data class Connection(val output: ModuleOutput, val input: ModuleInput)
+    data class Connection(
+        val output: ModuleOutput,
+        val input: ModuleInput,
+        val layer: PatchLayer = PatchLayer.User,
+        val policy: PatchPolicy? = null,
+    ) {
+        val resolvedPolicy: PatchPolicy
+            get() = policy ?: defaultPolicyFor(layer)
+
+        companion object {
+            fun defaultPolicyFor(layer: PatchLayer): PatchPolicy = when (layer) {
+                PatchLayer.Internal -> PatchPolicy.Keep
+                PatchLayer.Normal -> PatchPolicy.Replace
+                PatchLayer.User -> PatchPolicy.Keep
+            }
+        }
+    }
+
     open val connections = listOf<Connection>()
 }
 
-private class PatchImpl(list: List<Connection>): Patch() {
+private class PatchImpl(list: List<Patch.Connection>): Patch() {
     override val connections = list
 }
 
@@ -50,8 +79,25 @@ class PatchBuilder {
 
     val list = mutableListOf<Patch.Connection>()
 
-    fun patch(output: ModuleOutput, input: ModuleInput,) {
-        list.add(Patch.Connection(output, input))
+    class PatchConnectionHandle internal constructor(
+        private val updatePolicy: (PatchPolicy) -> Unit,
+    ) {
+        infix fun policy(policy: PatchPolicy) {
+            updatePolicy(policy)
+        }
+    }
+
+    fun patch(
+        output: ModuleOutput,
+        input: ModuleInput,
+        layer: PatchLayer = PatchLayer.User,
+        policy: PatchPolicy? = null,
+    ): PatchConnectionHandle {
+        val index = list.size
+        list.add(Patch.Connection(output, input, layer, policy))
+        return PatchConnectionHandle { newPolicy ->
+            list[index] = list[index].copy(policy = newPolicy)
+        }
     }
 
     infix fun patch(patch: Pair<ModuleOutput, ModuleInput>) {
@@ -62,12 +108,20 @@ class PatchBuilder {
         list.addAll(other.connections)
     }
 
-    infix fun ModuleOutput.patchTo(input: ModuleInput) {
-        patch(this, input)
+    infix fun ModuleOutput.internalTo(input: ModuleInput): PatchConnectionHandle {
+        return patch(this, input, PatchLayer.Internal)
     }
 
-    infix fun ModuleOutput.connect(input: ModuleInput) {
-        patch(this, input)
+    infix fun ModuleOutput.normalTo(input: ModuleInput): PatchConnectionHandle {
+        return patch(this, input, PatchLayer.Normal)
+    }
+
+    infix fun ModuleOutput.userTo(input: ModuleInput): PatchConnectionHandle {
+        return patch(this, input, PatchLayer.User)
+    }
+
+    infix fun ModuleOutput.connect(input: ModuleInput): PatchConnectionHandle {
+        return internalTo(input)
     }
 
     fun build(): Patch {
@@ -114,7 +168,7 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
     private fun <T: UserInput> exposeUserInput(userInput: T, name: String = userInput.name): T =
         userInput.createExposed<T>(moduleName = this.name, withName = name).also { exposedUserInputs.add(it as ExposedModuleUserInput) }
 
-    open val defaultPatch: Patch = Patch()
+    open val patch: Patch = Patch()
 
     fun createPatch(builder: PatchBuilder.() -> Unit) : Patch {
         val patchBuilder = PatchBuilder()
@@ -122,39 +176,110 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
         return patchBuilder.build()
     }
 
-    protected val currentPatch: MutablePatch = MutablePatch()
+    protected val declaredPatch: MutablePatch = MutablePatch()
+    protected val activePatch: MutablePatch = MutablePatch()
 
-
-    open fun clearPatches() {
+    protected open fun clearPatchStorage() {
         val context = moduleContext as PatchModuleContext
         context.resetPatch()
-        currentPatch.connections.clear()
+        declaredPatch.connections.clear()
+        activePatch.connections.clear()
     }
 
-    open fun applyDefaultPatch() {
-        val context = moduleContext as PatchModuleContext
-        for (connection in defaultPatch.connections) {
-            context.addPatch(connection.output, connection.input)
-            currentPatch.connections.add(connection)
+    protected open fun applyPatch() {
+        declaredPatch.connections.clear()
+        declaredPatch.connections.addAll(collectPatchConnections())
+        rebuildActivePatch()
+    }
+
+    protected open fun collectPatchConnections(): List<Patch.Connection> {
+        val connections = mutableListOf<Patch.Connection>()
+        connections.addAll(patch.connections)
+        modules.filterIsInstance<FlatModule>().forEach { flatModule ->
+            connections.addAll(flatModule.collectInlinePatchConnections())
         }
+        return connections
+    }
+
+    open fun addPatch(from: ModuleOutput, to: ModuleInput, layer: PatchLayer = PatchLayer.User, policy: PatchPolicy? = null) {
+        addPatch(Patch.Connection(from, to, layer, policy))
     }
 
     open fun addPatch(connection: Patch.Connection){
-        val context = moduleContext as PatchModuleContext
-        context.addPatch(connection.output, connection.input)
-        currentPatch.connections.add(connection)
+        declaredPatch.connections.add(connection)
+        rebuildActivePatch()
+    }
+
+    open fun removePatch(from: ModuleOutput, to: ModuleInput, layer: PatchLayer? = PatchLayer.User) {
+        declaredPatch.connections.removeAll { connection ->
+            connection.output == from && connection.input == to && (layer == null || connection.layer == layer)
+        }
+        rebuildActivePatch()
     }
 
     open fun removePatch(connection: Patch.Connection){
-        val context = moduleContext as PatchModuleContext
-        context.removePatch(connection.output, connection.input)
-        currentPatch.connections.remove(connection)
+        declaredPatch.connections.remove(connection)
+        rebuildActivePatch()
     }
 
-    //TODO need something like this to apply changes in batch.
-    // current implementations rebuild all patches each time a patch is added/removed
-//    fun applyPatchChanges(changes: (patch: Patch)-> Patch) {}
+    open fun replacePatchLayer(layer: PatchLayer, connections: List<Patch.Connection>) {
+        declaredPatch.connections.removeAll { it.layer == layer }
+        declaredPatch.connections.addAll(connections.map { it.copy(layer = layer) })
+        rebuildActivePatch()
+    }
 
+    open fun clearPatchLayer(layer: PatchLayer) {
+        declaredPatch.connections.removeAll { it.layer == layer }
+        rebuildActivePatch()
+    }
+
+    open fun replacePatch(patch: Patch) {
+        declaredPatch.connections.clear()
+        declaredPatch.connections.addAll(patch.connections)
+        rebuildActivePatch()
+    }
+
+    open fun clearPatch() {
+        declaredPatch.connections.clear()
+        rebuildActivePatch()
+    }
+
+    open fun getPatch(layer: PatchLayer? = null): Patch {
+        val connections = if (layer == null) {
+            declaredPatch.connections.toList()
+        } else {
+            declaredPatch.connections.filter { it.layer == layer }
+        }
+        return PatchImpl(connections)
+    }
+
+    open fun getActivePatch(): Patch {
+        return PatchImpl(activePatch.connections.toList())
+    }
+
+    protected open fun rebuildActivePatch() {
+        val context = moduleContext as PatchModuleContext
+        context.resetPatch()
+        activePatch.connections.clear()
+
+        val userConnections = declaredPatch.connections.filter { it.layer == PatchLayer.User }
+        val nextConnections = declaredPatch.connections.filter { connection ->
+            when (connection.layer) {
+                PatchLayer.Internal -> true
+                PatchLayer.User -> true
+                PatchLayer.Normal -> when (connection.resolvedPolicy) {
+                    PatchPolicy.Replace -> userConnections.none { it.input == connection.input }
+                    PatchPolicy.Keep -> true
+                    PatchPolicy.Mix -> true
+                }
+            }
+        }
+
+        nextConnections.forEach { connection ->
+            context.addPatch(connection.output, connection.input)
+            activePatch.connections.add(connection)
+        }
+    }
 
     override fun applyContext(context: ModuleContext) {
         context as? PatchModuleContext ?: throw IllegalArgumentException("Context must be of type PatchModuleContext")
@@ -163,10 +288,10 @@ open class PatchModule(name: String, protected val moduleNamePrefix: String? = n
     }
 
     open fun applyPatchModuleContext(context: PatchModuleContext) {
-        clearPatches()
+        clearPatchStorage()
         applyContextForIO(context)
         applyChildrenSettings()
-        applyDefaultPatch()
+        applyPatch()
     }
 
     protected open fun applyContextForIO(context: PatchModuleContext) {

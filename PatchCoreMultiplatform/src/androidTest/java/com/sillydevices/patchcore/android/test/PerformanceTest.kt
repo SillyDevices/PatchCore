@@ -118,7 +118,7 @@ class PerformanceTest {
 
                 val output by expose(vca.output, "output")
 
-                override val defaultPatch: Patch = createPatch {
+                override val patch: Patch = createPatch {
                     patch(vco.output, passA1.input)
                     patch(passA1.output, passA2.input)
                     patch(passA2.output, passA3.input)
@@ -151,7 +151,7 @@ class PerformanceTest {
 
             val voice by module { PerformanceVoiceModule() }
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(voice.output, monoOutput)
             }
         }

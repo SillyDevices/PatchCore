@@ -65,15 +65,15 @@ class NestedPatchModuleWithPolyModuleTest {
                 val input by expose(vca.input, "nested_in")
                 val output by expose(vca.output, "nested_out")
 
-                override val defaultPatch = createPatch {
-                    constCv.output patchTo vca.cv
+                override val patch = createPatch {
+                    constCv.output internalTo vca.cv
                 }
             }
             val nested by module(NestedModule("nested"))
 
-            override val defaultPatch: Patch = createPatch {
-                source.output patchTo nested.input
-                nested.output patchTo monoOutput
+            override val patch: Patch = createPatch {
+                source.output internalTo nested.input
+                nested.output internalTo monoOutput
             }
         }
 
@@ -100,8 +100,8 @@ class NestedPatchModuleWithPolyModuleTest {
                 val input by expose(vca.input, "inner_nested_in")
                 val output by expose(vca.output, "inner_nested_out")
 
-                override val defaultPatch = createPatch {
-                    constCv.output patchTo vca.cv
+                override val patch = createPatch {
+                    constCv.output internalTo vca.cv
                 }
             }
 
@@ -114,16 +114,16 @@ class NestedPatchModuleWithPolyModuleTest {
                 val input by expose(vca.input, "nested_in")
                 val output by expose(vca.output, "nested_out")
 
-                override val defaultPatch = createPatch {
-                    constCv.output patchTo innerNested.input
-                    innerNested.output patchTo vca.cv
+                override val patch = createPatch {
+                    constCv.output internalTo innerNested.input
+                    innerNested.output internalTo vca.cv
                 }
             }
             val nested by module(NestedModule("nested"))
 
-            override val defaultPatch: Patch = createPatch {
-                source.output patchTo nested.input
-                nested.output patchTo monoOutput
+            override val patch: Patch = createPatch {
+                source.output internalTo nested.input
+                nested.output internalTo monoOutput
             }
         }
 

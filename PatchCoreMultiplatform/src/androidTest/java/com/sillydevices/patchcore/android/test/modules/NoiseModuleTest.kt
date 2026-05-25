@@ -23,7 +23,7 @@
 package com.sillydevices.patchcore.android.test.modules
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.sillydevices.patchcore.android.utils.TestPatchCore
+import com.sillydevices.patchcore.android.utils.createPatchCoreForTest
 import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.modules.NoiseModule
 import com.sillydevices.patchcore.synth.ModularSynth
@@ -34,11 +34,11 @@ import org.junit.runner.RunWith
 class NoiseModuleTest {
     @Test
     fun testNoise() {
-        val patchCore = TestPatchCore
+        val patchCore = createPatchCoreForTest()
 
         class TestSynth: ModularSynth() {
             val noise by module(NoiseModule("noise"))
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(noise.output, monoOutput)
                 patch(noise.pinkOutput, monoOutput)
             }

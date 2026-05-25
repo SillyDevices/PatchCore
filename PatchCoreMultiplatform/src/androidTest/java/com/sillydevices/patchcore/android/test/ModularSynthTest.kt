@@ -66,7 +66,7 @@ class ModularSynthTest {
     fun testModularSynthWithConstModule() {
         class TestSynth: ModularSynth() {
             val const by module(ConstModule("const", 0.5f))
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(const.output, monoOutput)
             }
         }
@@ -88,7 +88,7 @@ class ModularSynthTest {
             val biasIn by module(ConstModule("biasIn", 0.5f))
             val biasCv by module(ConstModule("biasCv", 1.0f))
             val vca by module(VcaModule("vca"))
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(biasIn.output, vca.input)
                 patch(biasCv.output, vca.cv)
                 patch(vca.output, monoOutput)
@@ -111,7 +111,7 @@ class ModularSynthTest {
         class UserInputTestSynth: ModularSynth() {
             val bias by module(ConstModule("bias", 1.0f))
             val modulation by module(AttenuverterModule("modulation"))
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, modulation.input)
                 patch(modulation.output, monoOutput)
             }
@@ -144,12 +144,12 @@ class ModularSynthTest {
                 val modulation by module(AttenuverterModule("mod"))
                 val output by expose(modulation.output, "output")
                 //val cv = createUserInput("cv", 0f..1f)
-                override val defaultPatch = createPatch {
+                override val patch = createPatch {
                     patch(bias.output, modulation.input)
                 }
             }
             val test by module(TestModule())
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(test.output, monoOutput)
             }
         }
@@ -179,7 +179,7 @@ class ModularSynthTest {
             val vca by module(VcaModule("vca"))
 
             val output by expose(vca.output, "output")
-            override val defaultPatch = createPatch {
+            override val patch = createPatch {
                 patch(biasIn.output, vca.input)
                 patch(biasCv.output, vca.cv)
             }
@@ -199,7 +199,7 @@ class ModularSynthTest {
 
             val cv by expose(inModule.cv)
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(outModule.output, inModule.input)
                 patch(inModule.output, monoOutput)
             }
