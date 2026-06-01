@@ -23,9 +23,15 @@
 package com.sillydevices.patchcore.modules.envelope
 
 import com.sillydevices.patchcore.module.FactoryModule
+import com.sillydevices.patchcore.module.factory.ModuleParameter
 import com.sillydevices.patchcore.module.factory.ModuleType
 
-class ADSREnvelopeModule(name: String): FactoryModule(name, ModuleType.ADSREnvelope) {
+class ADSREnvelopeModule(name: String, decayIsRelease: Boolean = false): FactoryModule(name, ModuleType.ADSREnvelope) {
+
+    override val parameters: List<ModuleParameter> = listOf(
+        ModuleParameter("decay_is_release", decayIsRelease)
+    )
+
     val gate = registerInput("gate")
     val sustain = registerInput("s")
 

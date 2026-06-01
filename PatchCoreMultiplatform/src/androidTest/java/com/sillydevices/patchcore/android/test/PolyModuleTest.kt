@@ -59,7 +59,7 @@ class PolyModuleTest {
 
             private val module by module(CustomModule())
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(module.output, monoOutput)
             }
         }
@@ -85,7 +85,7 @@ class PolyModuleTest {
         class TestSynth: ModularSynth() {
             val module by module(CustomModule())
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(module.output, monoOutput)
             }
         }
@@ -122,7 +122,7 @@ class PolyModuleTest {
             val module by module(CustomModule())
             val ctrl by expose(module.cv, "synthCtrl")
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, module.input)
                 patch(module.output, monoOutput)
             }

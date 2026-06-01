@@ -65,7 +65,7 @@ class ExposeIoTest : BaseTest() {
             val bias by module(ConstModule("bias", 1f))
             val module by module(ExposedPatchModule())
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, module.input)
                 patch(module.output, monoOutput)
             }
@@ -106,7 +106,7 @@ class ExposeIoTest : BaseTest() {
             val bias by module(ConstModule("bias", 1f))
             val module by module(ExposedPatchModule())
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, module.input)
                 patch(module.output, monoOutput)
             }
@@ -143,7 +143,7 @@ class ExposeIoTest : BaseTest() {
             val bias by module(ConstModule("bias", 1f))
             val module by module(ExposedPolyModule())
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, module.input)
                 patch(module.output, monoOutput)
             }
@@ -187,7 +187,7 @@ class ExposeIoTest : BaseTest() {
             val bias by module(ConstModule("bias", 1f))
             val module by module(ExposedPolyModule())
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, module.input)
                 patch(module.output, monoOutput)
             }
@@ -219,9 +219,9 @@ class ExposeIoTest : BaseTest() {
             val outputPass by module(com.sillydevices.patchcore.modules.PassModule("outputPass"))
 
             inner class NestedFlatModule(name: String) : FlatModule(name) {
-                override val defaultPatch: Patch = createPatch {
-                    inputPass.output patchTo modulation.input
-                    modulation.output patchTo outputPass.input
+                override val patch: Patch = createPatch {
+                    inputPass.output internalTo modulation.input
+                    modulation.output internalTo outputPass.input
                 }
             }
 
@@ -229,17 +229,13 @@ class ExposeIoTest : BaseTest() {
             val input by expose(inputPass.input, "polyIn")
             val output by expose(outputPass.output, "polyOut")
             val cv by expose(modulation.cv, "polyCv")
-
-            override val defaultPatch: Patch = createPatch {
-                import(nested.defaultPatch)
-            }
         }
 
         class TestSynth : ModularSynth() {
             val bias by module(ConstModule("bias", 1f))
             val module by module(ExposedPolyModule())
 
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, module.input)
                 patch(module.output, monoOutput)
             }

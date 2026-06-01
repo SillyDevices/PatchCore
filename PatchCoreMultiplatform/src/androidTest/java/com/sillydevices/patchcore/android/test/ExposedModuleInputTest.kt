@@ -60,7 +60,7 @@ class ExposedModuleInputTest {
             val innerModulation by module(InnerModule())
 
             val cv by expose(innerModulation.cv, "cv")
-            override val defaultPatch: Patch = createPatch {
+            override val patch: Patch = createPatch {
                 patch(bias.output, innerModulation.input)
                 patch(innerModulation.output, monoOutput)
             }

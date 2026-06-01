@@ -48,9 +48,9 @@ class FlatModuleTest: BaseTest() {
                 val const by module { ConstModule("bias", 1.0f) }
                 val vca by module { VcaModule("vca") }
                 val passModule by module { PassModule("test") }
-                override val defaultPatch = createPatch {
-                    const.output patchTo vca.cv
-                    vca.output patchTo passModule.input
+                override val patch = createPatch {
+                    const.output internalTo vca.cv
+                    vca.output internalTo passModule.input
                 }
 
             }
@@ -69,18 +69,17 @@ class FlatModuleTest: BaseTest() {
                 val testMux by expose(nested.vca.output)
                 val testDemux by exposeDemux(nested.vca.output)
 
-                override val defaultPatch = createPatch {
-                    passIn.output patchTo nested.vca.input
-                    nested.passModule.output patchTo passOut.input
-                    nested.passModule.output patchTo demuxPass.input
-                    import(nested.defaultPatch)
+                override val patch = createPatch {
+                    passIn.output internalTo nested.vca.input
+                    nested.passModule.output internalTo passOut.input
+                    nested.passModule.output internalTo demuxPass.input
                 }
             }
             val engine by module { Engine(auto) }
 
-            override val defaultPatch: Patch = createPatch {
-                source.output patchTo engine.input
-                engine.output patchTo monoOutput
+            override val patch: Patch = createPatch {
+                source.output internalTo engine.input
+                engine.output internalTo monoOutput
             }
 
         }

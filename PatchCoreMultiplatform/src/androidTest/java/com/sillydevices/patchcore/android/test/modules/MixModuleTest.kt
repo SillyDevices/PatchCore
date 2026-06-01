@@ -24,7 +24,7 @@ package com.sillydevices.patchcore.android.test.modules
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.sillydevices.patchcore.android.utils.SynthTester
-import com.sillydevices.patchcore.android.utils.TestPatchCore
+import com.sillydevices.patchcore.android.utils.createPatchCoreForTest
 import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.modules.ConstModule
 import com.sillydevices.patchcore.modules.MixLinearModule
@@ -40,7 +40,7 @@ class MixModuleTest {
         val biasPositive by module(ConstModule("pos", 1f))
         val biasNegative by module(ConstModule("neg", -1f))
         val mix by module(MixLinearModule("mix"))
-        override val defaultPatch: Patch = createPatch {
+        override val patch: Patch = createPatch {
             patch(biasPositive.output, mix.a)
             patch(biasNegative.output, mix.b)
             patch(mix.output, monoOutput)
@@ -49,7 +49,7 @@ class MixModuleTest {
 
     @Test
     fun testMixLeft() {
-        val patchCore = TestPatchCore
+        val patchCore = createPatchCoreForTest()
         val synth = patchCore.createSynth(TestSynth())
 
         synth.mix.userCv.setValue(-1f)
@@ -65,7 +65,7 @@ class MixModuleTest {
 
     @Test
     fun testMixRight() {
-        val patchCore = TestPatchCore
+        val patchCore = createPatchCoreForTest()
         val synth = patchCore.createSynth(TestSynth())
 
         synth.mix.userCv.setValue(1f)
@@ -81,7 +81,7 @@ class MixModuleTest {
 
     @Test
     fun testMixCenter() {
-        val patchCore = TestPatchCore
+        val patchCore = createPatchCoreForTest()
         val synth = patchCore.createSynth(TestSynth())
 
         synth.mix.userCv.setValue(0f)
