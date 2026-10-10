@@ -48,5 +48,5 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_IN_MEMORY_KEY }}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-        run: ./gradlew PatchCoreMultiplatform:publishAllPublicationsToMavenCentralRepository -PgitTag=${TAG_VERSION}
+        run: ./gradlew PatchCoreAndroidNative:publishAllPublicationsToMavenCentralRepository PatchCoreMultiplatform:publishAllPublicationsToMavenCentralRepository -PgitTag=${TAG_VERSION}
 

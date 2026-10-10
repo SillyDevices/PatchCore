@@ -1,17 +1,14 @@
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "com.sillydevices.patchcore.android.test"
-    compileSdk = 34
-    buildToolsVersion = "35.0.0"
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
-        ndkVersion = libs.versions.ndk.get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
@@ -30,10 +27,6 @@ android {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
     }
 
     compileOptions {

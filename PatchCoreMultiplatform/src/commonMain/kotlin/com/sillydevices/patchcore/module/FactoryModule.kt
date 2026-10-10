@@ -49,7 +49,7 @@ abstract class FactoryModule(name: String, val moduleType: ModuleType): Module(n
         return input
     }
 
-    override fun createFrom(parentContext: PatchModuleContext) {
+    public override fun createFrom(parentContext: PatchModuleContext) {
         val pointer = parentContext.createModule(this)
         val newContext = parentContext.getContextFactory().createModuleContext(pointer, parentContext)
         applyContext(newContext)

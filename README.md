@@ -119,8 +119,10 @@ Don’t forget to add a swift package dependency to your iOS project from https:
 
 ⚠️  ANDROID WARNING:
 
-patchcore-multiplatform-android is supplied as an AAR artifact with unstripped native libraries.
-Make sure to strip them in release builds to reduce the size of your app.
+`patchcore-multiplatform-android` depends transitively on the `android-jni` AAR,
+which contains the unstripped native libraries. Gradle consumers receive it automatically;
+when copying AARs manually, include this dependency too.
+Make sure to strip native libraries in release builds to reduce the size of your app.
 
 By default AGP strip native libraries only if you have ndk installed. Ensure you have it installed on your LOCAL and CI machines. 
 AGP just skips stripReleaseDebugSymbols if ndk is not found.
@@ -144,6 +146,7 @@ settings.gradle.kts
 includeBuild("PatchCore") {
     dependencySubstitution {
         substitute(module("com.sillydevices.patchcore:native-android")).using(project(":PatchCore"))
+        substitute(module("com.sillydevices.patchcore:android-jni")).using(project(":PatchCoreAndroidNative"))
         substitute(module("com.sillydevices.patchcore:patchcore-multiplatform")).using(project(":PatchCoreMultiplatform"))
         substitute(module("com.sillydevices.patchcore:patchcore-multiplatform-android")).using(project(":PatchCoreMultiplatform"))
     }
