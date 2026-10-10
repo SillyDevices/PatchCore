@@ -1,29 +1,29 @@
 [versions]
-artifacts-patchCore = "0.3.1"
-artifacts-patchCoreMultiplatform = "0.3.2"
+artifacts-patchCore = "0.4.0"
+artifacts-patchCoreMultiplatform = "0.4.0"
 
-kotlin = "2.2.20"
-jetbrainsKotlinJvm = "2.2.20"
-androidGradlePlugin = "8.13.0"
+kotlin = "2.4.20"
+jetbrainsKotlinJvm = "2.4.20"
+androidGradlePlugin = "9.4.1"
 #hack for AGP. Change ndk if linker error shows
 ndk = "27.2.12479018" # this version is included in github actions image
 #ndk = "27.0.12077973" # this version is included in github actions image
-coreKtx = "1.17.0"
+coreKtx = "1.19.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-appcompat = "1.7.1"
-material = "1.13.0"
-oboe = "1.9.3"
-publishVersion = "0.29.0"
+appcompat = "1.8.0"
+material = "1.14.0"
+oboe = "1.11.0"
+publishVersion = "0.36.0"
 lifecycleRuntimeKtx = "2.9.3"
 activityCompose = "1.10.1"
-composeBom = "2024.09.00"
+composeBom = "2026.09.00"
 
 [plugins]
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "publishVersion" }

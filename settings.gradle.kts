@@ -20,4 +20,5 @@ rootProject.name = "PatchCoreLib"
 include(":PatchCore")
 include(":PatchCoreTest")
 include(":PatchCoreMultiplatform")
+include(":PatchCoreAndroidNative")
 include(":PatchCoreAndroidDemo")

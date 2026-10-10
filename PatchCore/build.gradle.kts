@@ -1,8 +1,5 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.KotlinMultiplatform
-import com.vanniktech.maven.publish.SonatypeHost
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
@@ -13,11 +10,10 @@ android {
 
     namespace = "com.sillydevices.patchcore.andoid"
     compileSdk = 35
-    buildToolsVersion = "35.0.0"
+    enableKotlin = false
 
     defaultConfig {
         minSdk = 21
-        ndkVersion = libs.versions.ndk.get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles.add(File("consumer-rules.pro"))
         externalNativeBuild {
@@ -72,7 +68,7 @@ android {
 val artifactVersion = libs.versions.artifacts.patchCore.get()
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = false)
+    publishToMavenCentral(automaticRelease = false)
     signAllPublications()
 
     coordinates("com.sillydevices.patchcore", "native-android", artifactVersion)
@@ -105,15 +101,14 @@ mavenPublishing {
 
     configure(
         AndroidSingleVariantLibrary(
-            sourcesJar = true,
-            publishJavadocJar = false,
+            javadocJar = JavadocJar.None(),
         )
     )
 }
 
-task("getArtifactVersion") {
+tasks.register("getArtifactVersion") {
     doLast {
-        val publication = publishing.publications.getByName("release") as MavenPublication
+        val publication = publishing.publications.getByName("maven") as MavenPublication
         println(publication.version)
     }
 }

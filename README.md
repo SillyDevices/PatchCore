@@ -34,28 +34,28 @@ class SoundEngine {
 
             val output = createOutput(vcf.output)
 
-            override val defaultPatch = createPatch {
-                keyboard.cv patchTo vco.cv
-                vco.output patchTo vca.input
+            override val patch = createPatch {
+                keyboard.cv connect vco.cv
+                vco.output connect vca.input
 
-                keyboard.gate patchTo env.gate
-                env.output patchTo vcf.input
+                keyboard.gate connect env.gate
+                env.output connect vcf.input
 
-                lfo.output patchTo pitchLfoAmount.input
-                pitchLfoAmount.output patchTo vco.cv
+                lfo.output connect pitchLfoAmount.input
+                pitchLfoAmount.output connect vco.cv
 
-                lfo.output patchTo cutoffLfoAmount.input
-                cutoffLfoAmount.output patchTo vcf.cutoff
+                lfo.output connect cutoffLfoAmount.input
+                cutoffLfoAmount.output connect vcf.cutoff
 
-                env.output patchTo cutoffEnvAmount.input
-                cutoffEnvAmount.output patchTo vcf.cutoff
+                env.output connect cutoffEnvAmount.input
+                cutoffEnvAmount.output connect vcf.cutoff
             }
         }
 
         val voice by module( Voice("voice") )
 
-        override val defaultPatch = createPatch {
-            voice.output patchTo monoOutput
+        override val patch = createPatch {
+            voice.output connect monoOutput
         }
     }
 
@@ -102,13 +102,13 @@ Add the dependency to your build.gradle.kts
 ```kotlin
 // for kotlin multiplatform projects
 commonMain.dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.3.2")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.4.0")
 }
 // for android projects
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.3.2")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.4.0")
     // or
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.3.2")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform-android:0.4.0")
 }
 
 ```
@@ -119,8 +119,10 @@ Don’t forget to add a swift package dependency to your iOS project from https:
 
 ⚠️  ANDROID WARNING:
 
-patchcore-multiplatform-android is supplied as an AAR artifact with unstripped native libraries.
-Make sure to strip them in release builds to reduce the size of your app.
+`patchcore-multiplatform-android` depends transitively on the `android-jni` AAR,
+which contains the unstripped native libraries. Gradle consumers receive it automatically;
+when copying AARs manually, include this dependency too.
+Make sure to strip native libraries in release builds to reduce the size of your app.
 
 By default AGP strip native libraries only if you have ndk installed. Ensure you have it installed on your LOCAL and CI machines. 
 AGP just skips stripReleaseDebugSymbols if ndk is not found.
@@ -144,6 +146,7 @@ settings.gradle.kts
 includeBuild("PatchCore") {
     dependencySubstitution {
         substitute(module("com.sillydevices.patchcore:native-android")).using(project(":PatchCore"))
+        substitute(module("com.sillydevices.patchcore:android-jni")).using(project(":PatchCoreAndroidNative"))
         substitute(module("com.sillydevices.patchcore:patchcore-multiplatform")).using(project(":PatchCoreMultiplatform"))
         substitute(module("com.sillydevices.patchcore:patchcore-multiplatform-android")).using(project(":PatchCoreMultiplatform"))
     }
@@ -155,7 +158,7 @@ add dependency to app module build.gradle.kts
 ```kotlin
 //build.gradle.kts
 dependencies {
-    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.3.2")
+    implementation("com.sillydevices.patchcore:patchcore-multiplatform:0.4.0")
 }
 ```
 

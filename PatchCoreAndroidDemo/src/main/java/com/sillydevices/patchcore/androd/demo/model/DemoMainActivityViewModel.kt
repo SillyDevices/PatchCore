@@ -27,6 +27,7 @@ import com.sillydevices.patchcore.PatchCore
 import com.sillydevices.patchcore.androd.demo.ui.DemoVCOInteractorMock
 import com.sillydevices.patchcore.androd.demo.ui.DemoVcoInteractor
 import com.sillydevices.patchcore.audiointerface.AndroidAudioInterfaceOptions
+import com.sillydevices.patchcore.module.Patch
 import com.sillydevices.patchcore.modules.AttenuverterModule
 import com.sillydevices.patchcore.modules.envelope.ADSREnvelopeModule
 import com.sillydevices.patchcore.modules.envelope.FaderEnvelopeModule
@@ -87,23 +88,23 @@ class AudioEngine: CoroutineScope by CoroutineScope(Dispatchers.Default){
             cv.setValue(0.8f)
         }
 
-        override val defaultPatch = createPatch {
-            keyboard.cv patchTo vco.cv
-            vco.output patchTo vcf.input
+        override val patch = createPatch {
+            keyboard.cv connect vco.cv
+            vco.output connect vcf.input
             //bypass envelope
-            vcf.output patchTo bypassVca.input
-            bypassFader.output patchTo bypassVca.cv
-            bypassVca.output patchTo outputVca.input
+            vcf.output connect bypassVca.input
+            bypassFader.output connect bypassVca.cv
+            bypassVca.output connect outputVca.input
             // envelope
-            vcf.output patchTo vca.input
-            keyboard.gate patchTo adsr.gate
+            vcf.output connect vca.input
+            keyboard.gate connect adsr.gate
 
-            adsr.output patchTo vca.cv
-            vca.output patchTo outputVca.input
+            adsr.output connect vca.cv
+            vca.output connect outputVca.input
             // main fader and vca
-            fader.output patchTo outputVca.cv
-            outputVca.output patchTo volumeMod.input
-            volumeMod.output patchTo monoOutput
+            fader.output connect outputVca.cv
+            outputVca.output connect volumeMod.input
+            volumeMod.output connect monoOutput
         }
     }
 
